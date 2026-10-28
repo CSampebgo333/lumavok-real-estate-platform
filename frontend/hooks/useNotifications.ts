@@ -1,5 +1,5 @@
-import {getStoredLanguage} from "@/lib/locale";
 "use client";
+import { getStoredLanguage } from "@/lib/locale";
 import { useContentLocale as useLanguage } from "@/hooks/useContentLocale";
 
 import {
@@ -68,7 +68,11 @@ export function useMarkAllNotificationsRead() {
     onSuccess: ({ updatedCount }) => {
       invalidate();
       if (updatedCount > 0) {
-        toast.success(getStoredLanguage()==="fr" ? `${updatedCount} notification(s) marquée(s) comme lue(s).` : `${updatedCount} notification(s) marked as read.`);
+        toast.success(
+          getStoredLanguage() === "fr"
+            ? `${updatedCount} notification(s) marquée(s) comme lue(s).`
+            : `${updatedCount} notification(s) marked as read.`,
+        );
       }
     },
     onError: (error) => toast.error(getErrorMessage(error)),

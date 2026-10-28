@@ -1,7 +1,6 @@
 "use client";
 import { UiText } from "@/components/common/UiText";
 
-
 import { Globe } from "lucide-react";
 
 import {
@@ -51,7 +50,9 @@ export function LanguageToggle() {
             className={language === code ? "bg-accent" : ""}
           >
             <span className="mr-2 font-medium">{short}</span>
-            <span className="text-muted-foreground"><UiText text={label} /></span>
+            <span className="text-muted-foreground">
+              <UiText text={label} />
+            </span>
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>

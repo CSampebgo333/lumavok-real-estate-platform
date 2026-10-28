@@ -1,7 +1,6 @@
 "use client";
 import { UiText, useUi } from "@/components/common/UiText";
 
-
 import Link from "next/link";
 import {
   AlertTriangle,
@@ -108,7 +107,9 @@ export function ActionNeededList({
                   <p className="flex flex-wrap items-center gap-2 text-sm font-medium">
                     {item.title}
                     <StatusBadge
-                      label={item.severity === "high" ? ui("High") : ui("Medium")}
+                      label={
+                        item.severity === "high" ? ui("High") : ui("Medium")
+                      }
                       tone={item.severity === "high" ? "danger" : "warning"}
                     />
                   </p>
@@ -119,7 +120,9 @@ export function ActionNeededList({
                 <Link
                   href={item.href}
                   className={buttonVariants({ variant: "outline", size: "sm" })}
-                ><UiText text={"View"} />{" "}</Link>
+                >
+                  <UiText text={"View"} />{" "}
+                </Link>
               </li>
             );
           })}

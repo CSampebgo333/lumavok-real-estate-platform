@@ -1,4 +1,3 @@
-
 import { UiText } from "@/components/common/UiText";
 import type { LucideIcon } from "lucide-react";
 
@@ -69,7 +68,9 @@ export function StatCard({
             <AnimatedNumber value={value} format={format} />
           </span>
           {hint && (
-            <span className="text-muted-foreground text-xs"><UiText text={hint} /></span>
+            <span className="text-muted-foreground text-xs">
+              <UiText text={hint} />
+            </span>
           )}
         </div>
         <div className="flex flex-col items-end gap-2">
@@ -84,7 +85,10 @@ export function StatCard({
             />
           ) : (
             hasTrend && (
-              <span className="text-muted-foreground text-right text-[10px] text-nowrap"><UiText text={"Not enough"} />{" "}<br /><UiText text={"activity yet"} />{" "}</span>
+              <span className="text-muted-foreground text-right text-[10px] text-nowrap">
+                <UiText text={"Not enough"} /> <br />
+                <UiText text={"activity yet"} />{" "}
+              </span>
             )
           )}
         </div>

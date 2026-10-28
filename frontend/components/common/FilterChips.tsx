@@ -1,3 +1,4 @@
+import { useUi } from "@/components/common/UiText";
 
 import { UiText } from "@/components/common/UiText";
 import { X } from "lucide-react";
@@ -22,6 +23,7 @@ export function FilterChips<TKey extends string>({
   chips,
   onRemove,
 }: FilterChipsProps<TKey>) {
+  const ui = useUi();
   if (chips.length === 0) return null;
 
   return (
@@ -32,7 +34,9 @@ export function FilterChips<TKey extends string>({
           <button
             type="button"
             onClick={() => onRemove(chip.key)}
-            aria-label={`Remove ${chip.label} filter`}
+            aria-label={ui("Remove {{value0}} filter", {
+              value0: ui(chip.label),
+            })}
             className="hover:bg-muted rounded-full p-0.5"
           >
             <X className="size-3" aria-hidden />

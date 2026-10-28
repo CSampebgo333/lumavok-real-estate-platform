@@ -13,7 +13,10 @@
     "test": "node --test tests/*.test.cjs",
     "migrate:preflight": "node scripts/deploy-reviewed.cjs",
     "content:check": "node scripts/backfill-reviewed-content.cjs",
-    "content:apply": "node scripts/backfill-reviewed-content.cjs --apply"
+    "content:apply": "node scripts/backfill-reviewed-content.cjs --apply",
+    "test:native": "node --test tests/native-postgres.cjs",
+    "migrate:fresh:preflight": "node scripts/deploy-fresh.cjs",
+    "migrate:fresh": "node scripts/deploy-fresh.cjs --apply"
   },
   "devDependencies": {
     "@electric-sql/pglite": "0.3.14",

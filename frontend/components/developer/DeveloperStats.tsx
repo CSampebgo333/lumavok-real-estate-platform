@@ -1,4 +1,3 @@
-
 import { UiText } from "@/components/common/UiText";
 interface DeveloperStatsProps {
   activeListings: number;
@@ -30,7 +29,9 @@ export function DeveloperStats({
           className="border-border rounded-lg border p-4 text-center"
         >
           <p className="text-xl font-semibold">{stat.value}</p>
-          <p className="text-muted-foreground text-xs"><UiText text={stat.label} /></p>
+          <p className="text-muted-foreground text-xs">
+            <UiText text={stat.label} />
+          </p>
         </div>
       ))}
     </div>

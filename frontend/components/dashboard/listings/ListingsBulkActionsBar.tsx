@@ -1,7 +1,6 @@
 "use client";
 import { UiText, useUi } from "@/components/common/UiText";
 
-
 import { Button } from "@/components/ui/button";
 import type { PropertyStatus } from "@/types";
 
@@ -35,27 +34,37 @@ export function ListingsBulkActionsBar({
       aria-label={ui("Bulk actions")}
       className="border-border bg-muted/50 animate-in fade-in slide-in-from-top-1 flex flex-wrap items-center gap-3 rounded-lg border p-3 duration-200"
     >
-      <span className="text-sm font-medium">{selectedCount}{" "}<UiText text={"selected"} /></span>
+      <span className="text-sm font-medium">
+        {selectedCount} <UiText text={"selected"} />
+      </span>
       <div className="ml-auto flex flex-wrap gap-2">
         <Button
           variant="outline"
           size="sm"
           disabled={isPending}
           onClick={() => onBulkStatus("ACTIVE")}
-        ><UiText text={"Publish / Reopen"} />{" "}</Button>
+        >
+          <UiText text={"Publish / Reopen"} />{" "}
+        </Button>
         <Button
           variant="outline"
           size="sm"
           disabled={isPending}
           onClick={() => onBulkStatus("SUSPENDED")}
-        ><UiText text={"Suspend"} />{" "}</Button>
+        >
+          <UiText text={"Suspend"} />{" "}
+        </Button>
         <Button
           variant="destructive"
           size="sm"
           disabled={isPending}
           onClick={onBulkDeleteRequest}
-        ><UiText text={"Delete"} />{" "}</Button>
-        <Button variant="ghost" size="sm" onClick={onClearSelection}><UiText text={"Clear selection"} />{" "}</Button>
+        >
+          <UiText text={"Delete"} />{" "}
+        </Button>
+        <Button variant="ghost" size="sm" onClick={onClearSelection}>
+          <UiText text={"Clear selection"} />{" "}
+        </Button>
       </div>
     </div>
   );

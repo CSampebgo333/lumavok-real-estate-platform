@@ -1,7 +1,6 @@
 "use client";
 import { UiText, useUi } from "@/components/common/UiText";
 
-
 import { useContentLocale } from "@/hooks/useContentLocale";
 import { useFormContext, useWatch } from "react-hook-form";
 
@@ -45,10 +44,17 @@ export function ListingPricingSection() {
           })}
         />
       </FormField>
-      <FormField label={fr ? "Devise" : ui("Currency")} htmlFor="listing-currency">
+      <FormField
+        label={fr ? "Devise" : ui("Currency")}
+        htmlFor="listing-currency"
+      >
         <select id="listing-currency" {...register("currencyCode")}>
-          <option value="">{fr ? "À confirmer" : ui("Confirm currency")}</option>
-          <option value="XOF"><UiText text={"XOF / CFA"} /></option>
+          <option value="">
+            {fr ? "À confirmer" : ui("Confirm currency")}
+          </option>
+          <option value="XOF">
+            <UiText text={"XOF / CFA"} />
+          </option>
         </select>
       </FormField>
       {listingType === "RENT" && (

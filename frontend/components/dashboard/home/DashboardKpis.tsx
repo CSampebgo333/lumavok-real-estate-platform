@@ -1,7 +1,6 @@
 "use client";
 import { useUi } from "@/components/common/UiText";
 
-
 import { BadgeCheck, Building2, FileText, type LucideIcon } from "lucide-react";
 
 import { ErrorState } from "@/components/common/ErrorState";

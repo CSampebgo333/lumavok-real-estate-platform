@@ -1,7 +1,6 @@
 "use client";
 import { UiText, useUi } from "@/components/common/UiText";
 
-
 import { useAuthStore } from "@/store/authStore";
 import { Heart, Info } from "lucide-react";
 import Link from "next/link";
@@ -20,8 +19,19 @@ export function SavedPropertiesView() {
   const { properties, savedCount, isLoading, isError, error } =
     useSavedProperties();
 
-  const authenticated = useAuthStore(state => state.isAuthenticated);
-  if (!authenticated) return <EmptyState title={ui("Sign in to see saved properties")} description={ui("Your shortlist is securely saved to your account.")} action={<Link href="/login?redirect=%2Fsaved" className={buttonVariants()}><UiText text={"Sign in"} /></Link>} />;
+  const authenticated = useAuthStore((state) => state.isAuthenticated);
+  if (!authenticated)
+    return (
+      <EmptyState
+        title={ui("Sign in to see saved properties")}
+        description={ui("Your shortlist is securely saved to your account.")}
+        action={
+          <Link href="/login?redirect=%2Fsaved" className={buttonVariants()}>
+            <UiText text={"Sign in"} />
+          </Link>
+        }
+      />
+    );
 
   return (
     <div className="flex flex-1 flex-col">
@@ -50,20 +60,30 @@ export function SavedPropertiesView() {
         {savedCount > 0 && (
           <p className="text-muted-foreground border-border flex items-start gap-2 border-l-2 py-1 pl-3 text-sm">
             <Info className="mt-0.5 size-4 shrink-0" aria-hidden />
-            <span><UiText text={"Saved properties are synced to your account across devices."} />{" "}</span>
+            <span>
+              <UiText
+                text={
+                  "Saved properties are synced to your account across devices."
+                }
+              />{" "}
+            </span>
           </p>
         )}
 
         {!isLoading && !isError && savedCount === 0 ? (
           <EmptyState
             title={ui("Nothing saved yet")}
-            description={ui("Use the heart on any listing to keep it here while you compare.")}
+            description={ui(
+              "Use the heart on any listing to keep it here while you compare.",
+            )}
             action={
               <Link
                 href={ROUTES.PROPERTIES}
                 className={buttonVariants({ className: "mt-2 gap-2" })}
               >
-                <Heart className="size-4" aria-hidden /><UiText text={"Browse properties"} />{" "}</Link>
+                <Heart className="size-4" aria-hidden />
+                <UiText text={"Browse properties"} />{" "}
+              </Link>
             }
           />
         ) : (
@@ -73,7 +93,9 @@ export function SavedPropertiesView() {
             isError={isError}
             error={error}
             skeletonCount={Math.min(Math.max(savedCount, 1), 8)}
-            emptyDescription={ui("The properties you saved are no longer listed.")}
+            emptyDescription={ui(
+              "The properties you saved are no longer listed.",
+            )}
           />
         )}
       </div>

@@ -94,4 +94,11 @@ describe("Developer listing flow", () => {
   });
 });
 
-vi.mock("@/hooks/useLocations",()=>({useLocations:()=>({data:[{id:"c1",name:"Ouagadougou",districts:[]},{id:"c2",name:"Bobo-Dioulasso",districts:[]}]})}));
+vi.mock("@/hooks/useLocations", () => ({
+  useLocations: () => ({
+    data: [
+      { id: "c1", name: "Ouagadougou", districts: [] },
+      { id: "c2", name: "Bobo-Dioulasso", districts: [] },
+    ],
+  }),
+}));

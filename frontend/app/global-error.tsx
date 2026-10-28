@@ -1,7 +1,6 @@
 "use client";
 import { UiText } from "@/components/common/UiText";
 
-
 import { useEffect } from "react";
 
 import "./globals.css";
@@ -34,17 +33,29 @@ export default function GlobalError({
   return (
     <html lang="en">
       <body className="bg-background text-foreground flex min-h-screen flex-col items-center justify-center gap-4 p-8 text-center">
-        <title><UiText text={"Something went wrong — Lumavok"} /></title>
+        <title>
+          <UiText text={"Something went wrong — Lumavok"} />
+        </title>
         <div role="alert" className="flex flex-col items-center gap-2">
-          <h1 className="text-xl font-semibold tracking-tight"><UiText text={"Something went wrong."} />{" "}</h1>
-          <p className="text-muted-foreground max-w-sm text-sm"><UiText text={"Lumavok could not finish loading. You can try again, or return to the homepage."} />{" "}</p>
+          <h1 className="text-xl font-semibold tracking-tight">
+            <UiText text={"Something went wrong."} />{" "}
+          </h1>
+          <p className="text-muted-foreground max-w-sm text-sm">
+            <UiText
+              text={
+                "Lumavok could not finish loading. You can try again, or return to the homepage."
+              }
+            />{" "}
+          </p>
         </div>
         <div className="flex flex-wrap items-center justify-center gap-2">
           <button
             type="button"
             onClick={() => unstable_retry()}
             className="bg-primary text-primary-foreground focus-visible:ring-ring/50 h-9 rounded-lg px-4 text-sm font-medium outline-none focus-visible:ring-3"
-          ><UiText text={"Try again"} />{" "}</button>
+          >
+            <UiText text={"Try again"} />{" "}
+          </button>
           {/*
             eslint-disable-next-line @next/next/no-html-link-for-pages --
             A plain anchor is deliberate here, not an oversight. <Link> performs
@@ -56,11 +67,15 @@ export default function GlobalError({
           <a
             href="/"
             className="border-border focus-visible:ring-ring/50 h-9 rounded-lg border px-4 text-sm leading-9 font-medium outline-none focus-visible:ring-3"
-          ><UiText text={"Go to homepage"} />{" "}</a>
+          >
+            <UiText text={"Go to homepage"} />{" "}
+          </a>
         </div>
         {/* Opaque log-correlation id only — no stack, message or internals. */}
         {error.digest && (
-          <p className="text-muted-foreground text-xs"><UiText text={"Reference:"} />{" "}<span className="font-mono">{error.digest}</span>
+          <p className="text-muted-foreground text-xs">
+            <UiText text={"Reference:"} />{" "}
+            <span className="font-mono">{error.digest}</span>
           </p>
         )}
       </body>

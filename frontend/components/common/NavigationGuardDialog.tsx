@@ -1,7 +1,6 @@
 "use client";
 import { UiText } from "@/components/common/UiText";
 
-
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -35,12 +34,18 @@ export function NavigationGuardDialog({
     >
       <DialogContent>
         <DialogHeader>
-          <DialogTitle><UiText text={"Leave without saving?"} /></DialogTitle>
+          <DialogTitle>
+            <UiText text={"Leave without saving?"} />
+          </DialogTitle>
           <DialogDescription>{message}</DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <Button variant="outline" onClick={onCancel}><UiText text={"Stay"} />{" "}</Button>
-          <Button variant="destructive" onClick={onConfirm}><UiText text={"Leave"} />{" "}</Button>
+          <Button variant="outline" onClick={onCancel}>
+            <UiText text={"Stay"} />{" "}
+          </Button>
+          <Button variant="destructive" onClick={onConfirm}>
+            <UiText text={"Leave"} />{" "}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

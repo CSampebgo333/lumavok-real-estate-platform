@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  turbopack: { root: process.cwd() },
+  outputFileTracingRoot: process.cwd(),
   async rewrites() {
     const backend = process.env.BACKEND_API_URL ?? "http://localhost:4000";
     return [

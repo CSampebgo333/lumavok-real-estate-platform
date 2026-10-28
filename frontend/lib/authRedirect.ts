@@ -3,7 +3,11 @@ import type { User } from "@/types";
 
 /** Where a signed-in user lands: developers/admins go to the dashboard, everyone else home. */
 export function getPostLoginDestination(user: User): string {
-  return user.role === "ADMIN" ? ROUTES.ADMIN : user.role === "DEVELOPER" ? ROUTES.DASHBOARD : ROUTES.HOME;
+  return user.role === "ADMIN"
+    ? ROUTES.ADMIN
+    : user.role === "DEVELOPER"
+      ? ROUTES.DASHBOARD
+      : ROUTES.HOME;
 }
 
 /**

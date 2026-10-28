@@ -1,4 +1,3 @@
-
 import { UiText } from "@/components/common/UiText";
 import Link from "next/link";
 
@@ -13,7 +12,9 @@ export default function NotFound() {
         title="Page not found"
         description="The page you're looking for doesn't exist or may have been moved."
         action={
-          <Link href={ROUTES.HOME} className={buttonVariants()}><UiText text={"Back to home"} />{" "}</Link>
+          <Link href={ROUTES.HOME} className={buttonVariants()}>
+            <UiText text={"Back to home"} />{" "}
+          </Link>
         }
       />
     </div>

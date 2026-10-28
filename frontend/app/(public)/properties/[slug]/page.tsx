@@ -33,7 +33,10 @@ export default async function PropertyDetailPage({
 
   const property = await propertyService
     .getPropertyBySlug(slug)
-    .catch((error:unknown) => { if(error instanceof CatalogueError && error.status===404)notFound(); throw error; });
+    .catch((error: unknown) => {
+      if (error instanceof CatalogueError && error.status === 404) notFound();
+      throw error;
+    });
 
   const relatedProperties =
     await propertyService.getRelatedProperties(property);

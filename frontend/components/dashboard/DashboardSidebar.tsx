@@ -3,7 +3,6 @@ import { UiText } from "@/components/common/UiText";
 
 import { useUi } from "@/components/common/UiText";
 
-
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 

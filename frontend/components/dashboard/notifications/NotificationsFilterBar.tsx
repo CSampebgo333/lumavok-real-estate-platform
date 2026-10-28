@@ -1,7 +1,6 @@
 "use client";
 import { UiText } from "@/components/common/UiText";
 
-
 import {
   NOTIFICATION_CATEGORY_OPTIONS,
   NOTIFICATION_PAGE_SIZE_OPTIONS,
@@ -34,7 +33,9 @@ export function NotificationsFilterBar({
         <label
           htmlFor="notification-filter-status"
           className="text-muted-foreground text-xs"
-        ><UiText text={"Status"} />{" "}</label>
+        >
+          <UiText text={"Status"} />{" "}
+        </label>
         <select
           id="notification-filter-status"
           value={filters.status ?? ""}
@@ -46,7 +47,9 @@ export function NotificationsFilterBar({
           }
           className={SELECT_CLASSNAME}
         >
-          <option value=""><UiText text={"All"} /></option>
+          <option value="">
+            <UiText text={"All"} />
+          </option>
           {NOTIFICATION_STATUS_OPTIONS.map((option) => (
             <option key={option.value} value={option.value}>
               <UiText text={option.label} />
@@ -59,7 +62,9 @@ export function NotificationsFilterBar({
         <label
           htmlFor="notification-filter-category"
           className="text-muted-foreground text-xs"
-        ><UiText text={"Category"} />{" "}</label>
+        >
+          <UiText text={"Category"} />{" "}
+        </label>
         <select
           id="notification-filter-category"
           value={filters.category ?? ""}
@@ -71,7 +76,9 @@ export function NotificationsFilterBar({
           }
           className={SELECT_CLASSNAME}
         >
-          <option value=""><UiText text={"All categories"} /></option>
+          <option value="">
+            <UiText text={"All categories"} />
+          </option>
           {NOTIFICATION_CATEGORY_OPTIONS.map((option) => (
             <option key={option.value} value={option.value}>
               <UiText text={option.label} />
@@ -84,7 +91,9 @@ export function NotificationsFilterBar({
         <label
           htmlFor="notification-filter-sort"
           className="text-muted-foreground text-xs"
-        ><UiText text={"Sort by"} />{" "}</label>
+        >
+          <UiText text={"Sort by"} />{" "}
+        </label>
         <select
           id="notification-filter-sort"
           value={filters.sort ?? "date_desc"}
@@ -107,7 +116,9 @@ export function NotificationsFilterBar({
         <label
           htmlFor="notification-filter-page-size"
           className="text-muted-foreground text-xs"
-        ><UiText text={"Rows per page"} />{" "}</label>
+        >
+          <UiText text={"Rows per page"} />{" "}
+        </label>
         <select
           id="notification-filter-page-size"
           value={filters.pageSize ?? NOTIFICATION_PAGE_SIZE_OPTIONS[0]}

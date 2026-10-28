@@ -1,7 +1,6 @@
 "use client";
 import { UiText, useUi } from "@/components/common/UiText";
 
-
 import { Search } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -45,7 +44,9 @@ export function SearchBar({ variant = "solid" }: SearchBarProps) {
           : "border-border bg-background focus-within:ring-ring/50",
       )}
     >
-      <label htmlFor="search-query" className="sr-only"><UiText text={"Search by city, neighborhood, or property name"} />{" "}</label>
+      <label htmlFor="search-query" className="sr-only">
+        <UiText text={"Search by city, neighborhood, or property name"} />{" "}
+      </label>
       <input
         id="search-query"
         type="text"

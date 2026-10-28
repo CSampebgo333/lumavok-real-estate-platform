@@ -9,13 +9,27 @@ import { SavedPropertiesView } from "./SavedPropertiesView";
 
 import { useAuthStore } from "@/store/authStore";
 let saved: string[] = [];
-vi.mock("next/navigation", () => ({ useRouter: () => ({push: vi.fn()}) }));
-vi.mock("@/services/favorite.service", () => ({favoriteService:{getState:async()=>({ids:[...saved],countDeltas:{}}),toggleFavorite:async(id:string)=>{saved=saved.includes(id)?saved.filter(x=>x!==id):[...saved,id];return {ids:[...saved],countDeltas:{}}}}}));
+vi.mock("next/navigation", () => ({ useRouter: () => ({ push: vi.fn() }) }));
+vi.mock("@/services/favorite.service", () => ({
+  favoriteService: {
+    getState: async () => ({ ids: [...saved], countDeltas: {} }),
+    toggleFavorite: async (id: string) => {
+      saved = saved.includes(id)
+        ? saved.filter((x) => x !== id)
+        : [...saved, id];
+      return { ids: [...saved], countDeltas: {} };
+    },
+  },
+}));
 vi.mock("@/services/property.service", async () => {
-  const {MOCK_PROPERTIES} = await import("@/services/mocks/properties.mock");
-  return { propertyService: { getPropertiesByIds: async (ids:string[]) => MOCK_PROPERTIES.filter(p=>ids.includes(p.id)) } };
+  const { MOCK_PROPERTIES } = await import("@/services/mocks/properties.mock");
+  return {
+    propertyService: {
+      getPropertiesByIds: async (ids: string[]) =>
+        MOCK_PROPERTIES.filter((p) => ids.includes(p.id)),
+    },
+  };
 });
-
 
 function seedSaved(ids: string[]) {
   saved = ids;
@@ -24,7 +38,15 @@ function seedSaved(ids: string[]) {
 describe("SavedPropertiesView", () => {
   beforeEach(() => {
     saved = [];
-    useAuthStore.getState().setAuth({id:"buyer",email:"buyer@example.test",fullName:"Buyer",role:"USER"},"test");
+    useAuthStore.getState().setAuth(
+      {
+        id: "buyer",
+        email: "buyer@example.test",
+        fullName: "Buyer",
+        role: "USER",
+      },
+      "test",
+    );
   });
 
   it("shows an empty state with a route back to browsing when nothing is saved", async () => {
@@ -56,9 +78,7 @@ describe("SavedPropertiesView", () => {
     renderWithQueryClient(<SavedPropertiesView />);
 
     await waitFor(() =>
-      expect(
-        screen.getByText(/synced to your account/i),
-      ).toBeInTheDocument(),
+      expect(screen.getByText(/synced to your account/i)).toBeInTheDocument(),
     );
   });
 
@@ -93,9 +113,7 @@ describe("SavedPropertiesView", () => {
     await waitFor(() =>
       expect(screen.queryByText(first.title)).not.toBeInTheDocument(),
     );
-    expect(
-      saved,
-    ).toEqual([]);
+    expect(saved).toEqual([]);
   });
 
   it("drops a saved id whose property is no longer listed, without erroring", async () => {

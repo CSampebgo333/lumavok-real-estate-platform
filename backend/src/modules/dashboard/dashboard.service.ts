@@ -12,7 +12,7 @@ export async function getDashboard(developerId: string) {
   const locale = await localeConfig();
   const where = { propertyDeveloperId:developerId };
   const props = {...where, deletedAt:null};
-  const previews = (status: "CONFIRMED"|"REQUESTED"|"COMPLETED") => prisma.appointment.findMany({where:{...where,status},orderBy:[{scheduledFor:status==="COMPLETED"?"desc":"asc"},{id:"asc"}],take:5,include:appointmentInclude});
+  const previews = (status: "CONFIRMED"|"REQUESTED"|"COMPLETED") => prisma.appointment.findMany({where:{...where,...(status==="CONFIRMED"?{status:{in:["CONFIRMED","RESCHEDULED"]},scheduledFor:{gte:new Date()}}:{status})},orderBy:[{scheduledFor:status==="COMPLETED"?"desc":"asc"},{id:"asc"}],take:5,include:appointmentInclude});
   const [developer, counts, listings, upcoming, requested, completed, requestCount, overdue, notifications, unreadCount, history] = await Promise.all([
     prisma.propertyDeveloper.findUnique({where:{id:developerId},select:{businessName:true,user:{select:{fullName:true}}}}),
     prisma.property.groupBy({by:["status"],where:props,_count:true}),

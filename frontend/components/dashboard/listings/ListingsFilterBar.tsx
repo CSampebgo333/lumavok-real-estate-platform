@@ -1,7 +1,6 @@
 "use client";
 import { UiText, useUi } from "@/components/common/UiText";
 
-
 import { Button } from "@/components/ui/button";
 import { PROPERTY_CATEGORIES } from "@/constants/categories";
 import {
@@ -49,7 +48,9 @@ export function ListingsFilterBar({
         <label
           htmlFor="listing-filter-q"
           className="text-muted-foreground text-xs"
-        ><UiText text={"Search"} />{" "}</label>
+        >
+          <UiText text={"Search"} />{" "}
+        </label>
         <input
           id="listing-filter-q"
           name="q"
@@ -64,7 +65,9 @@ export function ListingsFilterBar({
         <label
           htmlFor="listing-filter-status"
           className="text-muted-foreground text-xs"
-        ><UiText text={"Status"} />{" "}</label>
+        >
+          <UiText text={"Status"} />{" "}
+        </label>
         <select
           id="listing-filter-status"
           value={filters.status ?? ""}
@@ -76,7 +79,9 @@ export function ListingsFilterBar({
           }
           className={SELECT_CLASSNAME}
         >
-          <option value=""><UiText text={"All statuses"} /></option>
+          <option value="">
+            <UiText text={"All statuses"} />
+          </option>
           {LISTING_STATUS_OPTIONS.map((option) => (
             <option key={option.value} value={option.value}>
               <UiText text={option.label} />
@@ -89,7 +94,9 @@ export function ListingsFilterBar({
         <label
           htmlFor="listing-filter-category"
           className="text-muted-foreground text-xs"
-        ><UiText text={"Category"} />{" "}</label>
+        >
+          <UiText text={"Category"} />{" "}
+        </label>
         <select
           id="listing-filter-category"
           value={filters.category ?? ""}
@@ -101,7 +108,9 @@ export function ListingsFilterBar({
           }
           className={SELECT_CLASSNAME}
         >
-          <option value=""><UiText text={"All categories"} /></option>
+          <option value="">
+            <UiText text={"All categories"} />
+          </option>
           {PROPERTY_CATEGORIES.map((category) => (
             <option key={category.value} value={category.value}>
               <UiText text={category.label} />
@@ -114,7 +123,9 @@ export function ListingsFilterBar({
         <label
           htmlFor="listing-filter-type"
           className="text-muted-foreground text-xs"
-        ><UiText text={"Listing type"} />{" "}</label>
+        >
+          <UiText text={"Listing type"} />{" "}
+        </label>
         <select
           id="listing-filter-type"
           value={filters.listingType ?? ""}
@@ -126,9 +137,15 @@ export function ListingsFilterBar({
           }
           className={SELECT_CLASSNAME}
         >
-          <option value=""><UiText text={"Sale & Rent"} /></option>
-          <option value="SALE"><UiText text={"For Sale"} /></option>
-          <option value="RENT"><UiText text={"For Rent"} /></option>
+          <option value="">
+            <UiText text={"Sale & Rent"} />
+          </option>
+          <option value="SALE">
+            <UiText text={"For Sale"} />
+          </option>
+          <option value="RENT">
+            <UiText text={"For Rent"} />
+          </option>
         </select>
       </div>
 
@@ -136,7 +153,9 @@ export function ListingsFilterBar({
         <label
           htmlFor="listing-filter-sort"
           className="text-muted-foreground text-xs"
-        ><UiText text={"Sort by"} />{" "}</label>
+        >
+          <UiText text={"Sort by"} />{" "}
+        </label>
         <select
           id="listing-filter-sort"
           value={filters.sort ?? "updated_desc"}
@@ -159,7 +178,9 @@ export function ListingsFilterBar({
         <label
           htmlFor="listing-filter-page-size"
           className="text-muted-foreground text-xs"
-        ><UiText text={"Rows per page"} />{" "}</label>
+        >
+          <UiText text={"Rows per page"} />{" "}
+        </label>
         <select
           id="listing-filter-page-size"
           value={filters.pageSize ?? LISTING_PAGE_SIZE_OPTIONS[0]}
@@ -176,7 +197,9 @@ export function ListingsFilterBar({
         </select>
       </div>
 
-      <Button type="submit" size="sm"><UiText text={"Apply"} />{" "}</Button>
+      <Button type="submit" size="sm">
+        <UiText text={"Apply"} />{" "}
+      </Button>
     </form>
   );
 }

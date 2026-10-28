@@ -1,7 +1,6 @@
 "use client";
 import { UiText, useUi } from "@/components/common/UiText";
 
-
 import Link from "next/link";
 import { CalendarCheck } from "lucide-react";
 
@@ -77,7 +76,9 @@ export function AppointmentOverview() {
           <Link
             href={ROUTES.APPOINTMENTS}
             className="text-primary text-sm font-medium hover:underline"
-          ><UiText text={"View all"} />{" "}</Link>
+          >
+            <UiText text={"View all"} />{" "}
+          </Link>
         ) : undefined
       }
     >
@@ -95,11 +96,17 @@ export function AppointmentOverview() {
       ) : (
         <Tabs defaultValue="upcoming" className="gap-4">
           <TabsList>
-            <TabsTrigger value="upcoming"><UiText text={"Upcoming ("} />{data.upcoming.length})
+            <TabsTrigger value="upcoming">
+              <UiText text={"Upcoming ("} />
+              {data.upcoming.length})
             </TabsTrigger>
-            <TabsTrigger value="requested"><UiText text={"Requested ("} />{data.requested.length})
+            <TabsTrigger value="requested">
+              <UiText text={"Requested ("} />
+              {data.requested.length})
             </TabsTrigger>
-            <TabsTrigger value="completed"><UiText text={"Completed ("} />{data.completed.length})
+            <TabsTrigger value="completed">
+              <UiText text={"Completed ("} />
+              {data.completed.length})
             </TabsTrigger>
           </TabsList>
           <TabsContent value="upcoming">

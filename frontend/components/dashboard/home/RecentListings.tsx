@@ -1,7 +1,6 @@
 "use client";
 import { UiText, useUi } from "@/components/common/UiText";
 
-
 import Image from "next/image";
 import Link from "next/link";
 import { Building2, MoreHorizontal } from "lucide-react";
@@ -42,7 +41,7 @@ function ListingActions({ property }: { property: Property }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
-        aria-label={`Actions for ${property.title}`}
+        aria-label={ui("Actions for {{value0}}", { value0: property.title })}
         className={buttonVariants({ variant: "ghost", size: "icon-sm" })}
       >
         <MoreHorizontal />
@@ -55,7 +54,9 @@ function ListingActions({ property }: { property: Property }) {
         {isPubliclyVisible(property.status) && (
           <DropdownMenuItem
             render={<Link href={ROUTES.PROPERTY_DETAIL(property.slug)} />}
-          ><UiText text={"View listing"} />{" "}</DropdownMenuItem>
+          >
+            <UiText text={"View listing"} />{" "}
+          </DropdownMenuItem>
         )}
         <DropdownMenuItem
           disabled={!canEdit}
@@ -79,7 +80,9 @@ export function RecentListings() {
     <Link
       href={ROUTES.LISTINGS}
       className={buttonVariants({ variant: "ghost", size: "sm" })}
-    ><UiText text={"View all"} />{" "}</Link>
+    >
+      <UiText text={"View all"} />{" "}
+    </Link>
   ) : undefined;
 
   return (
@@ -100,17 +103,27 @@ export function RecentListings() {
       ) : data.length === 0 ? (
         <EmptyState
           title={ui("No listings yet")}
-          description={ui("Your properties will appear here once you add your first listing.")}
+          description={ui(
+            "Your properties will appear here once you add your first listing.",
+          )}
         />
       ) : (
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="px-4"><UiText text={"Property"} /></TableHead>
-              <TableHead><UiText text={"Status"} /></TableHead>
-              <TableHead><UiText text={"Last updated"} /></TableHead>
+              <TableHead className="px-4">
+                <UiText text={"Property"} />
+              </TableHead>
+              <TableHead>
+                <UiText text={"Status"} />
+              </TableHead>
+              <TableHead>
+                <UiText text={"Last updated"} />
+              </TableHead>
               <TableHead className="px-4 text-right">
-                <span className="sr-only"><UiText text={"Actions"} /></span>
+                <span className="sr-only">
+                  <UiText text={"Actions"} />
+                </span>
               </TableHead>
             </TableRow>
           </TableHeader>
@@ -169,11 +182,19 @@ function RecentListingsSkeleton() {
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead className="px-4"><UiText text={"Property"} /></TableHead>
-          <TableHead><UiText text={"Status"} /></TableHead>
-          <TableHead><UiText text={"Last updated"} /></TableHead>
           <TableHead className="px-4">
-            <span className="sr-only"><UiText text={"Actions"} /></span>
+            <UiText text={"Property"} />
+          </TableHead>
+          <TableHead>
+            <UiText text={"Status"} />
+          </TableHead>
+          <TableHead>
+            <UiText text={"Last updated"} />
+          </TableHead>
+          <TableHead className="px-4">
+            <span className="sr-only">
+              <UiText text={"Actions"} />
+            </span>
           </TableHead>
         </TableRow>
       </TableHeader>

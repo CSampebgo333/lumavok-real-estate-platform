@@ -1,7 +1,6 @@
 "use client";
 import { UiText } from "@/components/common/UiText";
 
-
 import * as React from "react";
 import { Dialog as DialogPrimitive } from "@base-ui/react/dialog";
 
@@ -73,7 +72,9 @@ function DialogContent({
             }
           >
             <XIcon />
-            <span className="sr-only"><UiText text={"Close"} /></span>
+            <span className="sr-only">
+              <UiText text={"Close"} />
+            </span>
           </DialogPrimitive.Close>
         )}
       </DialogPrimitive.Popup>
@@ -110,7 +111,9 @@ function DialogFooter({
     >
       {children}
       {showCloseButton && (
-        <DialogPrimitive.Close render={<Button variant="outline" />}><UiText text={"Close"} />{" "}</DialogPrimitive.Close>
+        <DialogPrimitive.Close render={<Button variant="outline" />}>
+          <UiText text={"Close"} />{" "}
+        </DialogPrimitive.Close>
       )}
     </div>
   );

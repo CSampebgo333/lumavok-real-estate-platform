@@ -1,4 +1,4 @@
-import {useAuthStore} from "@/store/authStore";
+import { useAuthStore } from "@/store/authStore";
 import { vi } from "vitest";
 import { formatPrice } from "@/lib/formatters";
 import { screen } from "@testing-library/react";
@@ -118,7 +118,15 @@ describe("PropertyCard", () => {
 
   it("toggles the favorite (save) button independently of the card's link", async () => {
     const user = userEvent.setup();
-    useAuthStore.getState().setAuth({id:"buyer",email:"buyer@example.test",role:"USER",fullName:"Buyer"},"test");
+    useAuthStore.getState().setAuth(
+      {
+        id: "buyer",
+        email: "buyer@example.test",
+        role: "USER",
+        fullName: "Buyer",
+      },
+      "test",
+    );
     const property = makeProperty({ id: "fav-1", title: "Save Me House" });
 
     renderWithQueryClient(<PropertyCard property={property} />);
@@ -140,6 +148,17 @@ describe("PropertyCard", () => {
   });
 });
 
-vi.mock("next/navigation", () => ({useRouter:()=>({push:vi.fn()})}));
+vi.mock("next/navigation", () => ({ useRouter: () => ({ push: vi.fn() }) }));
 
-vi.mock("@/services/favorite.service",()=>{let ids:string[]=[];return {favoriteService:{getState:async()=>({ids:[...ids],countDeltas:{}}),toggleFavorite:async(id:string)=>{ids=ids.includes(id)?ids.filter(x=>x!==id):[...ids,id];return {ids:[...ids],countDeltas:{}}}}}});
+vi.mock("@/services/favorite.service", () => {
+  let ids: string[] = [];
+  return {
+    favoriteService: {
+      getState: async () => ({ ids: [...ids], countDeltas: {} }),
+      toggleFavorite: async (id: string) => {
+        ids = ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id];
+        return { ids: [...ids], countDeltas: {} };
+      },
+    },
+  };
+});

@@ -1,6 +1,7 @@
 "use client";
-import { UiText } from "@/components/common/UiText";
+import { useUi } from "@/components/common/UiText";
 
+import { UiText } from "@/components/common/UiText";
 
 import { Monitor, Moon, Sun } from "lucide-react";
 
@@ -31,6 +32,7 @@ const THEME_META: Record<Theme, { label: string; icon: typeof Sun }> = {
  * a sun icon alone would misreport.
  */
 export function ThemeToggle({ className }: { className?: string }) {
+  const ui = useUi();
   const { preferences, setPreference } = usePreferences();
 
   // Driven entirely by the store, so the hydration render uses the server
@@ -41,7 +43,9 @@ export function ThemeToggle({ className }: { className?: string }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
-        aria-label={`Appearance: ${THEME_META[preferences.theme].label}`}
+        aria-label={ui("Appearance: {{value0}}", {
+          value0: ui(THEME_META[preferences.theme].label),
+        })}
         className={cn(
           "text-muted-foreground hover:text-foreground hover:bg-muted focus-visible:ring-ring/50 inline-flex size-9 items-center justify-center rounded-md transition-colors outline-none focus-visible:ring-3",
           className,

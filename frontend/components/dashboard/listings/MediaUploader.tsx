@@ -1,7 +1,6 @@
 "use client";
 import { UiText, useUi } from "@/components/common/UiText";
 
-
 import { useEffect, useRef } from "react";
 import { useFieldArray, useFormContext, useWatch } from "react-hook-form";
 import { toast } from "sonner";
@@ -12,7 +11,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useUploadQueue } from "@/hooks/useUploadQueue";
 import type { ListingFormValues } from "@/lib/validation/listing";
-import { uploadService } from "@/services";
 
 const MAX_IMAGES = 10;
 const MAX_FILE_SIZE_MB = 10;
@@ -111,7 +109,8 @@ export function MediaUploader() {
 
   function handleRemove(index: number, publicId: string) {
     remove(index);
-    void uploadService.deleteUpload(publicId);
+    // Storage cleanup follows a separate reviewed retention process after save.
+    void publicId;
   }
 
   const sorted = fields
@@ -144,7 +143,10 @@ export function MediaUploader() {
   return (
     <DashboardSection
       title={ui("Photos")}
-      description={`Up to ${MAX_IMAGES} photos. The first photo is the cover image.`}
+      description={ui(
+        "Up to {{value0}} photos. The first photo is the cover image.",
+        { value0: MAX_IMAGES },
+      )}
     >
       <div className="flex flex-col gap-4">
         {errors.media?.message && (
@@ -163,12 +165,18 @@ export function MediaUploader() {
                 {/* eslint-disable-next-line @next/next/no-img-element -- mock upload URLs aren't real remote hosts next/image can optimize */}
                 <img
                   src={item.url}
-                  alt={position === 0 ? ui("Cover photo") : `Photo ${position + 1}`}
+                  alt={
+                    position === 0
+                      ? ui("Cover photo")
+                      : ui("Photo {{value0}}", { value0: position + 1 })
+                  }
                   className="h-full w-full object-cover"
                 />
               </div>
               {position === 0 && (
-                <Badge className="absolute top-1.5 left-1.5"><UiText text={"Cover"} /></Badge>
+                <Badge className="absolute top-1.5 left-1.5">
+                  <UiText text={"Cover"} />
+                </Badge>
               )}
               <div className="absolute right-1.5 bottom-1.5 flex gap-1">
                 <Button
@@ -222,13 +230,17 @@ export function MediaUploader() {
                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 bg-black/40 text-white">
                   {item.status === "FAILED" ? (
                     <>
-                      <span className="px-2 text-center text-xs"><UiText text={"Upload failed"} />{" "}</span>
+                      <span className="px-2 text-center text-xs">
+                        <UiText text={"Upload failed"} />{" "}
+                      </span>
                       <Button
                         type="button"
                         variant="secondary"
                         size="xs"
                         onClick={() => queue.retry(item.id)}
-                      ><UiText text={"Retry"} />{" "}</Button>
+                      >
+                        <UiText text={"Retry"} />{" "}
+                      </Button>
                     </>
                   ) : (
                     <Loader2
@@ -257,7 +269,9 @@ export function MediaUploader() {
               htmlFor="listing-media-input"
               className="border-border text-muted-foreground hover:border-primary/40 hover:text-foreground flex aspect-square cursor-pointer flex-col items-center justify-center gap-1 rounded-lg border border-dashed text-xs"
             >
-              <Upload className="size-5" aria-hidden /><UiText text={"Add photos"} />{" "}<input
+              <Upload className="size-5" aria-hidden />
+              <UiText text={"Add photos"} />{" "}
+              <input
                 ref={inputRef}
                 id="listing-media-input"
                 type="file"

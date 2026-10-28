@@ -50,7 +50,9 @@ export function DashboardSection({
               <UiText text={title} />
             </h2>
             {description && (
-              <p className="text-muted-foreground text-sm"><UiText text={description} /></p>
+              <p className="text-muted-foreground text-sm">
+                <UiText text={description} />
+              </p>
             )}
           </div>
         </div>

@@ -1,4 +1,3 @@
-
 import { UiText } from "@/components/common/UiText";
 import { BadgeCheck, Mail } from "lucide-react";
 import Link from "next/link";
@@ -42,12 +41,15 @@ export function DeveloperInfoCard({ developer }: DeveloperInfoCardProps) {
             </Link>
             {developer.isVerified && (
               <Badge variant="secondary">
-                <BadgeCheck className="size-3.5" aria-hidden /><UiText text={"Verified"} />{" "}</Badge>
+                <BadgeCheck className="size-3.5" aria-hidden />
+                <UiText text={"Verified"} />{" "}
+              </Badge>
             )}
           </div>
           {developer.rating !== undefined && (
             <p className="text-muted-foreground text-sm">
-              {developer.rating.toFixed(1)}{" "}<UiText text={"/ 5 rating"} />{" "}</p>
+              {developer.rating.toFixed(1)} <UiText text={"/ 5 rating"} />{" "}
+            </p>
           )}
         </div>
       </div>
@@ -72,7 +74,9 @@ export function DeveloperInfoCard({ developer }: DeveloperInfoCardProps) {
         })}
       >
         <Mail className="size-4" aria-hidden />
-        <span className="truncate"><UiText text={"Contact"} />{" "}{developer.name}</span>
+        <span className="truncate">
+          <UiText text={"Contact"} /> {developer.name}
+        </span>
       </Link>
     </div>
   );

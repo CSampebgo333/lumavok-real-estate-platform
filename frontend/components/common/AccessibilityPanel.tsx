@@ -1,7 +1,6 @@
 "use client";
 import { UiText, useUi } from "@/components/common/UiText";
 
-
 import { Accessibility, RotateCcw } from "lucide-react";
 import { useId } from "react";
 
@@ -149,8 +148,16 @@ export function AccessibilityPanel({ className }: { className?: string }) {
           full set of groups is taller than the screen. */}
       <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-md">
         <DialogHeader>
-          <DialogTitle><UiText text={"Accessibility"} /></DialogTitle>
-          <DialogDescription><UiText text={"These settings are saved in this browser and apply across Lumavok."} />{" "}</DialogDescription>
+          <DialogTitle>
+            <UiText text={"Accessibility"} />
+          </DialogTitle>
+          <DialogDescription>
+            <UiText
+              text={
+                "These settings are saved in this browser and apply across Lumavok."
+              }
+            />{" "}
+          </DialogDescription>
         </DialogHeader>
 
         <div className="flex flex-col gap-6 py-2">
@@ -206,7 +213,9 @@ export function AccessibilityPanel({ className }: { className?: string }) {
             onClick={reset}
             className="w-full gap-2"
           >
-            <RotateCcw className="size-4" aria-hidden /><UiText text={"Reset all settings"} />{" "}</Button>
+            <RotateCcw className="size-4" aria-hidden />
+            <UiText text={"Reset all settings"} />{" "}
+          </Button>
         </div>
       </DialogContent>
     </Dialog>

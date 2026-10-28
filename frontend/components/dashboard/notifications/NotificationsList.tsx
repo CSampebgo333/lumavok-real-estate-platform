@@ -1,7 +1,6 @@
 "use client";
 import { UiText, useUi } from "@/components/common/UiText";
 
-
 import Link from "next/link";
 
 import { EmptyState } from "@/components/common/EmptyState";
@@ -70,7 +69,9 @@ function NotificationCard({
                 className="bg-primary size-2 shrink-0 rounded-full"
                 aria-hidden
               />
-              <span className="sr-only"><UiText text={"Unread:"} />{" "}</span>
+              <span className="sr-only">
+                <UiText text={"Unread:"} />{" "}
+              </span>
             </>
           )}
           <span className="text-sm font-medium">{notification.title}</span>
@@ -93,7 +94,9 @@ function NotificationCard({
           <Link
             href={notification.link}
             className={buttonVariants({ variant: "outline", size: "sm" })}
-          ><UiText text={"View"} />{" "}</Link>
+          >
+            <UiText text={"View"} />{" "}
+          </Link>
         )}
         {isUnread && (
           <Button
@@ -101,7 +104,9 @@ function NotificationCard({
             size="sm"
             disabled={isPending}
             onClick={() => onMarkAsRead(notification.id)}
-          ><UiText text={"Mark as read"} />{" "}</Button>
+          >
+            <UiText text={"Mark as read"} />{" "}
+          </Button>
         )}
       </div>
     </MotionRevealItem>
@@ -111,7 +116,9 @@ function NotificationCard({
 function NotificationsListSkeleton() {
   return (
     <ul role="status" aria-live="polite" className="flex flex-col gap-2">
-      <span className="sr-only"><UiText text={"Loading notifications…"} /></span>
+      <span className="sr-only">
+        <UiText text={"Loading notifications…"} />
+      </span>
       {Array.from({ length: 6 }).map((_, index) => (
         <li key={index}>
           <Skeleton className="h-20 w-full" aria-hidden />
@@ -163,7 +170,9 @@ export function NotificationsList({
             type="button"
             onClick={onClearFilters}
             className="text-primary text-sm font-medium hover:underline"
-          ><UiText text={"Clear filters"} />{" "}</button>
+          >
+            <UiText text={"Clear filters"} />{" "}
+          </button>
         }
       />
     ) : (

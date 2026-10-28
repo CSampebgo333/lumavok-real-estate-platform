@@ -1,7 +1,6 @@
 "use client";
 import { UiText } from "@/components/common/UiText";
 
-
 import { Bath, Bed, Building2, MapPin, Ruler, TrendingUp } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -120,12 +119,14 @@ export function PropertyCard({
               {property.bedrooms !== undefined && (
                 <span className="flex items-center gap-1">
                   <Bed className="size-3.5" aria-hidden />
-                  {property.bedrooms}{" "}<UiText text={"bd"} />{" "}</span>
+                  {property.bedrooms} <UiText text={"bd"} />{" "}
+                </span>
               )}
               {property.bathrooms !== undefined && (
                 <span className="flex items-center gap-1">
                   <Bath className="size-3.5" aria-hidden />
-                  {property.bathrooms}{" "}<UiText text={"ba"} />{" "}</span>
+                  {property.bathrooms} <UiText text={"ba"} />{" "}
+                </span>
               )}
               {measurement && (
                 <span className="flex items-center gap-1">

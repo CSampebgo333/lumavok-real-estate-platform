@@ -1,3 +1,4 @@
+import { localizedMetadata } from "@/lib/localizedMetadata";
 import type { Metadata } from "next";
 
 import { DashboardPageContainer } from "@/components/dashboard/DashboardPageContainer";
@@ -9,10 +10,12 @@ import {
   type RawNotificationSearchParams,
 } from "@/lib/notificationFilters";
 
-export const metadata: Metadata = {
-  title: `Notifications | ${APP_NAME}`,
-  description: "Review your latest updates across appointments and listings.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return localizedMetadata({
+    title: `Notifications | ${APP_NAME}`,
+    description: "Review your latest updates across appointments and listings.",
+  });
+}
 
 interface NotificationsPageProps {
   searchParams: Promise<RawNotificationSearchParams>;

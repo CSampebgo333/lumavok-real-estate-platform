@@ -1,2 +1,4 @@
 import { SellerApprovals } from "@/components/account/AccountViews";
-export default function Page(){return <SellerApprovals/>}
+export default function Page() {
+  return <SellerApprovals />;
+}

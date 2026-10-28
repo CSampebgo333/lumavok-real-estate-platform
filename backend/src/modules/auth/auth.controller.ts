@@ -7,6 +7,7 @@ import type {
   ResetPasswordInput,
 } from "./auth.schema.js";
 import { sendSuccess } from "../../utils/response.js";
+import {ApiError} from "../../utils/errors.js";
 import { getEnv } from "../../config/env.js";
 import type { AuthenticatedRequest } from "../../types/index.js";
 
@@ -81,6 +82,7 @@ export async function refresh(
     setRefreshCookie(res, refreshToken, expiresAt);
     sendSuccess(res, session, 200, "Token refreshed");
   } catch (err) {
+    if(err instanceof ApiError&&err.statusCode===401)res.clearCookie(getEnv().AUTH_COOKIE_NAME,{path:"/",httpOnly:true,secure:getEnv().NODE_ENV==="production",sameSite:"strict"});
     next(err);
   }
 }

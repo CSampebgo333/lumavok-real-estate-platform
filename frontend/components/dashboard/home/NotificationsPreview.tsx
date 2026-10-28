@@ -1,7 +1,6 @@
 "use client";
 import { UiText, useUi } from "@/components/common/UiText";
 
-
 import Link from "next/link";
 import { Bell } from "lucide-react";
 
@@ -35,7 +34,9 @@ function NotificationRow({ notification }: { notification: Notification }) {
                 className="size-2 shrink-0 rounded-full bg-sky-500"
                 aria-hidden
               />
-              <span className="sr-only"><UiText text={"Unread:"} />{" "}</span>
+              <span className="sr-only">
+                <UiText text={"Unread:"} />{" "}
+              </span>
             </>
           )}
           {notification.title}
@@ -61,7 +62,9 @@ export function NotificationsPreview() {
     <Link
       href={ROUTES.NOTIFICATIONS}
       className={buttonVariants({ variant: "ghost", size: "sm" })}
-    ><UiText text={"View all"} />{" "}</Link>
+    >
+      <UiText text={"View all"} />{" "}
+    </Link>
   ) : undefined;
 
   return (

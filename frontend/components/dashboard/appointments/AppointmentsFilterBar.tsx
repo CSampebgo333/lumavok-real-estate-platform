@@ -1,7 +1,6 @@
 "use client";
 import { UiText, useUi } from "@/components/common/UiText";
 
-
 import { Button } from "@/components/ui/button";
 import {
   APPOINTMENT_PAGE_SIZE_OPTIONS,
@@ -47,7 +46,9 @@ export function AppointmentsFilterBar({
         <label
           htmlFor="appointment-filter-q"
           className="text-muted-foreground text-xs"
-        ><UiText text={"Search"} />{" "}</label>
+        >
+          <UiText text={"Search"} />{" "}
+        </label>
         <input
           id="appointment-filter-q"
           name="q"
@@ -62,7 +63,9 @@ export function AppointmentsFilterBar({
         <label
           htmlFor="appointment-filter-status"
           className="text-muted-foreground text-xs"
-        ><UiText text={"Status"} />{" "}</label>
+        >
+          <UiText text={"Status"} />{" "}
+        </label>
         <select
           id="appointment-filter-status"
           value={filters.status ?? ""}
@@ -74,7 +77,9 @@ export function AppointmentsFilterBar({
           }
           className={SELECT_CLASSNAME}
         >
-          <option value=""><UiText text={"All statuses"} /></option>
+          <option value="">
+            <UiText text={"All statuses"} />
+          </option>
           {APPOINTMENT_STATUS_OPTIONS.map((option) => (
             <option key={option.value} value={option.value}>
               <UiText text={option.label} />
@@ -87,7 +92,9 @@ export function AppointmentsFilterBar({
         <label
           htmlFor="appointment-filter-timeframe"
           className="text-muted-foreground text-xs"
-        ><UiText text={"When"} />{" "}</label>
+        >
+          <UiText text={"When"} />{" "}
+        </label>
         <select
           id="appointment-filter-timeframe"
           value={filters.timeframe ?? ""}
@@ -99,7 +106,9 @@ export function AppointmentsFilterBar({
           }
           className={SELECT_CLASSNAME}
         >
-          <option value=""><UiText text={"Any time"} /></option>
+          <option value="">
+            <UiText text={"Any time"} />
+          </option>
           {APPOINTMENT_TIMEFRAME_OPTIONS.map((option) => (
             <option key={option.value} value={option.value}>
               <UiText text={option.label} />
@@ -112,7 +121,9 @@ export function AppointmentsFilterBar({
         <label
           htmlFor="appointment-filter-sort"
           className="text-muted-foreground text-xs"
-        ><UiText text={"Sort by"} />{" "}</label>
+        >
+          <UiText text={"Sort by"} />{" "}
+        </label>
         <select
           id="appointment-filter-sort"
           value={filters.sort ?? "date_asc"}
@@ -135,7 +146,9 @@ export function AppointmentsFilterBar({
         <label
           htmlFor="appointment-filter-page-size"
           className="text-muted-foreground text-xs"
-        ><UiText text={"Rows per page"} />{" "}</label>
+        >
+          <UiText text={"Rows per page"} />{" "}
+        </label>
         <select
           id="appointment-filter-page-size"
           value={filters.pageSize ?? APPOINTMENT_PAGE_SIZE_OPTIONS[0]}
@@ -152,7 +165,9 @@ export function AppointmentsFilterBar({
         </select>
       </div>
 
-      <Button type="submit" size="sm"><UiText text={"Apply"} />{" "}</Button>
+      <Button type="submit" size="sm">
+        <UiText text={"Apply"} />{" "}
+      </Button>
     </form>
   );
 }

@@ -3,7 +3,6 @@ import { UiText } from "@/components/common/UiText";
 
 import { useUi } from "@/components/common/UiText";
 
-
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAppointmentStatusCounts } from "@/hooks/useAppointments";
 import { APPOINTMENT_STATUS_OPTIONS } from "@/lib/appointmentFilters";

@@ -89,6 +89,9 @@ describe("RouteError", () => {
     const error = new Error("boom");
     renderRouteError({ error });
 
-    expect(console.error).toHaveBeenCalledWith("Route failed",{name:"Error",digest:undefined});
+    expect(console.error).toHaveBeenCalledWith("Route failed", {
+      name: "Error",
+      digest: undefined,
+    });
   });
 });

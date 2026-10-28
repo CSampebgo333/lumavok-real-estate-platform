@@ -1,7 +1,6 @@
 "use client";
 import { UiText } from "@/components/common/UiText";
 
-
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/hooks/useAuth";
 import { useDashboardSummary } from "@/hooks/useDashboard";
@@ -48,10 +47,13 @@ export function DashboardWelcome() {
       </h1>
       <div className="text-muted-foreground text-sm">
         {summary ? (
-          <p><UiText text={"Here's what's happening at"} />{" "}
+          <p>
+            <UiText text={"Here's what's happening at"} />{" "}
             <span className="text-foreground font-medium">
               {summary.companyName}
-            </span>{" "}<UiText text={"today."} />{" "}</p>
+            </span>{" "}
+            <UiText text={"today."} />{" "}
+          </p>
         ) : (
           <Skeleton className="h-5 w-64" />
         )}

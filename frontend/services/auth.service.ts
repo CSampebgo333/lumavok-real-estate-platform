@@ -1,4 +1,5 @@
 import { mapSession } from "@/lib/authSession";
+import { refreshSession } from "@/lib/refreshSession";
 import { api } from "@/lib/api";
 import type { ApiResponse, User } from "@/types";
 
@@ -31,10 +32,7 @@ export interface ValidateResetTokenResult {
 /** Auth API calls. Encapsulates the request/response shape so callers never touch Axios directly. */
 export const authService = {
   /** Exchanges the HttpOnly refresh cookie for a new access token — see docs/ARCHITECTURE.md §6. */
-  refresh: () =>
-    api
-      .post<ApiResponse<AuthSession>>("/auth/refresh")
-      .then((response) => mapSession(response.data.data)),
+  refresh: refreshSession,
 
   login: ({ email, password }: LoginPayload): Promise<AuthSession> =>
     api

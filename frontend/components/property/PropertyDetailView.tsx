@@ -126,12 +126,14 @@ export function PropertyDetailView({
                 {property.bedrooms !== undefined && (
                   <span className="flex items-center gap-1.5">
                     <Bed className="size-4" aria-hidden />
-                    {property.bedrooms}{" "}<UiText text={"Bedrooms"} />{" "}</span>
+                    {property.bedrooms} <UiText text={"Bedrooms"} />{" "}
+                  </span>
                 )}
                 {property.bathrooms !== undefined && (
                   <span className="flex items-center gap-1.5">
                     <Bath className="size-4" aria-hidden />
-                    {property.bathrooms}{" "}<UiText text={"Bathrooms"} />{" "}</span>
+                    {property.bathrooms} <UiText text={"Bathrooms"} />{" "}
+                  </span>
                 )}
                 {measurement && (
                   <span className="flex items-center gap-1.5">
@@ -153,7 +155,9 @@ export function PropertyDetailView({
           </div>
 
           <div className="flex flex-col gap-3">
-            <h2 className="text-subsection-title"><UiText text={"Contact"} /></h2>
+            <h2 className="text-subsection-title">
+              <UiText text={"Contact"} />
+            </h2>
             <DeveloperInfoCard developer={property.developer} />
             <ViewingRequest propertyId={property.id} />
             {/* Rendered only when the flag is on. It previously fell back to a
@@ -168,7 +172,9 @@ export function PropertyDetailView({
 
         <div className="flex flex-col gap-8 lg:col-span-2 lg:row-start-2">
           <MotionReveal as="section" className="flex flex-col gap-2">
-            <h2 className="text-subsection-title"><UiText text={"Description"} /></h2>
+            <h2 className="text-subsection-title">
+              <UiText text={"Description"} />
+            </h2>
             <p className="text-muted-foreground text-sm leading-relaxed">
               {property.description}
             </p>
@@ -176,7 +182,9 @@ export function PropertyDetailView({
 
           {property.amenities.length > 0 && (
             <MotionReveal as="section" className="flex flex-col gap-2">
-              <h2 className="text-subsection-title"><UiText text={"Amenities"} /></h2>
+              <h2 className="text-subsection-title">
+                <UiText text={"Amenities"} />
+              </h2>
               <PropertyAmenities
                 amenities={property.amenities}
                 features={property.features}
@@ -185,7 +193,9 @@ export function PropertyDetailView({
           )}
 
           <MotionReveal as="section" className="flex flex-col gap-2">
-            <h2 className="text-subsection-title"><UiText text={"Location"} /></h2>
+            <h2 className="text-subsection-title">
+              <UiText text={"Location"} />
+            </h2>
             <PropertyLocation property={property} />
           </MotionReveal>
         </div>

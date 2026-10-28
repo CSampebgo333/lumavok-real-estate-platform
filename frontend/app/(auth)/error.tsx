@@ -1,7 +1,6 @@
 "use client";
 import { useUi } from "@/components/common/UiText";
 
-
 import { RouteError } from "@/components/common/RouteError";
 import { ROUTES } from "@/constants/routes";
 
@@ -27,7 +26,9 @@ export default function AuthError({
       retry={unstable_retry}
       homeHref={ROUTES.LOGIN}
       homeLabel="Back to log in"
-      description={ui("This page could not be loaded. You can try again, or return to log in.")}
+      description={ui(
+        "This page could not be loaded. You can try again, or return to log in.",
+      )}
     />
   );
 }

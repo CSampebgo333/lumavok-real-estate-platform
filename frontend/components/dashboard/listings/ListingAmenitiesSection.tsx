@@ -1,7 +1,6 @@
 "use client";
 import { UiText, useUi } from "@/components/common/UiText";
 
-
 import { X } from "lucide-react";
 import { useFormContext, useWatch } from "react-hook-form";
 
@@ -41,9 +40,13 @@ export function ListingAmenitiesSection() {
     return (
       <DashboardSection
         title={ui("Features & amenities")}
-        description={ui("Choose a category in Basics to see available features.")}
+        description={ui(
+          "Choose a category in Basics to see available features.",
+        )}
       >
-        <p className="text-muted-foreground text-sm"><UiText text={"No category selected yet."} />{" "}</p>
+        <p className="text-muted-foreground text-sm">
+          <UiText text={"No category selected yet."} />{" "}
+        </p>
       </DashboardSection>
     );
   }
@@ -59,14 +62,17 @@ export function ListingAmenitiesSection() {
     >
       <div className="flex flex-col gap-4">
         {selected.length > 0 && (
-          <div className="flex flex-wrap gap-2" aria-label={ui("Selected features")}>
+          <div
+            className="flex flex-wrap gap-2"
+            aria-label={ui("Selected features")}
+          >
             {selected.map((feature) => {
               const Icon = getFeatureIcon(feature.iconName);
               return (
                 <button
                   key={feature.id}
                   type="button"
-                  aria-label={`Remove ${feature.name}`}
+                  aria-label={ui("Remove {{value0}}", { value0: feature.name })}
                   onClick={() => toggle(feature.id)}
                   className="bg-primary/10 text-primary ring-primary/20 hover:bg-primary/15 inline-flex items-center gap-1.5 rounded-full py-1 pr-1.5 pl-2.5 text-xs font-medium ring-1 transition-colors"
                 >
@@ -80,7 +86,9 @@ export function ListingAmenitiesSection() {
         )}
 
         {isLoading ? (
-          <p className="text-muted-foreground text-sm"><UiText text={"Loading features…"} /></p>
+          <p className="text-muted-foreground text-sm">
+            <UiText text={"Loading features…"} />
+          </p>
         ) : (
           <div className="grid gap-2 sm:grid-cols-2">
             {(features ?? []).map((feature) => {

@@ -22,6 +22,7 @@ test(
       missing: "00000000-0000-4000-8000-000000000005",
     };
     const tokens = new Map<string, string>();
+    const storageObjects=new Map<string,Buffer>();let failStorageDelete=false;
     const jwt = (id: string) =>
       "test." +
       Buffer.from(JSON.stringify({ session_id: id })).toString("base64url") +
@@ -63,9 +64,16 @@ test(
     process.env.NODE_ENV = "test";
     process.env.SUPABASE_URL = "https://auth.example.test";
     process.env.SUPABASE_PUBLISHABLE_KEY = "sb_publishable_test";
+    process.env.SUPABASE_STORAGE_KEY="fixture_storage_only";
     process.env.AUTH_REDIRECT_URL = "http://localhost:3000/reset-password";
     const originalFetch = globalThis.fetch;
     globalThis.fetch = async (input: any, init: any) => {
+      const url=String(input),part=url.split("/storage/v1/")[1];
+      const json=(data:unknown,status=200)=>new Response(JSON.stringify(data),{status,headers:{"Content-Type":"application/json"}});
+      if(part?.startsWith("object/list/")){const body=JSON.parse(String(init.body)),prefix=body.prefix+"/";return json([...storageObjects.keys()].filter(k=>k.startsWith(prefix)).map(k=>({name:k.slice(prefix.length),id:k,metadata:{mimetype:"image/webp"}})))}
+      if(part?.startsWith("object/sign/property-media/"))return json({signedURL:"/object/sign/property-media/"+part.split("object/sign/property-media/")[1]+"?token=fixture"});
+      if(part?.startsWith("object/property-media/")&&init?.method==="POST"){const key=part.split("object/property-media/")[1];storageObjects.set(key,Buffer.from(init.body));return json({Key:"property-media/"+key})}
+      if(part==="object/property-media"&&init?.method==="DELETE"){if(failStorageDelete)return json({message:"Fixture storage unavailable",statusCode:"503"},503);for(const key of JSON.parse(String(init.body)).prefixes)storageObjects.delete(key);return json([])}
       const authorization =
         new Headers(init?.headers).get("authorization") ?? "";
       const id = tokens.get(authorization.replace(/^Bearer /, ""));
@@ -299,6 +307,19 @@ test(
       const analytics=await api.get("/api/v1/developers/me/analytics?period=7d&lang=fr").set(auth("one")).expect(200);assert.equal(analytics.body.data.funnel.period,"7d");assert.equal(analytics.body.data.funnel.totalRequested,26);assert.equal(analytics.body.data.stats[0].label,"Total des annonces");assert.ok(analytics.body.data.portfolio.byCategory.every((r:any)=>r.category===r.category.toLowerCase()));
       await api.post("/api/v1/favorites/p1").set(auth("two")).expect(200);const favorites=await api.get("/api/v1/favorites").set(auth("two")).expect(200);assert.deepEqual(favorites.body.data.ids,["p1"]);
       const otherFavorites=await api.get("/api/v1/favorites").set(auth("one")).expect(200);assert.deepEqual(otherFavorites.body.data.ids,[]);
+
+      const image=Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=","base64");
+      const uploaded=await api.post("/api/v1/uploads/file").set(auth("one")).attach("file",image,{filename:"image.png",contentType:"image/png"}).expect(201);
+      const upload=uploaded.body.data;
+      const patchMedia=async(media:any[])=>{const current=await api.get(`/api/v1/developers/me/listings/${listing.id}?lang=fr`).set(auth("one")).expect(200);return api.patch(`/api/v1/developers/me/listings/${listing.id}`).set(auth("one")).send({contentLanguage:"fr",rowVersion:current.body.data.rowVersion,media});};
+      const attached=await patchMedia([{...upload,order:0}]);assert.equal(attached.status,200);
+      await api.delete("/api/v1/uploads/"+upload.publicId).set(auth("two")).expect(400);
+      await api.delete("/api/v1/uploads/"+upload.publicId).set(auth("one")).expect(409);
+      assert.equal(storageObjects.size,1);
+      const detached=await patchMedia([]);assert.equal(detached.status,200);
+      failStorageDelete=true;await api.delete("/api/v1/uploads/"+upload.publicId).set(auth("one")).expect(503);
+      const forbiddenAttachment=await patchMedia([{...upload,order:0}]);assert.equal(forbiddenAttachment.status,400);
+      failStorageDelete=false;await api.delete("/api/v1/uploads/"+upload.publicId).set(auth("one")).expect(200);await api.delete("/api/v1/uploads/"+upload.publicId).set(auth("one")).expect(200);assert.equal(storageObjects.size,0);
       // Removed Auth sessions are denied even when the provider accepts the JWT.
       await prisma.$transaction(async (tx) => {
         await tx.$executeRaw`SET LOCAL ROLE postgres`;

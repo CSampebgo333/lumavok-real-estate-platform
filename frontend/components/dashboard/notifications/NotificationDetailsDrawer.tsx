@@ -1,7 +1,6 @@
 "use client";
 import { UiText } from "@/components/common/UiText";
 
-
 import Link from "next/link";
 
 import { NotificationCategoryBadge } from "@/components/dashboard/StatusBadge";
@@ -77,14 +76,18 @@ export function NotificationDetailsDrawer({
                 <Link
                   href={notification.link}
                   className={buttonVariants({ variant: "outline", size: "sm" })}
-                ><UiText text={"View details"} />{" "}</Link>
+                >
+                  <UiText text={"View details"} />{" "}
+                </Link>
               )}
               {notification.status === "UNREAD" && (
                 <Button
                   size="sm"
                   disabled={isPending}
                   onClick={() => onMarkAsRead(notification.id)}
-                ><UiText text={"Mark as read"} />{" "}</Button>
+                >
+                  <UiText text={"Mark as read"} />{" "}
+                </Button>
               )}
             </DrawerFooter>
           </>

@@ -1,4 +1,3 @@
-
 import { UiText } from "@/components/common/UiText";
 import {
   ArrowRight,
@@ -65,12 +64,12 @@ const RAIL =
 const RAIL_ITEM = "min-w-[78%] snap-start sm:min-w-0";
 
 export default async function Home() {
-  const [recent,popular,land]=await Promise.all([
-    propertyService.getProperties({pageSize:12}),
-    propertyService.getProperties({pageSize:6,sort:"popular"}),
-    propertyService.getProperties({pageSize:6,category:"land"}),
+  const [recent, popular, land] = await Promise.all([
+    propertyService.getProperties({ pageSize: 12 }),
+    propertyService.getProperties({ pageSize: 6, sort: "popular" }),
+    propertyService.getProperties({ pageSize: 6, category: "land" }),
   ]);
-  const catalogue=recent.items;
+  const catalogue = recent.items;
   // Sections claim their properties in order of how specific their claim is,
   // and a property is only ever claimed once. Trending goes first because
   // "what buyers are saving most" is a falsifiable statement about a specific
@@ -85,11 +84,11 @@ export default async function Home() {
     return picked;
   }
 
-  const trending = claim(sortByPopularity(popular.items).filter(p=>(p.favoriteCount??0)>0), 3);
-  const landOpportunities = claim(
-    land.items,
+  const trending = claim(
+    sortByPopularity(popular.items).filter((p) => (p.favoriteCount ?? 0) > 0),
     3,
   );
+  const landOpportunities = claim(land.items, 3);
   const latest = claim(catalogue, 6);
 
   // A section that can't fill its grid is hidden rather than padded. Three is
@@ -119,8 +118,16 @@ export default async function Home() {
           <MotionRevealItem
             as="h1"
             className="font-display max-w-2xl text-4xl leading-[1.1] font-semibold tracking-tight text-balance sm:text-5xl"
-          ><UiText text={"Find your next home across African markets."} />{" "}</MotionRevealItem>
-          <MotionRevealItem as="p" className="max-w-xl text-white/85"><UiText text={"Browse real listings from real developers — no account required."} />{" "}</MotionRevealItem>
+          >
+            <UiText text={"Find your next home across African markets."} />{" "}
+          </MotionRevealItem>
+          <MotionRevealItem as="p" className="max-w-xl text-white/85">
+            <UiText
+              text={
+                "Browse real listings from real developers — no account required."
+              }
+            />{" "}
+          </MotionRevealItem>
           <MotionRevealItem className="flex w-full max-w-xl justify-center">
             <SearchBar variant="glass" />
           </MotionRevealItem>
@@ -143,7 +150,9 @@ export default async function Home() {
                 buttonVariants({ size: "lg" }),
                 "gap-2 bg-white text-neutral-900 hover:bg-white/90 focus-visible:ring-white/50",
               )}
-            ><UiText text={"Browse properties"} />{" "}<ArrowRight className="size-4" aria-hidden />
+            >
+              <UiText text={"Browse properties"} />{" "}
+              <ArrowRight className="size-4" aria-hidden />
             </Link>
           </MotionRevealItem>
         </MotionReveal>
@@ -151,7 +160,9 @@ export default async function Home() {
 
       <section className="container-page page-section flex flex-col gap-6">
         {/* Translation point */}
-        <h2 className="text-section-title"><UiText text={"Explore by category"} /></h2>
+        <h2 className="text-section-title">
+          <UiText text={"Explore by category"} />
+        </h2>
         <MotionReveal
           stagger
           className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5"
@@ -202,11 +213,15 @@ export default async function Home() {
         >
           <div className="flex items-end justify-between gap-4">
             {/* Translation point */}
-            <h2 className="text-section-title"><UiText text={"Latest listings"} /></h2>
+            <h2 className="text-section-title">
+              <UiText text={"Latest listings"} />
+            </h2>
             <Link
               href={ROUTES.PROPERTIES}
               className="text-muted-foreground hover:text-foreground inline-flex shrink-0 items-center gap-1 text-sm transition-colors"
-            ><UiText text={"View all"} />{" "}<ArrowRight className="size-3.5" aria-hidden />
+            >
+              <UiText text={"View all"} />{" "}
+              <ArrowRight className="size-3.5" aria-hidden />
             </Link>
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -225,9 +240,15 @@ export default async function Home() {
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-2">
               <TrendingUp className="text-brand-gold size-5" aria-hidden />
-              <h2 className="text-section-title"><UiText text={"Trending now"} /></h2>
+              <h2 className="text-section-title">
+                <UiText text={"Trending now"} />
+              </h2>
             </div>
-            <p className="text-muted-foreground text-sm"><UiText text={"The properties buyers are saving the most."} />{" "}</p>
+            <p className="text-muted-foreground text-sm">
+              <UiText
+                text={"The properties buyers are saving the most."}
+              />{" "}
+            </p>
           </div>
           <div
             className={`${RAIL} sm:grid-cols-3`}
@@ -249,7 +270,9 @@ export default async function Home() {
           as="section"
           className="container-page page-section flex flex-col gap-6"
         >
-          <h2 className="text-section-title"><UiText text={"Land opportunities"} /></h2>
+          <h2 className="text-section-title">
+            <UiText text={"Land opportunities"} />
+          </h2>
           <div
             className={`${RAIL} sm:grid-cols-3`}
             tabIndex={0}
@@ -296,12 +319,22 @@ export default async function Home() {
         as="section"
         className="container-page page-section flex flex-col items-center gap-4 text-center"
       >
-        <h2 className="text-section-title"><UiText text={"Ready to find your next property?"} />{" "}</h2>
-        <p className="text-muted-foreground max-w-md"><UiText text={"Browse listings across Ghana's biggest markets — houses, apartments, land, and commercial space."} />{" "}</p>
+        <h2 className="text-section-title">
+          <UiText text={"Ready to find your next property?"} />{" "}
+        </h2>
+        <p className="text-muted-foreground max-w-md">
+          <UiText
+            text={
+              "Browse listings across Ghana's biggest markets — houses, apartments, land, and commercial space."
+            }
+          />{" "}
+        </p>
         <Link
           href={ROUTES.PROPERTIES}
           className={buttonVariants({ size: "lg" })}
-        ><UiText text={"Browse Properties"} />{" "}</Link>
+        >
+          <UiText text={"Browse Properties"} />{" "}
+        </Link>
       </MotionReveal>
     </div>
   );

@@ -1,7 +1,6 @@
 "use client";
 import { UiText, useUi } from "@/components/common/UiText";
 
-
 import Image from "next/image";
 import Link from "next/link";
 import { Building2, MoreHorizontal, Pencil } from "lucide-react";
@@ -117,7 +116,7 @@ function RowActions({
       {canEdit ? (
         <Link
           href={ROUTES.EDIT_LISTING(property.id)}
-          aria-label={`Edit ${property.title}`}
+          aria-label={ui("Edit {{value0}}", { value0: property.title })}
           title={ui("Edit listing")}
           aria-disabled={disabled}
           tabIndex={disabled ? -1 : undefined}
@@ -141,7 +140,7 @@ function RowActions({
           variant="ghost"
           size="icon-sm"
           disabled
-          aria-label={`Edit ${property.title}`}
+          aria-label={ui("Edit {{value0}}", { value0: property.title })}
           title={ui("Edit listing (soon)")}
         >
           <Pencil />
@@ -150,7 +149,9 @@ function RowActions({
       {hasMenuActions && (
         <DropdownMenu>
           <DropdownMenuTrigger
-            aria-label={`Actions for ${property.title}`}
+            aria-label={ui("Actions for {{value0}}", {
+              value0: property.title,
+            })}
             disabled={disabled}
             className={buttonVariants({ variant: "ghost", size: "icon-sm" })}
           >
@@ -160,7 +161,9 @@ function RowActions({
             {viewable && (
               <DropdownMenuItem
                 render={<Link href={ROUTES.PROPERTY_DETAIL(property.slug)} />}
-              ><UiText text={"View listing"} />{" "}</DropdownMenuItem>
+              >
+                <UiText text={"View listing"} />{" "}
+              </DropdownMenuItem>
             )}
             {viewable && transitions.length > 0 && <DropdownMenuSeparator />}
             {transitions.map((transition) => (
@@ -179,7 +182,9 @@ function RowActions({
                 <DropdownMenuItem
                   variant="destructive"
                   onClick={() => onDeleteRequest(property)}
-                ><UiText text={"Delete"} />{" "}</DropdownMenuItem>
+                >
+                  <UiText text={"Delete"} />{" "}
+                </DropdownMenuItem>
               </>
             )}
           </DropdownMenuContent>
@@ -224,7 +229,7 @@ function ListingCards({
           <Checkbox
             checked={selectedIds.has(property.id)}
             onChange={() => onToggleRow(property.id)}
-            aria-label={`Select ${property.title}`}
+            aria-label={ui("Select {{value0}}", { value0: property.title })}
             className="mt-1 shrink-0"
           />
 
@@ -263,10 +268,13 @@ function ListingCards({
                 )}
               </span>
               <span className="text-muted-foreground">
-                {property.listingType === "SALE" ? ui("For Sale") : ui("For Rent")}
+                {property.listingType === "SALE"
+                  ? ui("For Sale")
+                  : ui("For Rent")}
               </span>
             </span>
-            <span className="text-muted-foreground text-xs"><UiText text={"Updated"} />{" "}
+            <span className="text-muted-foreground text-xs">
+              <UiText text={"Updated"} />{" "}
               {property.updatedAt
                 ? formatRelativeTime(property.updatedAt)
                 : "—"}
@@ -337,7 +345,9 @@ export function ListingsTable({
             type="button"
             onClick={onClearFilters}
             className="text-primary text-sm font-medium hover:underline"
-          ><UiText text={"Clear filters"} />{" "}</button>
+          >
+            <UiText text={"Clear filters"} />{" "}
+          </button>
         }
       />
     ) : (
@@ -362,7 +372,9 @@ export function ListingsTable({
             checked={allSelected}
             indeterminate={someSelected && !allSelected}
             onChange={onToggleAll}
-          /><UiText text={"Select all listings on this page"} />{" "}</label>
+          />
+          <UiText text={"Select all listings on this page"} />{" "}
+        </label>
         <ListingCards
           listings={listings}
           selectedIds={selectedIds}
@@ -386,13 +398,25 @@ export function ListingsTable({
               onChange={onToggleAll}
             />
           </TableHead>
-          <TableHead><UiText text={"Property"} /></TableHead>
-          <TableHead><UiText text={"Type"} /></TableHead>
-          <TableHead><UiText text={"Price"} /></TableHead>
-          <TableHead><UiText text={"Status"} /></TableHead>
-          <TableHead><UiText text={"Last updated"} /></TableHead>
+          <TableHead>
+            <UiText text={"Property"} />
+          </TableHead>
+          <TableHead>
+            <UiText text={"Type"} />
+          </TableHead>
+          <TableHead>
+            <UiText text={"Price"} />
+          </TableHead>
+          <TableHead>
+            <UiText text={"Status"} />
+          </TableHead>
+          <TableHead>
+            <UiText text={"Last updated"} />
+          </TableHead>
           <TableHead className="px-4 text-right">
-            <span className="sr-only"><UiText text={"Actions"} /></span>
+            <span className="sr-only">
+              <UiText text={"Actions"} />
+            </span>
           </TableHead>
         </TableRow>
       </TableHeader>
@@ -400,13 +424,15 @@ export function ListingsTable({
         {listings.map((property) => (
           <TableRow
             key={property.id}
-            data-state={selectedIds.has(property.id) ? ui("selected") : undefined}
+            data-state={
+              selectedIds.has(property.id) ? ui("selected") : undefined
+            }
           >
             <TableCell className="px-4">
               <Checkbox
                 checked={selectedIds.has(property.id)}
                 onChange={() => onToggleRow(property.id)}
-                aria-label={`Select ${property.title}`}
+                aria-label={ui("Select {{value0}}", { value0: property.title })}
               />
             </TableCell>
             <TableCell>
@@ -437,7 +463,9 @@ export function ListingsTable({
               </div>
             </TableCell>
             <TableCell className="text-muted-foreground">
-              {property.listingType === "SALE" ? ui("For Sale") : ui("For Rent")}
+              {property.listingType === "SALE"
+                ? ui("For Sale")
+                : ui("For Rent")}
             </TableCell>
             <TableCell>
               {formatPrice(
@@ -475,21 +503,37 @@ function ListingsTableSkeleton() {
       <TableHeader>
         <TableRow>
           <TableHead className="w-10 px-4">
-            <span className="sr-only"><UiText text={"Select"} /></span>
+            <span className="sr-only">
+              <UiText text={"Select"} />
+            </span>
           </TableHead>
-          <TableHead><UiText text={"Property"} /></TableHead>
-          <TableHead><UiText text={"Type"} /></TableHead>
-          <TableHead><UiText text={"Price"} /></TableHead>
-          <TableHead><UiText text={"Status"} /></TableHead>
-          <TableHead><UiText text={"Last updated"} /></TableHead>
+          <TableHead>
+            <UiText text={"Property"} />
+          </TableHead>
+          <TableHead>
+            <UiText text={"Type"} />
+          </TableHead>
+          <TableHead>
+            <UiText text={"Price"} />
+          </TableHead>
+          <TableHead>
+            <UiText text={"Status"} />
+          </TableHead>
+          <TableHead>
+            <UiText text={"Last updated"} />
+          </TableHead>
           <TableHead className="px-4">
-            <span className="sr-only"><UiText text={"Actions"} /></span>
+            <span className="sr-only">
+              <UiText text={"Actions"} />
+            </span>
           </TableHead>
         </TableRow>
       </TableHeader>
       <TableBody role="status" aria-live="polite">
         <TableRow className="hover:bg-transparent">
-          <TableCell colSpan={COLUMN_COUNT} className="sr-only"><UiText text={"Loading properties…"} />{" "}</TableCell>
+          <TableCell colSpan={COLUMN_COUNT} className="sr-only">
+            <UiText text={"Loading properties…"} />{" "}
+          </TableCell>
         </TableRow>
         {Array.from({ length: 6 }).map((_, index) => (
           <TableRow key={index} aria-hidden className="hover:bg-transparent">

@@ -1,5 +1,7 @@
 "use client";
 
+import { isAxiosError } from "axios";
+import { getErrorMessage } from "@/lib/errors";
 import { useEffect } from "react";
 
 import { authService } from "@/services";
@@ -14,6 +16,7 @@ import { useAuthStore } from "@/store/authStore";
  */
 export function useAuthBootstrap() {
   const setAuth = useAuthStore((state) => state.setAuth);
+  const setBootstrapError = useAuthStore((state) => state.setBootstrapError);
   const setBootstrapped = useAuthStore((state) => state.setBootstrapped);
 
   useEffect(() => {
@@ -24,8 +27,16 @@ export function useAuthBootstrap() {
       .then((session) => {
         if (!cancelled) setAuth(session.user, session.accessToken);
       })
-      .catch(() => {
-        // No valid refresh cookie — expected for anonymous visitors, not an error to surface.
+      .catch((error: unknown) => {
+        if (cancelled) return;
+        // An absent/ended session is normal for anonymous visitors; a provider
+        // outage keeps the protected view blocked with a retryable explanation.
+        if (
+          isAxiosError(error) &&
+          [400, 401].includes(error.response?.status ?? 0)
+        )
+          setBootstrapError(null);
+        else setBootstrapError(getErrorMessage(error));
       })
       .finally(() => {
         if (!cancelled) setBootstrapped();
@@ -34,5 +45,5 @@ export function useAuthBootstrap() {
     return () => {
       cancelled = true;
     };
-  }, [setAuth, setBootstrapped]);
+  }, [setAuth, setBootstrapped, setBootstrapError]);
 }

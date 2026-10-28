@@ -1,7 +1,6 @@
 "use client";
 import { UiText } from "@/components/common/UiText";
 
-
 import { ANALYTICS_PERIOD_OPTIONS } from "@/lib/analyticsFilters";
 import type { AnalyticsPeriod } from "@/types";
 
@@ -20,7 +19,9 @@ export function AnalyticsPeriodSelector({
       <label
         htmlFor="analytics-period"
         className="text-muted-foreground text-xs"
-      ><UiText text={"Period"} />{" "}</label>
+      >
+        <UiText text={"Period"} />{" "}
+      </label>
       <select
         id="analytics-period"
         value={period}

@@ -84,5 +84,12 @@ describe("ListingAmenitiesSection", () => {
 // UI fixtures exercise selection by canonical ID; the API contract has its own tests.
 vi.mock("@/services/feature.service", async () => {
   const { MOCK_FEATURES } = await import("@/services/mocks/features.mock");
-  return { featureService: { getFeatures: async (category?: string) => MOCK_FEATURES.filter(f => !category || f.propertyCategories.some(c => c === category)) } };
+  return {
+    featureService: {
+      getFeatures: async (category?: string) =>
+        MOCK_FEATURES.filter(
+          (f) => !category || f.propertyCategories.some((c) => c === category),
+        ),
+    },
+  };
 });

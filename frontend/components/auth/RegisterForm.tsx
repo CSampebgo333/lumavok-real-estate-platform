@@ -1,7 +1,6 @@
 "use client";
 import { UiText, useUi } from "@/components/common/UiText";
 
-
 import { useContentLocale } from "@/hooks/useContentLocale";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -143,7 +142,11 @@ export function RegisterForm() {
             }
             {...register("acceptTerms")}
           />
-          <span><UiText text={"I agree to the Terms of Service and Privacy Policy."} /></span>
+          <span>
+            <UiText
+              text={"I agree to the Terms of Service and Privacy Policy."}
+            />
+          </span>
         </label>
         {errors.acceptTerms?.message && (
           <p

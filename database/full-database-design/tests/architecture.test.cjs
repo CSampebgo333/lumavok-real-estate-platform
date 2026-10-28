@@ -6,7 +6,7 @@ const { PGlite } = require("@electric-sql/pglite");
 const root = path.resolve(__dirname, "..");
 const migrations = fs
   .readdirSync(path.join(root, "migrations"))
-  .filter((n) => /^20261026/.test(n))
+  .filter((n) => /^202610/.test(n))
   .sort();
 const { setup } = require("./helpers.cjs");
 async function actor(db, user = "", developer = "", role = "", auth = "") {
@@ -171,3 +171,20 @@ for (const observed of [false, true])
       await db.close();
     }
   });
+
+test("managed media: ownership, upload states, attachment/deletion exclusion and storage-key isolation", async () => {
+ const db=await setup(false),asset="11111111-1111-4111-8111-111111111111";
+ try {
+  await actor(db,"u1","dev1","PROPERTY_DEVELOPER");
+  await db.query("INSERT INTO public.storage_asset(id,property_developer_id,storage_key)VALUES($1,'dev1',$2)",[asset,'dev1/'+asset+'.webp']);
+  const attach=()=>db.query("INSERT INTO public.property_media(id,property_id,url,public_id,\"order\",is_primary,storage_provider,storage_key,asset_id)VALUES('managed','p1','storage://property-media/test',$1::text,1,false,'supabase',$2,($1::text)::uuid)",[asset,'dev1/'+asset+'.webp']);
+  await assert.rejects(attach); // UPLOADING is not attachable.
+  await db.query("UPDATE public.storage_asset SET state='AVAILABLE' WHERE id=$1",[asset]);await attach();
+  await assert.rejects(()=>db.query("UPDATE public.storage_asset SET state='DELETING' WHERE id=$1",[asset])); // FK checks every reference.
+  await actor(db,"u2","dev2","PROPERTY_DEVELOPER");assert.equal((await rows(db,"SELECT id FROM public.storage_asset")).length,0);
+  await actor(db,"u1","dev1","PROPERTY_DEVELOPER");await db.exec("DELETE FROM public.property_media WHERE id='managed'");
+  await db.query("UPDATE public.storage_asset SET state='DELETING' WHERE id=$1",[asset]);await assert.rejects(attach);
+  await db.query("UPDATE public.storage_asset SET state='DELETED' WHERE id=$1",[asset]);await assert.rejects(()=>db.query("UPDATE public.storage_asset SET state='AVAILABLE' WHERE id=$1",[asset]));
+  await db.exec("RESET ROLE;SET ROLE service_role");await assert.rejects(()=>db.exec("SELECT * FROM public.property"));
+ } finally { await db.close(); }
+});

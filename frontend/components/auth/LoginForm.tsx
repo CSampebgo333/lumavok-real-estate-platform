@@ -1,7 +1,6 @@
 "use client";
 import { UiText, useUi } from "@/components/common/UiText";
 
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -103,7 +102,9 @@ export function LoginForm({ redirectTo }: LoginFormProps) {
         <Link
           href={ROUTES.FORGOT_PASSWORD}
           className="text-primary text-sm hover:underline"
-        ><UiText text={"Forgot password?"} />{" "}</Link>
+        >
+          <UiText text={"Forgot password?"} />{" "}
+        </Link>
       </div>
 
       {formError && (

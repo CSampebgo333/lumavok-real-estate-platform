@@ -1,4 +1,4 @@
-
+import { localizedMetadata } from "@/lib/localizedMetadata";
 import { UiText } from "@/components/common/UiText";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -8,10 +8,12 @@ import { ForgotPasswordForm } from "@/components/auth/ForgotPasswordForm";
 import { APP_NAME } from "@/constants/config";
 import { ROUTES } from "@/constants/routes";
 
-export const metadata: Metadata = {
-  title: `Forgot password | ${APP_NAME}`,
-  description: `Reset your ${APP_NAME} account password.`,
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return localizedMetadata({
+    title: `Forgot password | ${APP_NAME}`,
+    description: `Reset your ${APP_NAME} account password.`,
+  });
+}
 
 export default function ForgotPasswordPage() {
   return (
@@ -22,7 +24,9 @@ export default function ForgotPasswordPage() {
         <Link
           href={ROUTES.LOGIN}
           className="font-medium text-white underline underline-offset-2 hover:text-white/80"
-        ><UiText text={"Back to sign in"} />{" "}</Link>
+        >
+          <UiText text={"Back to sign in"} />{" "}
+        </Link>
       }
     >
       <ForgotPasswordForm />

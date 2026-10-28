@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 import type { PropertyStatus } from "@/types";
-import { canDeleteListing, getAvailableTransitions, isPubliclyVisible, PUBLICLY_VISIBLE_STATUSES } from "./listing.service";
+import {
+  canDeleteListing,
+  getAvailableTransitions,
+  isPubliclyVisible,
+  PUBLICLY_VISIBLE_STATUSES,
+} from "./listing.service";
 
 describe("status transitions", () => {
   it("DRAFT can only publish", () => {

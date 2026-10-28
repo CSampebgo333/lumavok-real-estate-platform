@@ -1,7 +1,6 @@
 "use client";
 import { UiText } from "@/components/common/UiText";
 
-
 import { Button } from "@/components/ui/button";
 import { useLocations } from "@/hooks/useLocations";
 import type { DeveloperSort, GetDevelopersParams } from "@/services";
@@ -23,7 +22,7 @@ export function DeveloperFilterPanel({
   filters,
   onApply,
 }: DeveloperFilterPanelProps) {
-  const {data:cities=[]}=useLocations();
+  const { data: cities = [] } = useLocations();
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);

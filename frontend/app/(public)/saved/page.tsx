@@ -1,12 +1,15 @@
+import { localizedMetadata } from "@/lib/localizedMetadata";
 import type { Metadata } from "next";
 
 import { SavedPropertiesView } from "@/components/property/SavedPropertiesView";
 import { APP_NAME } from "@/constants/config";
 
-export const metadata: Metadata = {
-  title: `Saved Properties | ${APP_NAME}`,
-  description: "The property listings you've saved.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return localizedMetadata({
+    title: `Saved Properties | ${APP_NAME}`,
+    description: "The property listings you've saved.",
+  });
+}
 
 /**
  * No `searchParams`, unlike /properties and /search: this list isn't filtered or

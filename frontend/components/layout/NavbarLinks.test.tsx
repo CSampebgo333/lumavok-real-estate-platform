@@ -2,7 +2,9 @@ import { render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import i18n from "@/lib/i18n";
-beforeEach(async () => { await i18n.changeLanguage("fr"); });
+beforeEach(async () => {
+  await i18n.changeLanguage("fr");
+});
 
 import { NavbarLinks } from "./NavbarLinks";
 

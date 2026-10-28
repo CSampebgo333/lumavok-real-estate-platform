@@ -1,7 +1,6 @@
 "use client";
 import { UiText, useUi } from "@/components/common/UiText";
 
-
 import { Button } from "@/components/ui/button";
 import { AppointmentActionPolicy } from "@/lib/appointmentActionPolicy";
 import type { AppointmentStatus } from "@/types";
@@ -45,7 +44,9 @@ export function AppointmentsBulkActionsBar({
       aria-label={ui("Bulk actions")}
       className="border-border bg-muted/50 animate-in fade-in slide-in-from-top-1 flex flex-wrap items-center gap-3 rounded-lg border p-3 duration-200"
     >
-      <span className="text-sm font-medium">{selectedCount}{" "}<UiText text={"selected"} /></span>
+      <span className="text-sm font-medium">
+        {selectedCount} <UiText text={"selected"} />
+      </span>
       <div className="ml-auto flex flex-wrap gap-2">
         {bulkActions.map((action) => {
           const noneEligible =
@@ -62,7 +63,10 @@ export function AppointmentsBulkActionsBar({
               disabled={isPending || noneEligible}
               title={
                 noneEligible
-                  ? `None of the selected appointments are eligible for "${action.label}".`
+                  ? ui(
+                      'None of the selected appointments are eligible for "{{value0}}".',
+                      { value0: ui(action.label) },
+                    )
                   : undefined
               }
               onClick={() => onBulkStatus(action.target!)}
@@ -71,7 +75,9 @@ export function AppointmentsBulkActionsBar({
             </Button>
           );
         })}
-        <Button variant="ghost" size="sm" onClick={onClearSelection}><UiText text={"Clear selection"} />{" "}</Button>
+        <Button variant="ghost" size="sm" onClick={onClearSelection}>
+          <UiText text={"Clear selection"} />{" "}
+        </Button>
       </div>
     </div>
   );

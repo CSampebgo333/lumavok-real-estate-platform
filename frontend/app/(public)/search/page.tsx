@@ -1,3 +1,4 @@
+import { localizedMetadata } from "@/lib/localizedMetadata";
 import type { Metadata } from "next";
 
 import { PropertiesView } from "@/components/property/PropertiesView";
@@ -7,10 +8,12 @@ import {
   type RawPropertySearchParams,
 } from "@/lib/propertyFilters";
 
-export const metadata: Metadata = {
-  title: `Search | ${APP_NAME}`,
-  description: "Search property listings across African markets.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return localizedMetadata({
+    title: `Search | ${APP_NAME}`,
+    description: "Search property listings in Burkina Faso.",
+  });
+}
 
 interface SearchPageProps {
   searchParams: Promise<RawPropertySearchParams>;

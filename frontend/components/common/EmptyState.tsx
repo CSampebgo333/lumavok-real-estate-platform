@@ -10,9 +10,13 @@ interface EmptyStateProps {
 export function EmptyState({ title, description, action }: EmptyStateProps) {
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-2 p-8 text-center">
-      <p className="text-sm font-medium"><UiText text={title} /></p>
+      <p className="text-sm font-medium">
+        <UiText text={title} />
+      </p>
       {description && (
-        <p className="text-muted-foreground text-sm"><UiText text={description} /></p>
+        <p className="text-muted-foreground text-sm">
+          <UiText text={description} />
+        </p>
       )}
       {action}
     </div>

@@ -1,7 +1,6 @@
 "use client";
 import { UiText, useUi } from "@/components/common/UiText";
 
-
 import * as React from "react";
 import {
   CalendarClock,
@@ -145,7 +144,9 @@ function RowActions({
   // actions of comparable weight (Reschedule/Complete/No-show/Cancel), so
   // there's no one action to promote without second-guessing the developer's
   // workflow — those stay in the menu, ordered exactly as the policy returns.
-  const confirmAction = allActions.find((action) => action.key === ui("CONFIRM"));
+  const confirmAction = allActions.find(
+    (action) => action.key === ui("CONFIRM"),
+  );
   const menuActions = confirmAction
     ? allActions.filter((action) => action.key !== ui("CONFIRM"))
     : allActions;
@@ -157,7 +158,9 @@ function RowActions({
           variant="ghost"
           size="icon-sm"
           disabled={disabled}
-          aria-label={`Confirm appointment with ${appointment.clientName}`}
+          aria-label={ui("Confirm appointment with {{value0}}", {
+            value0: appointment.clientName,
+          })}
           title={ui("Confirm")}
           onClick={() => onAction(appointment, confirmAction)}
         >
@@ -166,14 +169,18 @@ function RowActions({
       )}
       <DropdownMenu>
         <DropdownMenuTrigger
-          aria-label={`Actions for ${appointment.clientName}`}
+          aria-label={ui("Actions for {{value0}}", {
+            value0: appointment.clientName,
+          })}
           disabled={disabled}
           className={buttonVariants({ variant: "ghost", size: "icon-sm" })}
         >
           <MoreHorizontal />
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={() => onViewDetails(appointment)}><UiText text={"View details"} />{" "}</DropdownMenuItem>
+          <DropdownMenuItem onClick={() => onViewDetails(appointment)}>
+            <UiText text={"View details"} />{" "}
+          </DropdownMenuItem>
           {menuActions.length > 0 && <DropdownMenuSeparator />}
           {menuActions.map((action) => (
             <DropdownMenuItem
@@ -241,7 +248,9 @@ function AppointmentCards({
                   <Checkbox
                     checked={selectedIds.has(appointment.id)}
                     onChange={() => onToggleRow(appointment.id)}
-                    aria-label={`Select appointment with ${appointment.clientName}`}
+                    aria-label={ui("Select appointment with {{value0}}", {
+                      value0: appointment.clientName,
+                    })}
                     className="mt-1 shrink-0"
                   />
 
@@ -274,7 +283,9 @@ function AppointmentCards({
                           aria-hidden
                           className="text-destructive flex items-center gap-1 text-xs font-medium"
                         >
-                          <CalendarClock className="size-3.5" aria-hidden /><UiText text={"Overdue"} />{" "}</span>
+                          <CalendarClock className="size-3.5" aria-hidden />
+                          <UiText text={"Overdue"} />{" "}
+                        </span>
                       )}
                     </span>
                   </div>
@@ -349,13 +360,17 @@ export function AppointmentsTable({
             type="button"
             onClick={onClearFilters}
             className="text-primary text-sm font-medium hover:underline"
-          ><UiText text={"Clear filters"} />{" "}</button>
+          >
+            <UiText text={"Clear filters"} />{" "}
+          </button>
         }
       />
     ) : (
       <EmptyState
         title={ui("No appointments yet")}
-        description={ui("Viewing requests from prospective buyers and renters will appear here.")}
+        description={ui(
+          "Viewing requests from prospective buyers and renters will appear here.",
+        )}
       />
     );
   }
@@ -376,7 +391,9 @@ export function AppointmentsTable({
             checked={allSelected}
             indeterminate={someSelected && !allSelected}
             onChange={onToggleAll}
-          /><UiText text={"Select all appointments on this page"} />{" "}</label>
+          />
+          <UiText text={"Select all appointments on this page"} />{" "}
+        </label>
         <AppointmentCards
           groups={groups}
           selectedIds={selectedIds}
@@ -400,12 +417,22 @@ export function AppointmentsTable({
               onChange={onToggleAll}
             />
           </TableHead>
-          <TableHead><UiText text={"Client"} /></TableHead>
-          <TableHead><UiText text={"Property"} /></TableHead>
-          <TableHead><UiText text={"Scheduled for"} /></TableHead>
-          <TableHead><UiText text={"Status"} /></TableHead>
+          <TableHead>
+            <UiText text={"Client"} />
+          </TableHead>
+          <TableHead>
+            <UiText text={"Property"} />
+          </TableHead>
+          <TableHead>
+            <UiText text={"Scheduled for"} />
+          </TableHead>
+          <TableHead>
+            <UiText text={"Status"} />
+          </TableHead>
           <TableHead className="px-4 text-right">
-            <span className="sr-only"><UiText text={"Actions"} /></span>
+            <span className="sr-only">
+              <UiText text={"Actions"} />
+            </span>
           </TableHead>
         </TableRow>
       </TableHeader>
@@ -434,7 +461,9 @@ export function AppointmentsTable({
                   <Checkbox
                     checked={selectedIds.has(appointment.id)}
                     onChange={() => onToggleRow(appointment.id)}
-                    aria-label={`Select appointment with ${appointment.clientName}`}
+                    aria-label={ui("Select appointment with {{value0}}", {
+                      value0: appointment.clientName,
+                    })}
                   />
                 </TableCell>
                 <TableCell className="font-medium">
@@ -462,7 +491,9 @@ export function AppointmentsTable({
                     {formatTime(appointment.scheduledFor)}
                     {isOverdueAppointment(appointment, new Date()) && (
                       <span className="text-destructive flex items-center gap-1 text-xs font-medium">
-                        <CalendarClock className="size-3.5" aria-hidden /><UiText text={"Overdue"} />{" "}</span>
+                        <CalendarClock className="size-3.5" aria-hidden />
+                        <UiText text={"Overdue"} />{" "}
+                      </span>
                     )}
                   </span>
                 </TableCell>
@@ -492,14 +523,26 @@ function AppointmentsTableSkeleton() {
       <TableHeader>
         <TableRow>
           <TableHead className="w-10 px-4">
-            <span className="sr-only"><UiText text={"Select"} /></span>
+            <span className="sr-only">
+              <UiText text={"Select"} />
+            </span>
           </TableHead>
-          <TableHead><UiText text={"Client"} /></TableHead>
-          <TableHead><UiText text={"Property"} /></TableHead>
-          <TableHead><UiText text={"Scheduled for"} /></TableHead>
-          <TableHead><UiText text={"Status"} /></TableHead>
+          <TableHead>
+            <UiText text={"Client"} />
+          </TableHead>
+          <TableHead>
+            <UiText text={"Property"} />
+          </TableHead>
+          <TableHead>
+            <UiText text={"Scheduled for"} />
+          </TableHead>
+          <TableHead>
+            <UiText text={"Status"} />
+          </TableHead>
           <TableHead className="px-4">
-            <span className="sr-only"><UiText text={"Actions"} /></span>
+            <span className="sr-only">
+              <UiText text={"Actions"} />
+            </span>
           </TableHead>
         </TableRow>
       </TableHeader>
@@ -511,7 +554,9 @@ function AppointmentsTableSkeleton() {
               aria-live="polite"
               className="flex flex-col gap-2 p-4"
             >
-              <span className="sr-only"><UiText text={"Loading appointments…"} /></span>
+              <span className="sr-only">
+                <UiText text={"Loading appointments…"} />
+              </span>
               {Array.from({ length: 6 }).map((_, index) => (
                 <Skeleton key={index} className="h-10 w-full" aria-hidden />
               ))}

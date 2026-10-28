@@ -1,7 +1,6 @@
 "use client";
 import { UiText, useUi } from "@/components/common/UiText";
 
-
 import { useFormContext } from "react-hook-form";
 
 import { DashboardSection } from "@/components/dashboard/DashboardSection";
@@ -22,7 +21,10 @@ export function ListingBasicsSection() {
   } = useFormContext<ListingFormValues>();
 
   return (
-    <DashboardSection title={ui("Basics")} description={ui("What you're listing.")}>
+    <DashboardSection
+      title={ui("Basics")}
+      description={ui("What you're listing.")}
+    >
       <div className="flex flex-col gap-4">
         <FormField
           label={ui("Title")}
@@ -62,7 +64,9 @@ export function ListingBasicsSection() {
               className={SELECT_CLASSNAME}
               {...register("category")}
             >
-              <option value=""><UiText text={"Choose a category…"} /></option>
+              <option value="">
+                <UiText text={"Choose a category…"} />
+              </option>
               {PROPERTY_CATEGORIES.map((category) => (
                 <option key={category.value} value={category.value}>
                   <UiText text={category.label} />
@@ -82,9 +86,15 @@ export function ListingBasicsSection() {
               className={SELECT_CLASSNAME}
               {...register("listingType")}
             >
-              <option value=""><UiText text={"Choose Sale or Rent…"} /></option>
-              <option value="SALE"><UiText text={"For Sale"} /></option>
-              <option value="RENT"><UiText text={"For Rent"} /></option>
+              <option value="">
+                <UiText text={"Choose Sale or Rent…"} />
+              </option>
+              <option value="SALE">
+                <UiText text={"For Sale"} />
+              </option>
+              <option value="RENT">
+                <UiText text={"For Rent"} />
+              </option>
             </select>
           </FormField>
         </div>

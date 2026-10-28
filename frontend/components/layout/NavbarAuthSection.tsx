@@ -1,6 +1,6 @@
 "use client";
 
-import {useUi} from "@/components/common/UiText";
+import { useUi } from "@/components/common/UiText";
 import Link from "next/link";
 import { LayoutDashboard } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -16,7 +16,7 @@ import { useAuth } from "@/hooks/useAuth";
  * required, auth state is untouched by this navigation (a plain Link).
  */
 export function NavbarAuthSection() {
-  const ui=useUi();
+  const ui = useUi();
   const { user, isAuthenticated, logout } = useAuth();
   const { t } = useTranslation("common");
 
@@ -30,7 +30,7 @@ export function NavbarAuthSection() {
         </span>
         {hasDashboard && (
           <Link
-            href={user.role==="ADMIN"?ROUTES.ADMIN:ROUTES.DASHBOARD}
+            href={user.role === "ADMIN" ? ROUTES.ADMIN : ROUTES.DASHBOARD}
             className={buttonVariants({
               variant: "outline",
               size: "sm",
@@ -41,8 +41,12 @@ export function NavbarAuthSection() {
             {t("nav.dashboard")}
           </Link>
         )}
-        <Link href="/my-viewings" className="hidden sm:inline">{ui("My viewings")}</Link>
-        {user.role==="USER"&&<Link href="/sell">{ui("Become a seller")}</Link>}
+        <Link href="/my-viewings" className="hidden sm:inline">
+          {ui("My viewings")}
+        </Link>
+        {user.role === "USER" && (
+          <Link href="/sell">{ui("Become a seller")}</Link>
+        )}
         <Button variant="outline" size="sm" onClick={() => logout()}>
           {t("nav.logout")}
         </Button>

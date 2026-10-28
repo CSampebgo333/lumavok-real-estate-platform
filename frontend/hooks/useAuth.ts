@@ -18,12 +18,9 @@ export function useAuth() {
   const logout = useCallback(async () => {
     try {
       await authService.logout();
-    } catch(error) {
-      toast.error(getErrorMessage(error));
-    } finally {
-      // Clear client state even if the request fails — an unreachable logout
-      // endpoint shouldn't trap the user in an apparently-logged-in state.
       clearAuth();
+    } catch (error) {
+      toast.error(getErrorMessage(error));
     }
   }, [clearAuth]);
 

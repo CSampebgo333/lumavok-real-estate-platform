@@ -1,7 +1,6 @@
 "use client";
 import { UiText, useUi } from "@/components/common/UiText";
 
-
 import { Info } from "lucide-react";
 
 import { FilterChips } from "@/components/common/FilterChips";
@@ -94,17 +93,29 @@ export function PropertiesView({
         {hasMixedPriceComparison(filters) && (
           <p className="text-muted-foreground border-border flex items-start gap-2 border-l-2 py-1 pl-3 text-sm">
             <Info className="mt-0.5 size-4 shrink-0" aria-hidden />
-            <span><UiText text={"Sale prices and monthly rents are being ordered together."} />{" "}
+            <span>
+              <UiText
+                text={
+                  "Sale prices and monthly rents are being ordered together."
+                }
+              />{" "}
               <button
                 type="button"
                 onClick={() => handleFilterChange({ listingType: "SALE" })}
                 className="text-foreground focus-visible:ring-ring/50 rounded-sm underline underline-offset-2 outline-none focus-visible:ring-3"
-              ><UiText text={"Show sales only"} />{" "}</button>{" "}<UiText text={"or"} />{" "}
+              >
+                <UiText text={"Show sales only"} />{" "}
+              </button>{" "}
+              <UiText text={"or"} />{" "}
               <button
                 type="button"
                 onClick={() => handleFilterChange({ listingType: "RENT" })}
                 className="text-foreground focus-visible:ring-ring/50 rounded-sm underline underline-offset-2 outline-none focus-visible:ring-3"
-              ><UiText text={"rentals only"} />{" "}</button>{" "}<UiText text={"to compare like with like."} />{" "}</span>
+              >
+                <UiText text={"rentals only"} />{" "}
+              </button>{" "}
+              <UiText text={"to compare like with like."} />{" "}
+            </span>
           </p>
         )}
 

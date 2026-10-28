@@ -1,7 +1,6 @@
 "use client";
 import { UiText, useUi } from "@/components/common/UiText";
 
-
 import { useMemo, useState } from "react";
 
 import { FilterChips } from "@/components/common/FilterChips";
@@ -83,7 +82,9 @@ export function NotificationsView({ filters }: NotificationsViewProps) {
           size="sm"
           disabled={!unreadCount || markAllAsRead.isPending}
           onClick={() => markAllAsRead.mutate()}
-        ><UiText text={"Mark all as read"} />{" "}</Button>
+        >
+          <UiText text={"Mark all as read"} />{" "}
+        </Button>
       </div>
 
       <NotificationsFilterBar filters={filters} onApply={handleFilterChange} />

@@ -65,7 +65,8 @@ export const propertyService = {
           )
           .then((res) => res.data.data)
           .catch((error: unknown) => {
-            if (isAxiosError(error) && error.response?.status === 404) return null;
+            if (isAxiosError(error) && error.response?.status === 404)
+              return null;
             throw error;
           }),
       ),
@@ -74,7 +75,9 @@ export const propertyService = {
 
   getPropertyBySlug: (slug: string): Promise<PropertyDetail> =>
     api
-      .get<ApiResponse<PropertyDetail>>(`/properties/${encodeURIComponent(slug)}`)
+      .get<ApiResponse<PropertyDetail>>(
+        `/properties/${encodeURIComponent(slug)}`,
+      )
       .then((res) => res.data.data),
 
   /**

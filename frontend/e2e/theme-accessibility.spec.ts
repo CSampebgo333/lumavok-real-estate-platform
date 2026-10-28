@@ -1,5 +1,5 @@
 import AxeBuilder from "@axe-core/playwright";
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Page } from "./fixtures";
 
 const STORAGE_KEY = "lumavok:preferences";
 
@@ -211,7 +211,7 @@ test.describe("Skip to main content", () => {
 test.describe("Reduced motion via the accessibility preference", () => {
   test("leaves no reveal element hidden", async ({ page }) => {
     await seedPreferences(page, { motion: "reduced" });
-    await page.goto("/developers/atlantic-properties");
+    await page.goto("/developers/dev-one");
 
     // Same 150ms guarantee the OS-level preference has to meet.
     await page.waitForTimeout(150);
@@ -231,7 +231,7 @@ test.describe("Accessibility (axe) across appearance modes", () => {
   const routes = [
     { name: "Homepage", path: "/" },
     { name: "Property listing", path: "/properties" },
-    { name: "Developer profile", path: "/developers/atlantic-properties" },
+    { name: "Developer profile", path: "/developers/dev-one" },
     { name: "Login", path: "/login" },
   ];
 

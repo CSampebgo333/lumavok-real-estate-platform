@@ -15,6 +15,11 @@ import type {
 } from "./auth.schema.js";
 import type { Session, User as AuthUser } from "@supabase/supabase-js";
 
+function checkProviderAvailability(error: unknown) {
+  const value=error as {status?:number;name?:string}|null;
+  if(value&&((value.status??0)>=500||value.name==="AuthRetryableFetchError"))throw new ApiError(503,"Authentication temporarily unavailable","AUTH_UNAVAILABLE");
+  if(value?.status===429)throw new ApiError(429,"Too many requests","RATE_LIMITED");
+}
 export interface AuthSession {
   user: {
     id: string;
@@ -105,6 +110,7 @@ export async function login(
     email: input.email,
     password: input.password,
   });
+  checkProviderAvailability(error);
   if (error || !data.session || !data.user)
     throw new ApiError(401,"Invalid email or password","INVALID_CREDENTIALS");
   return mapSession(data.session, data.user);
@@ -123,6 +129,7 @@ export async function register(
       emailRedirectTo: getEnv().CORS_ORIGIN + "/login?confirmed=1",
     },
   });
+  checkProviderAvailability(error);
   if (error)
     throw new BadRequestError(
       "Unable to register account",
@@ -140,6 +147,7 @@ export async function refresh(
   const { data, error } = await getSupabase().auth.refreshSession({
     refresh_token: token,
   });
+  checkProviderAvailability(error);
   if (error || !data.session || !data.user)
     throw new UnauthorizedError("Invalid or expired refresh session");
   return mapSession(data.session, data.user);

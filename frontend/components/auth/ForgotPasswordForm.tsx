@@ -1,7 +1,6 @@
 "use client";
 import { UiText, useUi } from "@/components/common/UiText";
 
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -46,8 +45,13 @@ export function ForgotPasswordForm() {
   if (submittedEmail) {
     return (
       <div role="status" className="flex flex-col gap-2 text-center text-sm">
-        <p className="font-medium"><UiText text={"Check your email"} /></p>
-        <p className="text-muted-foreground"><UiText text={"If an account exists for"} />{" "}{submittedEmail}<UiText text={", we've sent a link to reset your password."} />{" "}</p>
+        <p className="font-medium">
+          <UiText text={"Check your email"} />
+        </p>
+        <p className="text-muted-foreground">
+          <UiText text={"If an account exists for"} /> {submittedEmail}
+          <UiText text={", we've sent a link to reset your password."} />{" "}
+        </p>
       </div>
     );
   }

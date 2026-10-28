@@ -1,3 +1,4 @@
+import { localizedMetadata } from "@/lib/localizedMetadata";
 import type { Metadata } from "next";
 
 import { AppointmentsView } from "@/components/dashboard/appointments/AppointmentsView";
@@ -9,10 +10,12 @@ import {
   type RawAppointmentSearchParams,
 } from "@/lib/appointmentFilters";
 
-export const metadata: Metadata = {
-  title: `Appointments | ${APP_NAME}`,
-  description: "Manage viewing requests and appointments.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return localizedMetadata({
+    title: `Appointments | ${APP_NAME}`,
+    description: "Manage viewing requests and appointments.",
+  });
+}
 
 interface AppointmentsPageProps {
   searchParams: Promise<RawAppointmentSearchParams>;

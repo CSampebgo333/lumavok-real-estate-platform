@@ -1,7 +1,6 @@
 "use client";
 import { useUi } from "@/components/common/UiText";
 
-
 import { Activity } from "lucide-react";
 
 import { EmptyState } from "@/components/common/EmptyState";
@@ -42,7 +41,9 @@ export function DashboardActivity() {
       ) : data.length === 0 ? (
         <EmptyState
           title={ui("No activity yet")}
-          description={ui("Your account activity will appear here as you manage listings and appointments.")}
+          description={ui(
+            "Your account activity will appear here as you manage listings and appointments.",
+          )}
         />
       ) : (
         <ActivityTimeline items={data} />

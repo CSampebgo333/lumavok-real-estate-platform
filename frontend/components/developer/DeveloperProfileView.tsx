@@ -1,4 +1,3 @@
-
 import { UiText } from "@/components/common/UiText";
 import { BadgeCheck, Building2, Globe, Mail, MapPin, Star } from "lucide-react";
 
@@ -68,7 +67,9 @@ export function DeveloperProfileView({
                   <h1 className="text-page-title">{developer.name}</h1>
                   {developer.isVerified && (
                     <Badge variant="secondary">
-                      <BadgeCheck className="size-3.5" aria-hidden /><UiText text={"Verified"} />{" "}</Badge>
+                      <BadgeCheck className="size-3.5" aria-hidden />
+                      <UiText text={"Verified"} />{" "}
+                    </Badge>
                   )}
                 </div>
 
@@ -87,7 +88,7 @@ export function DeveloperProfileView({
                   </span>
                   <span className="flex items-center gap-1.5">
                     <Building2 className="size-3.5 shrink-0" aria-hidden />
-                    {developer.activeListings}{" "}<UiText text={"active"} />{" "}
+                    {developer.activeListings} <UiText text={"active"} />{" "}
                     {developer.activeListings === 1 ? "listing" : "listings"}
                   </span>
                   {developer.rating !== undefined && (
@@ -111,7 +112,9 @@ export function DeveloperProfileView({
                 href="#contact"
                 className={buttonVariants({ variant: "outline", size: "lg" })}
               >
-                <Mail className="size-4" aria-hidden /><UiText text={"Contact"} />{" "}</a>
+                <Mail className="size-4" aria-hidden />
+                <UiText text={"Contact"} />{" "}
+              </a>
               {/* Rendered only when the flag is on — the same rule the property
                   detail page follows. This previously fell back to a disabled
                   "Message on WhatsApp (coming soon)" button, which advertised a
@@ -161,7 +164,9 @@ export function DeveloperProfileView({
             <h2
               id="developer-contact-heading"
               className="text-subsection-title"
-            ><UiText text={"Contact"} />{" "}</h2>
+            >
+              <UiText text={"Contact"} />{" "}
+            </h2>
             <div className="border-border flex flex-col gap-2 rounded-lg border p-4 text-sm">
               {/* An email address has no spaces, so it has no natural wrap
                   opportunity: at 150% text scaling this one needed 350px inside
@@ -201,7 +206,9 @@ export function DeveloperProfileView({
           </section>
 
           <div className="flex flex-col gap-2">
-            <h2 className="text-subsection-title"><UiText text={"Location"} /></h2>
+            <h2 className="text-subsection-title">
+              <UiText text={"Location"} />
+            </h2>
             {!isFeatureEnabled("MAP_VIEW") && <MapPlaceholder />}
           </div>
         </MotionReveal>
@@ -209,7 +216,9 @@ export function DeveloperProfileView({
         <MotionReveal as="section" className="flex flex-col gap-4">
           {/* The count comes straight off the resolved list, so the heading and
               the grid can never disagree. */}
-          <h2 className="text-subsection-title"><UiText text={"Active listings"} />{" "}{activeListings.length > 0 && (
+          <h2 className="text-subsection-title">
+            <UiText text={"Active listings"} />{" "}
+            {activeListings.length > 0 && (
               <span className="text-muted-foreground font-normal">
                 {" "}
                 ({activeListings.length})

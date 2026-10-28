@@ -1,4 +1,3 @@
-
 import { UiText } from "@/components/common/UiText";
 import Link from "next/link";
 
@@ -19,8 +18,12 @@ export function InvalidResetLink({ reason }: InvalidResetLinkProps) {
   return (
     <div role="alert" className="flex flex-col gap-3 text-center text-sm">
       <p className="font-medium">{MESSAGES[reason]}</p>
-      <p className="text-muted-foreground"><UiText text={"Request a new password reset link to continue."} />{" "}</p>
-      <Link href={ROUTES.FORGOT_PASSWORD} className={buttonVariants()}><UiText text={"Request new link"} />{" "}</Link>
+      <p className="text-muted-foreground">
+        <UiText text={"Request a new password reset link to continue."} />{" "}
+      </p>
+      <Link href={ROUTES.FORGOT_PASSWORD} className={buttonVariants()}>
+        <UiText text={"Request new link"} />{" "}
+      </Link>
     </div>
   );
 }

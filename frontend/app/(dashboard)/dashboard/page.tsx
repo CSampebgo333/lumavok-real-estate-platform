@@ -1,3 +1,4 @@
+import { localizedMetadata } from "@/lib/localizedMetadata";
 import type { Metadata } from "next";
 
 import { DashboardPageContainer } from "@/components/dashboard/DashboardPageContainer";
@@ -12,10 +13,12 @@ import { RecentListings } from "@/components/dashboard/home/RecentListings";
 import { MotionReveal } from "@/components/motion";
 import { APP_NAME } from "@/constants/config";
 
-export const metadata: Metadata = {
-  title: `Dashboard | ${APP_NAME}`,
-  description: "Your listings, appointments, and analytics at a glance.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return localizedMetadata({
+    title: `Dashboard | ${APP_NAME}`,
+    description: "Your listings, appointments, and analytics at a glance.",
+  });
+}
 
 /**
  * Developer Dashboard Home. A Server Component that lays out the grid and

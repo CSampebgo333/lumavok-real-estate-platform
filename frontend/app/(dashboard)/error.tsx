@@ -1,7 +1,6 @@
 "use client";
 import { useUi } from "@/components/common/UiText";
 
-
 import { RouteError } from "@/components/common/RouteError";
 import { ROUTES } from "@/constants/routes";
 
@@ -25,7 +24,9 @@ export default function DashboardError({
       retry={unstable_retry}
       homeHref={ROUTES.DASHBOARD}
       homeLabel="Back to dashboard"
-      description={ui("This section could not be loaded. You can try again, or return to your dashboard.")}
+      description={ui(
+        "This section could not be loaded. You can try again, or return to your dashboard.",
+      )}
     />
   );
 }

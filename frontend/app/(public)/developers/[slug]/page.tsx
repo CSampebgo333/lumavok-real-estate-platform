@@ -33,7 +33,10 @@ export default async function DeveloperProfilePage({
 
   const developer = await developerService
     .getDeveloperBySlug(slug)
-    .catch((error:unknown) => { if(error instanceof CatalogueError && error.status===404)notFound(); throw error; });
+    .catch((error: unknown) => {
+      if (error instanceof CatalogueError && error.status === 404) notFound();
+      throw error;
+    });
 
   const activeListingsResult = await developerService.getDeveloperListings(
     developer.id,

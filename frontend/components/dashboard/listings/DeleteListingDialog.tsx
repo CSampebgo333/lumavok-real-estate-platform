@@ -1,7 +1,6 @@
 "use client";
 import { UiText, useUi } from "@/components/common/UiText";
 
-
 import {
   Dialog,
   DialogContent,
@@ -32,16 +31,27 @@ export function DeleteListingDialog({
   const ui = useUi();
   const description =
     "title" in target ? (
-      <><UiText text={"This permanently deletes"} />{" "}<strong>{target.title}</strong><UiText text={". This can't be undone."} />{" "}</>
+      <>
+        <UiText text={"This permanently deletes"} />{" "}
+        <strong>{target.title}</strong>
+        <UiText text={". This can't be undone."} />{" "}
+      </>
     ) : (
-      <><UiText text={"This permanently deletes"} />{" "}<strong>{target.count}</strong>{" "}<UiText text={"listing"} />{" "}{target.count === 1 ? "" : "s"}<UiText text={". This can't be undone."} />{" "}</>
+      <>
+        <UiText text={"This permanently deletes"} />{" "}
+        <strong>{target.count}</strong> <UiText text={"listing"} />{" "}
+        {target.count === 1 ? "" : "s"}
+        <UiText text={". This can't be undone."} />{" "}
+      </>
     );
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle><UiText text={"Delete listing"} />{"count" in target && target.count !== 1 ? "s" : ""}?
+          <DialogTitle>
+            <UiText text={"Delete listing"} />
+            {"count" in target && target.count !== 1 ? "s" : ""}?
           </DialogTitle>
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
@@ -50,7 +60,9 @@ export function DeleteListingDialog({
             variant="outline"
             onClick={() => onOpenChange(false)}
             disabled={isPending}
-          ><UiText text={"Cancel"} />{" "}</Button>
+          >
+            <UiText text={"Cancel"} />{" "}
+          </Button>
           <Button
             variant="destructive"
             onClick={onConfirm}

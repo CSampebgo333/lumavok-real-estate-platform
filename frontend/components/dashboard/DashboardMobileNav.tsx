@@ -1,7 +1,6 @@
 "use client";
 import { UiText, useUi } from "@/components/common/UiText";
 
-
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { MoreHorizontal } from "lucide-react";
@@ -95,14 +94,22 @@ export function DashboardMobileNav() {
                 className="bg-primary border-background absolute -top-0.5 -right-0.5 size-2 rounded-full border"
               />
             )}
-          </span><UiText text={"More"} />{" "}{moreHasUnread && (
-            <span className="sr-only"><UiText text={", unread notifications"} /></span>
+          </span>
+          <UiText text={"More"} />{" "}
+          {moreHasUnread && (
+            <span className="sr-only">
+              <UiText text={", unread notifications"} />
+            </span>
           )}
         </DrawerTrigger>
         <DrawerContent>
           <DrawerHeader>
-            <DrawerTitle><UiText text={"More"} /></DrawerTitle>
-            <DrawerDescription><UiText text={"The rest of your dashboard."} /></DrawerDescription>
+            <DrawerTitle>
+              <UiText text={"More"} />
+            </DrawerTitle>
+            <DrawerDescription>
+              <UiText text={"The rest of your dashboard."} />
+            </DrawerDescription>
           </DrawerHeader>
           <div className="flex flex-col gap-1 p-4 pt-2">
             {moreItems.map((item) => {

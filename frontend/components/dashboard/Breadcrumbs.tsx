@@ -1,6 +1,6 @@
 "use client";
 
-import { UiText,useUi } from "@/components/common/UiText";
+import { UiText, useUi } from "@/components/common/UiText";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import { Fragment } from "react";
@@ -20,7 +20,7 @@ interface BreadcrumbsProps {
  * at all. The last item is always the current page: non-link, aria-current="page".
  */
 export function Breadcrumbs({ items }: BreadcrumbsProps) {
- const ui = useUi();
+  const ui = useUi();
   if (items.length === 0) return null;
 
   return (

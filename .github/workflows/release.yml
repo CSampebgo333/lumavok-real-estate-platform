@@ -1,0 +1,39 @@
+name: Build approved release images
+on:
+  workflow_dispatch:
+    inputs:
+      commit_sha:
+        description: Exact 40-character commit with successful CI
+        required: true
+permissions:
+  contents: read
+  actions: read
+  packages: write
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    environment: release
+    timeout-minutes: 25
+    env:
+      APPROVED_SHA: ${{ inputs.commit_sha }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Require successful CI for the exact commit
+        shell: bash
+        run: |
+          [[ "$APPROVED_SHA" =~ ^[0-9a-f]{40}$ ]] || exit 1
+          gh api "repos/$GITHUB_REPOSITORY/actions/workflows/ci.yml/runs?head_sha=$APPROVED_SHA&status=success" > "$RUNNER_TEMP/lumavok-ci.json"
+          jq -e '.workflow_runs | any(.conclusion == "success" and .head_sha == env.APPROVED_SHA)' "$RUNNER_TEMP/lumavok-ci.json"
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          ref: ${{ inputs.commit_sha }}
+      - name: Build and publish immutable release candidates
+        shell: bash
+        run: |
+          printf '%s' "$GH_TOKEN" | docker login ghcr.io --username "$GITHUB_ACTOR" --password-stdin
+          lumavok_image_repo="ghcr.io/${GITHUB_REPOSITORY,,}"
+          for component in frontend backend; do
+            docker build --file "$component/Dockerfile" --tag "$lumavok_image_repo/$component:$APPROVED_SHA" .
+            docker push "$lumavok_image_repo/$component:$APPROVED_SHA"
+          done
+          docker logout ghcr.io

@@ -17,7 +17,9 @@ describe("QuickActions", () => {
 
     // DASHBOARD_PROFILE is still false, so the Edit Company Profile action is
     // absent entirely rather than present as a disabled control.
-    expect(screen.getByRole("link",{name:"Edit Company Profile"})).toHaveAttribute("href","/profile");
+    expect(
+      screen.getByRole("link", { name: "Edit Company Profile" }),
+    ).toHaveAttribute("href", "/profile");
   });
 
   it("links 'View Listings' now that My Properties (Phase 6.2) has shipped", () => {

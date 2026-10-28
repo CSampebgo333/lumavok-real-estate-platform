@@ -1,7 +1,6 @@
 "use client";
 import { UiText, useUi } from "@/components/common/UiText";
 
-
 import { AnimatePresence, motion } from "framer-motion";
 import { Building2 } from "lucide-react";
 import Image from "next/image";
@@ -32,7 +31,9 @@ export function PropertyMediaGallery({
     return (
       <div className="bg-muted text-muted-foreground flex aspect-[16/10] w-full flex-col items-center justify-center gap-2 rounded-xl md:aspect-[2/1] lg:aspect-[16/10]">
         <Building2 className="size-10" aria-hidden />
-        <p className="text-sm"><UiText text={"No photos for this listing yet"} /></p>
+        <p className="text-sm">
+          <UiText text={"No photos for this listing yet"} />
+        </p>
       </div>
     );
   }
@@ -69,7 +70,11 @@ export function PropertyMediaGallery({
           >
             <Image
               src={activeImage.url}
-              alt={`${title} — photo ${activeIndex + 1} of ${media.length}`}
+              alt={ui("{{value0}} — photo {{value1}} of {{value2}}", {
+                value0: title,
+                value1: activeIndex + 1,
+                value2: media.length,
+              })}
               fill
               sizes="(min-width: 1024px) 900px, 100vw"
               className="object-cover"
@@ -102,7 +107,10 @@ export function PropertyMediaGallery({
               key={item.publicId}
               type="button"
               aria-current={index === activeIndex ? "true" : undefined}
-              aria-label={`Photo ${index + 1} of ${media.length}`}
+              aria-label={ui("Photo {{value0}} of {{value1}}", {
+                value0: index + 1,
+                value1: media.length,
+              })}
               onClick={() => setActiveIndex(index)}
               className={cn(
                 // Was size-16. Every listing in the catalogue carries exactly

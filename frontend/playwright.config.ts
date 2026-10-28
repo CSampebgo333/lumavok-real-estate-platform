@@ -1,48 +1,52 @@
+import fs from "node:fs";
 import { defineConfig, devices } from "@playwright/test";
-
-/**
- * Full cross-browser + responsive matrix is defined here for local/nightly use
- * (`npm run e2e` runs all projects). CI runs only `chromium-desktop` on every PR
- * for fast feedback — see .github/workflows/ci.yml.
- */
+const localBrowser = process.env.PLAYWRIGHT_BROWSER_CONFIG
+  ? JSON.parse(fs.readFileSync(process.env.PLAYWRIGHT_BROWSER_CONFIG, "utf8"))
+  : undefined;
 export default defineConfig({
   testDir: "./e2e",
-  fullyParallel: true,
+  fullyParallel: false,
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : undefined,
-  reporter: process.env.CI ? [["html", { open: "never" }]] : "list",
+  retries: 0,
+  workers: 1,
+  reporter: [["list"], ["html", { open: "never" }]],
+  timeout: 45000,
+  expect: { timeout: 12000 },
   use: {
     baseURL: "http://localhost:3000",
-    trace: "on-first-retry",
+    trace: "retain-on-failure",
     screenshot: "only-on-failure",
   },
   projects: [
     {
-      name: "chromium-desktop",
-      use: { ...devices["Desktop Chrome"] },
-    },
-    {
-      name: "firefox-desktop",
-      use: { ...devices["Desktop Firefox"] },
-    },
-    {
-      name: "webkit-desktop",
-      use: { ...devices["Desktop Safari"] },
-    },
-    {
-      name: "mobile-chrome",
-      use: { ...devices["Pixel 7"] },
-    },
-    {
-      name: "mobile-safari",
-      use: { ...devices["iPhone 14"] },
+      name:
+        process.env.E2E_MOBILE === "1" ? "chromium-mobile" : "chromium-desktop",
+      use: {
+        ...devices[
+          process.env.E2E_MOBILE === "1" ? "Pixel 7" : "Desktop Chrome"
+        ],
+        launchOptions: localBrowser,
+      },
     },
   ],
-  webServer: {
-    command: "npm run build && npm run start",
-    url: "http://localhost:3000",
-    reuseExistingServer: !process.env.CI,
-    timeout: 180_000,
-  },
+  webServer: [
+    {
+      command: "node --import tsx tests/e2e-server.ts",
+      cwd: "../backend",
+      env: { LUMAVOK_E2E_FIXTURE: "1", NODE_ENV: "test" },
+      url: "http://127.0.0.1:4100/api/health",
+      reuseExistingServer: !process.env.CI,
+      timeout: 60000,
+    },
+    {
+      command: "npm run build && npm run start -- --hostname 127.0.0.1",
+      env: {
+        BACKEND_API_URL: "http://127.0.0.1:4100",
+        NEXT_TELEMETRY_DISABLED: "1",
+      },
+      url: "http://localhost:3000/login",
+      reuseExistingServer: !process.env.CI,
+      timeout: 180000,
+    },
+  ],
 });

@@ -1,4 +1,4 @@
-
+import { localizedMetadata } from "@/lib/localizedMetadata";
 import { UiText } from "@/components/common/UiText";
 import Link from "next/link";
 import type { Metadata } from "next";
@@ -16,10 +16,12 @@ import {
   type RawListingSearchParams,
 } from "@/lib/listingFilters";
 
-export const metadata: Metadata = {
-  title: `My Properties | ${APP_NAME}`,
-  description: "Manage your property portfolio.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return localizedMetadata({
+    title: `My Properties | ${APP_NAME}`,
+    description: "Manage your property portfolio.",
+  });
+}
 
 interface ListingsPageProps {
   searchParams: Promise<RawListingSearchParams>;
@@ -45,7 +47,9 @@ export default async function ListingsPage({
         action={
           isFeatureEnabled("DASHBOARD_PROPERTY_EDITOR") ? (
             <Link href={ROUTES.NEW_LISTING} className={buttonVariants()}>
-              <Plus /><UiText text={"Add Property"} />{" "}</Link>
+              <Plus />
+              <UiText text={"Add Property"} />{" "}
+            </Link>
           ) : undefined
         }
       />

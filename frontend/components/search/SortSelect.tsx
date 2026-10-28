@@ -1,7 +1,6 @@
 "use client";
 import { UiText } from "@/components/common/UiText";
 
-
 import type { PropertySort } from "@/services";
 
 const SORT_OPTIONS: { value: PropertySort; label: string }[] = [
@@ -30,7 +29,9 @@ export function SortSelect({ value, onChange }: SortSelectProps) {
       <label
         htmlFor="filter-sort"
         className="text-muted-foreground shrink-0 text-sm"
-      ><UiText text={"Sort by"} />{" "}</label>
+      >
+        <UiText text={"Sort by"} />{" "}
+      </label>
       <select
         id="filter-sort"
         value={value ?? "newest"}

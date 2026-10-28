@@ -32,8 +32,12 @@ export default function EditListingPage({
           value={contentLanguage}
           onChange={(e) => setContentLanguage(e.target.value as "en" | "fr")}
         >
-          <option value="fr"><UiText text={"Français"} /></option>
-          <option value="en"><UiText text={"English"} /></option>
+          <option value="fr">
+            <UiText text={"Français"} />
+          </option>
+          <option value="en">
+            <UiText text={"English"} />
+          </option>
         </select>
       </label>
       {dirty && (

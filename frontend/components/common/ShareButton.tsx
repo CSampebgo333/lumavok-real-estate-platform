@@ -1,7 +1,6 @@
 "use client";
 import { useUi } from "@/components/common/UiText";
 
-
 import { Check, Share2 } from "lucide-react";
 import { useState } from "react";
 
@@ -46,7 +45,11 @@ export function ShareButton({ title, className }: ShareButtonProps) {
       variant="outline"
       size="icon-lg"
       onClick={handleShare}
-      aria-label={copied ? ui("Link copied to clipboard") : `Share ${title}`}
+      aria-label={
+        copied
+          ? ui("Link copied to clipboard")
+          : ui("Share {{value0}}", { value0: title })
+      }
       className={className}
     >
       {copied ? (

@@ -133,4 +133,4 @@ describe("Developer profile flow", () => {
   });
 });
 
-vi.mock("next/navigation", () => ({useRouter:()=>({push:vi.fn()})}));
+vi.mock("next/navigation", () => ({ useRouter: () => ({ push: vi.fn() }) }));

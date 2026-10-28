@@ -1,7 +1,6 @@
 "use client";
 import { useUi } from "@/components/common/UiText";
 
-
 import { RouteError } from "@/components/common/RouteError";
 import { ROUTES } from "@/constants/routes";
 
@@ -24,7 +23,9 @@ export default function PublicError({
       retry={unstable_retry}
       homeHref={ROUTES.PROPERTIES}
       homeLabel="Browse properties"
-      description={ui("This page could not be loaded. You can try again, or continue browsing.")}
+      description={ui(
+        "This page could not be loaded. You can try again, or continue browsing.",
+      )}
     />
   );
 }

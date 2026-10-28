@@ -9,7 +9,7 @@ const FAVORITES_KEY = ["favorites"] as const;
 
 /** Favorites are account-owned and refreshed on focus and after mutations. */
 export function useFavoritesState() {
-  const userId = useAuthStore(state => state.user?.id);
+  const userId = useAuthStore((state) => state.user?.id);
   return useQuery({
     queryKey: [...FAVORITES_KEY, userId],
     enabled: !!userId,
@@ -35,7 +35,7 @@ export function useFavoriteCount(
 /** Optimistic favorite changes roll back on failure, then refresh server state. */
 export function useToggleFavorite() {
   const queryClient = useQueryClient();
-  const userId = useAuthStore(state => state.user?.id);
+  const userId = useAuthStore((state) => state.user?.id);
   const key = [...FAVORITES_KEY, userId];
 
   return useMutation({

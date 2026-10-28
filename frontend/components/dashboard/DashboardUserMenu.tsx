@@ -1,6 +1,7 @@
 "use client";
-import { UiText } from "@/components/common/UiText";
+import { useUi } from "@/components/common/UiText";
 
+import { UiText } from "@/components/common/UiText";
 
 import Link from "next/link";
 import { ExternalLink, LogOut } from "lucide-react";
@@ -28,6 +29,7 @@ function initials(fullName: string): string {
 
 /** The dashboard TopBar's account menu — name, role, and the two account-level actions. */
 export function DashboardUserMenu() {
+  const ui = useUi();
   const { user, logout } = useAuth();
 
   if (!user) return null;
@@ -35,7 +37,9 @@ export function DashboardUserMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
-        aria-label={`Account menu for ${user.fullName}`}
+        aria-label={ui("Account menu for {{value0}}", {
+          value0: user.fullName,
+        })}
         // The resting hairline ring stays, but `ring-inset` had to go: an inset
         // focus ring would be drawn *inside* the avatar's solid primary circle,
         // where a teal-on-teal ring is effectively invisible. Rendering it
@@ -61,9 +65,13 @@ export function DashboardUserMenu() {
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem render={<Link href={ROUTES.HOME} />}>
-          <ExternalLink /><UiText text={"View public site"} />{" "}</DropdownMenuItem>
+          <ExternalLink />
+          <UiText text={"View public site"} />{" "}
+        </DropdownMenuItem>
         <DropdownMenuItem variant="destructive" onClick={() => logout()}>
-          <LogOut /><UiText text={"Log out"} />{" "}</DropdownMenuItem>
+          <LogOut />
+          <UiText text={"Log out"} />{" "}
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

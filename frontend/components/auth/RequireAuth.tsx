@@ -3,6 +3,9 @@
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
+import { useUi } from "@/components/common/UiText";
+import { ErrorState } from "@/components/common/ErrorState";
+import { Button } from "@/components/ui/button";
 import { Loading } from "@/components/common/Loading";
 import { ROUTES } from "@/constants/routes";
 import { useAuthStore } from "@/store/authStore";
@@ -37,6 +40,8 @@ function hasRequiredRole(
  * would fire a second, redundant session-restore request.
  */
 export function RequireAuth({ children, role }: RequireAuthProps) {
+  const ui = useUi();
+  const bootstrapError = useAuthStore((state) => state.bootstrapError);
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -46,15 +51,27 @@ export function RequireAuth({ children, role }: RequireAuthProps) {
     isAuthenticated && !!role && !hasRequiredRole(user?.role, role);
 
   useEffect(() => {
-    if (isBootstrapping) return;
+    if (isBootstrapping || bootstrapError) return;
 
     if (!isAuthenticated) {
       router.replace(ROUTES.UNAUTHORIZED);
     } else if (isForbidden) {
       router.replace(ROUTES.FORBIDDEN);
     }
-  }, [isBootstrapping, isAuthenticated, isForbidden, router]);
+  }, [isBootstrapping, isAuthenticated, isForbidden, router, bootstrapError]);
 
+  if (!isBootstrapping && bootstrapError)
+    return (
+      <ErrorState
+        title={ui("Your session could not be verified.")}
+        description={bootstrapError}
+        action={
+          <Button onClick={() => window.location.reload()}>
+            {ui("Try again")}
+          </Button>
+        }
+      />
+    );
   if (isBootstrapping || !isAuthenticated || isForbidden) {
     return <Loading />;
   }

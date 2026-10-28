@@ -1,4 +1,3 @@
-
 import { UiText } from "@/components/common/UiText";
 import type { ReactNode } from "react";
 
@@ -28,9 +27,13 @@ export function DashboardPageHeader({
       )}
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="flex flex-col gap-1">
-          <h1 className="text-dashboard-title"><UiText text={title} /></h1>
+          <h1 className="text-dashboard-title">
+            <UiText text={title} />
+          </h1>
           {description && (
-            <p className="text-muted-foreground text-sm"><UiText text={description} /></p>
+            <p className="text-muted-foreground text-sm">
+              <UiText text={description} />
+            </p>
           )}
         </div>
         {action}

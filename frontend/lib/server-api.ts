@@ -8,7 +8,11 @@ import type {
   ApiResponse,
 } from "@/types";
 import { rankSimilarProperties } from "@/lib/similarProperties";
-export class CatalogueError extends Error { constructor(public readonly status:number){super("Catalogue unavailable");} }
+export class CatalogueError extends Error {
+  constructor(public readonly status: number) {
+    super("Catalogue unavailable");
+  }
+}
 async function read<T>(path: string): Promise<T> {
   const language =
     (await cookies()).get("lumavok-language")?.value === "en" ? "en" : "fr";
@@ -20,9 +24,15 @@ async function read<T>(path: string): Promise<T> {
   return ((await response.json()) as ApiResponse<T>).data;
 }
 export const serverPropertyService = {
-  getProperties: ({pageSize=12,category,sort}:{pageSize?:number;category?:string;sort?:string}={}) => {
-    const query=new URLSearchParams({pageSize:String(pageSize)});if(category)query.set("category",category);if(sort)query.set("sort",sort);
-    return read<PaginatedResult<Property>>("/properties?"+query);
+  getProperties: ({
+    pageSize = 12,
+    category,
+    sort,
+  }: { pageSize?: number; category?: string; sort?: string } = {}) => {
+    const query = new URLSearchParams({ pageSize: String(pageSize) });
+    if (category) query.set("category", category);
+    if (sort) query.set("sort", sort);
+    return read<PaginatedResult<Property>>("/properties?" + query);
   },
   getPropertyBySlug: (slug: string) =>
     read<PropertyDetail>("/properties/" + encodeURIComponent(slug)),

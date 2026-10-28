@@ -1,7 +1,6 @@
 "use client";
 import { UiText, useUi } from "@/components/common/UiText";
 
-
 import Link from "next/link";
 import { useEffect } from "react";
 
@@ -55,7 +54,9 @@ export function RouteError({
       description={description}
       action={
         <div className="mt-2 flex flex-wrap items-center justify-center gap-2">
-          <Button type="button" size="lg" onClick={retry}><UiText text={"Try again"} />{" "}</Button>
+          <Button type="button" size="lg" onClick={retry}>
+            <UiText text={"Try again"} />{" "}
+          </Button>
           <Link
             href={homeHref}
             className={buttonVariants({ variant: "outline", size: "lg" })}
@@ -70,7 +71,9 @@ export function RouteError({
             only when one exists (client-side errors have none).
           */}
           {error.digest && (
-            <p className="text-muted-foreground w-full text-xs"><UiText text={"Reference:"} />{" "}<span className="font-mono">{error.digest}</span>
+            <p className="text-muted-foreground w-full text-xs">
+              <UiText text={"Reference:"} />{" "}
+              <span className="font-mono">{error.digest}</span>
             </p>
           )}
         </div>

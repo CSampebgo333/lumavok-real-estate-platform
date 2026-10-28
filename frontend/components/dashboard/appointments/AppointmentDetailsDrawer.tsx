@@ -1,7 +1,6 @@
 "use client";
 import { UiText, useUi } from "@/components/common/UiText";
 
-
 import { ActivityTimeline } from "@/components/dashboard/ActivityTimeline";
 import { AppointmentStatusBadge } from "@/components/dashboard/StatusBadge";
 import { Button } from "@/components/ui/button";
@@ -61,23 +60,30 @@ export function AppointmentDetailsDrawer({
 
             <div className="flex flex-col gap-4 overflow-y-auto p-4">
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground text-sm"><UiText text={"Scheduled for"} />{" "}{formatDateTime(appointment.scheduledFor)}
+                <span className="text-muted-foreground text-sm">
+                  <UiText text={"Scheduled for"} />{" "}
+                  {formatDateTime(appointment.scheduledFor)}
                 </span>
                 <AppointmentStatusBadge status={appointment.status} />
               </div>
 
               {appointment.previousScheduledFor && (
-                <p className="text-muted-foreground text-xs"><UiText text={"Originally scheduled for"} />{" "}
+                <p className="text-muted-foreground text-xs">
+                  <UiText text={"Originally scheduled for"} />{" "}
                   {formatDateTime(appointment.previousScheduledFor)}
                 </p>
               )}
 
               <div>
-                <h3 className="mb-3 text-sm font-medium"><UiText text={"History"} /></h3>
+                <h3 className="mb-3 text-sm font-medium">
+                  <UiText text={"History"} />
+                </h3>
                 {appointment.history && appointment.history.length > 0 ? (
                   <ActivityTimeline items={appointment.history} />
                 ) : (
-                  <p className="text-muted-foreground text-sm"><UiText text={"No history recorded yet."} />{" "}</p>
+                  <p className="text-muted-foreground text-sm">
+                    <UiText text={"No history recorded yet."} />{" "}
+                  </p>
                 )}
               </div>
             </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { UiText,useUi } from "@/components/common/UiText";
+import { UiText, useUi } from "@/components/common/UiText";
 import Link from "next/link";
 import {
   Briefcase,
@@ -63,7 +63,7 @@ const QUICK_ACTIONS: QuickAction[] = [
  * destination in its own right.
  */
 export function QuickActions() {
- const ui = useUi();
+  const ui = useUi();
   // Same rule the primary nav follows (getAvailableNavItems): an action the
   // product cannot perform yet is omitted, not rendered as a disabled "Soon"
   // control. A quick-actions toolbar is a set of things you can do, so an

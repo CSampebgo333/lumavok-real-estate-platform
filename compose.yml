@@ -1,0 +1,31 @@
+name: lumavok
+services:
+  api:
+    image: ${BACKEND_IMAGE:?Supply an approved backend image digest}
+    env_file: ${API_ENV_FILE:-./infrastructure/api.env}
+    environment:
+      NODE_ENV: production
+      PORT: 4000
+    restart: unless-stopped
+    read_only: true
+    tmpfs: [/tmp]
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+    networks: [internal]
+  web:
+    image: ${FRONTEND_IMAGE:?Supply an approved frontend image digest}
+    environment:
+      NODE_ENV: production
+      BACKEND_API_URL: http://api:4000
+    depends_on:
+      api:
+        condition: service_healthy
+    ports: ["127.0.0.1:3000:3000"]
+    restart: unless-stopped
+    tmpfs: [/tmp]
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+    networks: [internal]
+networks:
+  internal:
+    driver: bridge

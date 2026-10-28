@@ -36,12 +36,22 @@ export function PageHeader({
   return (
     <header className="border-border border-b">
       <div className="container-page page-band flex flex-col gap-3">
-        {eyebrow && <p className="text-eyebrow"><UiText text={eyebrow} /></p>}
+        {eyebrow && (
+          <p className="text-eyebrow">
+            <UiText text={eyebrow} />
+          </p>
+        )}
         <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
-          <h1 className="text-page-title max-w-3xl"><UiText text={title} /></h1>
+          <h1 className="text-page-title max-w-3xl">
+            <UiText text={title} />
+          </h1>
           {action}
         </div>
-        {lede && <p className="text-page-lede"><UiText text={lede} /></p>}
+        {lede && (
+          <p className="text-page-lede">
+            <UiText text={lede} />
+          </p>
+        )}
         {meta}
       </div>
     </header>

@@ -1,11 +1,9 @@
 import { getStoredLanguage } from "@/lib/locale";
-import { mapSession } from "@/lib/authSession";
+import { refreshSession } from "@/lib/refreshSession";
 import axios, { AxiosError } from "axios";
 
 import { API_BASE_URL } from "@/constants/config";
 import { useAuthStore } from "@/store/authStore";
-import type { ApiResponse } from "@/types";
-import type { AuthSession } from "@/services/auth.service";
 
 /** Configured Axios instance for all backend API calls. */
 export const api = axios.create({
@@ -15,7 +13,10 @@ export const api = axios.create({
 
 api.interceptors.request.use((config) => {
   config.params = { lang: getStoredLanguage(), ...config.params };
-  const accessToken = useAuthStore.getState().accessToken;
+  const state = useAuthStore.getState();
+  if (config._requestUserId === undefined)
+    config._requestUserId = state.user?.id ?? null;
+  const accessToken = state.accessToken;
   if (accessToken) {
     config.headers.Authorization = `Bearer ${accessToken}`;
   }
@@ -25,32 +26,8 @@ api.interceptors.request.use((config) => {
 declare module "axios" {
   export interface InternalAxiosRequestConfig {
     _retried?: boolean;
+    _requestUserId?: string | null;
   }
-}
-
-/**
- * Calls /auth/refresh directly via a bare axios instance rather than importing
- * authService — authService imports `api` from this file, so importing it back here
- * would be circular. Kept deliberately minimal (this one request only).
- */
-let refreshing: Promise<string> | null = null;
-function refreshAccessToken(): Promise<string> {
-  if (refreshing) return refreshing;
-  refreshing = axios
-    .post<ApiResponse<AuthSession>>(
-      `${API_BASE_URL}/auth/refresh`,
-      {},
-      { withCredentials: true },
-    )
-    .then((response) => {
-      const session = mapSession(response.data.data);
-      useAuthStore.getState().setAuth(session.user, session.accessToken);
-      return session.accessToken;
-    })
-    .finally(() => {
-      refreshing = null;
-    });
-  return refreshing;
 }
 
 // Silent-refresh-and-retry: an access token expires (15min) well before the refresh
@@ -66,7 +43,8 @@ api.interceptors.response.use(
       error.response?.status !== 401 ||
       !originalRequest ||
       originalRequest._retried ||
-      originalRequest.url?.startsWith("/auth/")
+      (originalRequest.url?.startsWith("/auth/") &&
+        originalRequest.url !== "/auth/logout")
     ) {
       return Promise.reject(error);
     }
@@ -74,11 +52,22 @@ api.interceptors.response.use(
     originalRequest._retried = true;
 
     try {
-      const accessToken = await refreshAccessToken();
+      const { accessToken } = await refreshSession();
+      if (
+        (useAuthStore.getState().user?.id ?? null) !==
+        originalRequest._requestUserId
+      )
+        throw new Error("Session changed. Please try again.");
       originalRequest.headers.Authorization = `Bearer ${accessToken}`;
       return api(originalRequest);
     } catch (refreshError) {
-      useAuthStore.getState().clearAuth();
+      if (
+        axios.isAxiosError(refreshError) &&
+        [400, 401].includes(refreshError.response?.status ?? 0) &&
+        (useAuthStore.getState().user?.id ?? null) ===
+          originalRequest._requestUserId
+      )
+        useAuthStore.getState().clearAuth();
       return Promise.reject(refreshError);
     }
   },

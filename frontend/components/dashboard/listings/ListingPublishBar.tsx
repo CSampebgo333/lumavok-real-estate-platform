@@ -1,7 +1,6 @@
 "use client";
 import { UiText, useUi } from "@/components/common/UiText";
 
-
 import { useRef } from "react";
 import { CircleCheck, CircleAlert } from "lucide-react";
 
@@ -70,7 +69,9 @@ function PublishReadiness({
   if (readiness.success) {
     return (
       <span className="text-muted-foreground flex items-center gap-1.5 text-xs">
-        <CircleCheck className="text-primary size-3.5" aria-hidden /><UiText text={"Ready to publish"} />{" "}</span>
+        <CircleCheck className="text-primary size-3.5" aria-hidden />
+        <UiText text={"Ready to publish"} />{" "}
+      </span>
     );
   }
 
@@ -86,7 +87,9 @@ function PublishReadiness({
         })}
       >
         <CircleAlert className="size-3.5" aria-hidden />
-        {count} {count === 1 ? "thing needs" : "things need"}{" "}<UiText text={"attention"} />{" "}</DropdownMenuTrigger>
+        {count} {count === 1 ? "thing needs" : "things need"}{" "}
+        <UiText text={"attention"} />{" "}
+      </DropdownMenuTrigger>
       <DropdownMenuContent
         align="start"
         finalFocus={() => {
@@ -155,7 +158,9 @@ export function ListingPublishBar({
   return (
     <div className="bg-background/95 border-border bottom-dashboard-mobile-nav sticky z-10 flex flex-wrap items-center justify-between gap-3 border-t px-4 py-3 backdrop-blur-sm md:bottom-0">
       <div className="flex items-center gap-3">
-        <Button type="button" variant="ghost" size="sm" onClick={onBack}><UiText text={"Back to My Properties"} />{" "}</Button>
+        <Button type="button" variant="ghost" size="sm" onClick={onBack}>
+          <UiText text={"Back to My Properties"} />{" "}
+        </Button>
         {isDraft ? (
           <span aria-live="polite" className="flex items-center gap-2 text-xs">
             <span
@@ -173,7 +178,9 @@ export function ListingPublishBar({
                 variant="ghost"
                 size="xs"
                 onClick={onRetrySave}
-              ><UiText text={"Retry"} />{" "}</Button>
+              >
+                <UiText text={"Retry"} />{" "}
+              </Button>
             )}
           </span>
         ) : (
@@ -197,7 +204,9 @@ export function ListingPublishBar({
             variant="destructive"
             size="sm"
             onClick={onDeleteRequest}
-          ><UiText text={"Delete"} />{" "}</Button>
+          >
+            <UiText text={"Delete"} />{" "}
+          </Button>
         )}
         {transitions.map((transition) => (
           <Button
@@ -211,7 +220,9 @@ export function ListingPublishBar({
           </Button>
         ))}
         {transitions.length === 0 && status === "SOLD" && (
-          <span className="text-muted-foreground text-xs"><UiText text={"Sold listings can't be reopened."} />{" "}</span>
+          <span className="text-muted-foreground text-xs">
+            <UiText text={"Sold listings can't be reopened."} />{" "}
+          </span>
         )}
       </div>
     </div>

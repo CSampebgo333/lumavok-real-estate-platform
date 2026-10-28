@@ -1,3 +1,4 @@
+import { localizedMetadata } from "@/lib/localizedMetadata";
 import type { Metadata } from "next";
 
 import { PageHeader } from "@/components/common/PageHeader";
@@ -8,10 +9,12 @@ import {
   type RawDeveloperSearchParams,
 } from "@/lib/developerFilters";
 
-export const metadata: Metadata = {
-  title: `Developers | ${APP_NAME}`,
-  description: "Browse property developers across African markets.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return localizedMetadata({
+    title: `Developers | ${APP_NAME}`,
+    description: "Browse property developers in Burkina Faso.",
+  });
+}
 
 interface DevelopersPageProps {
   searchParams: Promise<RawDeveloperSearchParams>;

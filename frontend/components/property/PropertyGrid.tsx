@@ -31,7 +31,7 @@ export function PropertyGrid({
   skeletonCount = 8,
   emptyDescription = "Try adjusting your search or check back later.",
 }: PropertyGridProps) {
- const ui = useUi();
+  const ui = useUi();
   if (isError) {
     return (
       <ErrorState
@@ -44,7 +44,9 @@ export function PropertyGrid({
   if (isLoading) {
     return (
       <div role="status" aria-live="polite" className={GRID_CLASSNAME}>
-        <span className="sr-only"><UiText text={"Loading properties…"} /></span>
+        <span className="sr-only">
+          <UiText text={"Loading properties…"} />
+        </span>
         {Array.from({ length: skeletonCount }).map((_, index) => (
           <PropertyCardSkeleton key={index} aria-hidden />
         ))}
@@ -54,7 +56,10 @@ export function PropertyGrid({
 
   if (properties.length === 0) {
     return (
-      <EmptyState title={ui("No properties found")} description={emptyDescription} />
+      <EmptyState
+        title={ui("No properties found")}
+        description={emptyDescription}
+      />
     );
   }
 

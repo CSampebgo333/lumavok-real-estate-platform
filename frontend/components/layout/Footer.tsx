@@ -1,7 +1,6 @@
 "use client";
 import { UiText } from "@/components/common/UiText";
 
-
 import Link from "next/link";
 
 import { APP_NAME } from "@/constants/config";

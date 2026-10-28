@@ -1,7 +1,6 @@
 "use client";
 import { UiText, useUi } from "@/components/common/UiText";
 
-
 import { motion } from "framer-motion";
 import { useState } from "react";
 
@@ -72,20 +71,28 @@ export function AppointmentFunnelChart({
       ) : funnel.totalRequested === 0 ? (
         <EmptyState
           title={ui("No appointments requested this period")}
-          description={ui("Try a longer period, or check back once requests come in.")}
+          description={ui(
+            "Try a longer period, or check back once requests come in.",
+          )}
         />
       ) : view === "table" ? (
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead><UiText text={"Stage"} /></TableHead>
-              <TableHead className="text-right"><UiText text={"Count"} /></TableHead>
+              <TableHead>
+                <UiText text={"Stage"} />
+              </TableHead>
+              <TableHead className="text-right">
+                <UiText text={"Count"} />
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {funnel.stages.map((stage) => (
               <TableRow key={stage.status}>
-                <TableCell><UiText text={APPOINTMENT_STATUS_LABEL[stage.status]} /></TableCell>
+                <TableCell>
+                  <UiText text={APPOINTMENT_STATUS_LABEL[stage.status]} />
+                </TableCell>
                 <TableCell className="text-right tabular-nums">
                   {stage.count}
                 </TableCell>

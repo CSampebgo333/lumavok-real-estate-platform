@@ -1,7 +1,6 @@
 "use client";
 import { UiText, useUi } from "@/components/common/UiText";
 
-
 import { useFormContext, useWatch } from "react-hook-form";
 
 import { DashboardSection } from "@/components/dashboard/DashboardSection";
@@ -107,9 +106,13 @@ export function ListingMeasurementsSection() {
     return (
       <DashboardSection
         title={ui("Details")}
-        description={ui("Choose a category in Basics to see the relevant details.")}
+        description={ui(
+          "Choose a category in Basics to see the relevant details.",
+        )}
       >
-        <p className="text-muted-foreground text-sm"><UiText text={"No category selected yet."} />{" "}</p>
+        <p className="text-muted-foreground text-sm">
+          <UiText text={"No category selected yet."} />{" "}
+        </p>
       </DashboardSection>
     );
   }
@@ -174,7 +177,9 @@ export function ListingMeasurementsSection() {
               className={SELECT_CLASSNAME}
               {...numberField(register, "bedrooms")}
             >
-              <option value=""><UiText text={"Select…"} /></option>
+              <option value="">
+                <UiText text={"Select…"} />
+              </option>
               {BEDROOM_BATHROOM_OPTIONS.map((count) => (
                 <option key={count} value={count}>
                   {count === 0 ? ui("Studio (0)") : count}
@@ -196,7 +201,9 @@ export function ListingMeasurementsSection() {
               className={SELECT_CLASSNAME}
               {...numberField(register, "bathrooms")}
             >
-              <option value=""><UiText text={"Select…"} /></option>
+              <option value="">
+                <UiText text={"Select…"} />
+              </option>
               {BEDROOM_BATHROOM_OPTIONS.map((count) => (
                 <option key={count} value={count}>
                   {count}

@@ -1,7 +1,6 @@
 "use client";
 import { UiText, useUi } from "@/components/common/UiText";
 
-
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -58,16 +57,21 @@ export function RescheduleDialog({
       <DialogContent>
         <form onSubmit={handleSubmit}>
           <DialogHeader>
-            <DialogTitle><UiText text={"Reschedule appointment"} /></DialogTitle>
+            <DialogTitle>
+              <UiText text={"Reschedule appointment"} />
+            </DialogTitle>
             <DialogDescription>
               {appointment &&
-                `Pick a new date and time for ${appointment.clientName}'s viewing.`}
+                ui("Pick a new date and time for {{value0}}'s viewing.", {
+                  value0: appointment.clientName,
+                })}
             </DialogDescription>
           </DialogHeader>
 
           <div className="flex flex-col gap-3 p-4">
             {appointment && (
-              <p className="text-muted-foreground text-sm"><UiText text={"Currently scheduled for"} />{" "}
+              <p className="text-muted-foreground text-sm">
+                <UiText text={"Currently scheduled for"} />{" "}
                 <span className="text-foreground font-medium">
                   {formatDateTime(appointment.scheduledFor)}
                 </span>
@@ -78,7 +82,9 @@ export function RescheduleDialog({
               <label
                 htmlFor="reschedule-datetime"
                 className="text-muted-foreground mb-1 block text-xs"
-              ><UiText text={"New date & time"} />{" "}</label>
+              >
+                <UiText text={"New date & time"} />{" "}
+              </label>
               <input
                 id="reschedule-datetime"
                 type="datetime-local"
@@ -96,7 +102,9 @@ export function RescheduleDialog({
               variant="outline"
               onClick={() => onOpenChange(false)}
               disabled={isPending}
-            ><UiText text={"Cancel"} />{" "}</Button>
+            >
+              <UiText text={"Cancel"} />{" "}
+            </Button>
             <Button type="submit" disabled={isPending || !value}>
               {isPending ? ui("Saving…") : ui("Confirm reschedule")}
             </Button>

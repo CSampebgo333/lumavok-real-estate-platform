@@ -50,7 +50,7 @@ export function Providers({
       }),
   );
   useAuthBootstrap();
-  useEffect(() => watchAuthQueryCache(queryClient),[queryClient]);
+  useEffect(() => watchAuthQueryCache(queryClient), [queryClient]);
 
   return (
     <LanguageProvider initialLanguage={initialLanguage}>

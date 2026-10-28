@@ -20,7 +20,7 @@ export function Pagination({
   totalPages,
   onPageChange,
 }: PaginationProps) {
- const ui = useUi();
+  const ui = useUi();
   if (totalPages <= 1) return null;
 
   const pages =
@@ -56,7 +56,8 @@ export function Pagination({
           </Button>
         ))
       ) : (
-        <span className="text-muted-foreground px-3 text-sm" aria-live="polite"><UiText text={"Page"} />{" "}{page}{" "}<UiText text={"of"} />{" "}{totalPages}
+        <span className="text-muted-foreground px-3 text-sm" aria-live="polite">
+          <UiText text={"Page"} /> {page} <UiText text={"of"} /> {totalPages}
         </span>
       )}
 

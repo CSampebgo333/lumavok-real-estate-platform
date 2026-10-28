@@ -1,7 +1,6 @@
 "use client";
 import { UiText, useUi } from "@/components/common/UiText";
 
-
 import { useMemo, useState } from "react";
 import { CalendarClock } from "lucide-react";
 
@@ -55,9 +54,14 @@ function OverdueBanner({
       <CalendarClock className="text-destructive size-5 shrink-0" aria-hidden />
       <p className="flex-1 text-sm">
         <span className="font-medium">
-          {count}{" "}<UiText text={"viewing request"} />{count === 1 ? "" : "s"}
-        </span>{" "}<UiText text={"past their scheduled date with no response yet."} />{" "}</p>
-      <Button variant="outline" size="sm" onClick={onView}><UiText text={"View overdue"} />{" "}</Button>
+          {count} <UiText text={"viewing request"} />
+          {count === 1 ? "" : "s"}
+        </span>{" "}
+        <UiText text={"past their scheduled date with no response yet."} />{" "}
+      </p>
+      <Button variant="outline" size="sm" onClick={onView}>
+        <UiText text={"View overdue"} />{" "}
+      </Button>
     </div>
   );
 }

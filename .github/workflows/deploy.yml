@@ -1,0 +1,56 @@
+name: Deploy approved images
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        type: choice
+        options: [staging, production]
+        required: true
+      frontend_image:
+        description: Approved ghcr.io image pinned with @sha256 digest
+        required: true
+      backend_image:
+        description: Approved ghcr.io image pinned with @sha256 digest
+        required: true
+      approval_reference:
+        description: Change approval and tested rollback reference
+        required: true
+permissions:
+  contents: read
+concurrency:
+  group: deploy-${{ inputs.target }}
+  cancel-in-progress: false
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.target }}
+    timeout-minutes: 15
+    env:
+      DEPLOYMENT_ENABLED: ${{ vars.DEPLOYMENT_ENABLED }}
+      FRONTEND_IMAGE: ${{ inputs.frontend_image }}
+      BACKEND_IMAGE: ${{ inputs.backend_image }}
+      APPROVAL_REFERENCE: ${{ inputs.approval_reference }}
+      DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+      DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+      SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
+    steps:
+      - name: Validate approved target and immutable images
+        shell: bash
+        run: |
+          [[ "$DEPLOYMENT_ENABLED" == true ]] || { echo 'Deployment environment is not enabled'; exit 1; }
+          [[ -n "$APPROVAL_REFERENCE" && -n "$SSH_PRIVATE_KEY" && -n "$SSH_KNOWN_HOSTS" ]] || exit 1
+          [[ "$DEPLOY_USER" =~ ^[a-z_][a-z0-9_-]*$ && "$DEPLOY_HOST" =~ ^[A-Za-z0-9.-]+$ ]] || exit 1
+          for image in "$FRONTEND_IMAGE" "$BACKEND_IMAGE"; do
+            [[ "$image" =~ ^ghcr.io/[a-z0-9._/-]+@sha256:[0-9a-f]{64}$ ]] || exit 1
+          done
+      - name: Apply the prepared server deployment
+        shell: bash
+        run: |
+          umask 077
+          key="$RUNNER_TEMP/lumavok-deploy-key"
+          known="$RUNNER_TEMP/lumavok-known-hosts"
+          trap 'rm -f "$key" "$known"' EXIT
+          printf '%s\n' "$SSH_PRIVATE_KEY" > "$key"
+          printf '%s\n' "$SSH_KNOWN_HOSTS" > "$known"
+          ssh -i "$key" -o BatchMode=yes -o StrictHostKeyChecking=yes -o UserKnownHostsFile="$known" "$DEPLOY_USER@$DEPLOY_HOST" "/srv/lumavok/deploy.sh '$FRONTEND_IMAGE' '$BACKEND_IMAGE'"

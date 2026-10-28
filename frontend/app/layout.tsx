@@ -1,3 +1,4 @@
+import { localizedMetadata } from "@/lib/localizedMetadata";
 import { cookies, headers } from "next/headers";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Newsreader } from "next/font/google";
@@ -29,17 +30,19 @@ const newsreader = Newsreader({
   display: "swap",
 });
 
-export const metadata: Metadata = {
-  title: APP_NAME,
-  description: "Property discovery and trust platform for African markets.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return localizedMetadata({
+    title: APP_NAME,
+    description: "Find property for sale and rent in Burkina Faso.",
+  });
+}
 
 export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const nonce=(await headers()).get("x-nonce")??undefined;
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
   const language =
     (await cookies()).get("lumavok-language")?.value === "en" ? "en" : "fr";
   return (
@@ -83,9 +86,9 @@ d.style.setProperty("--a11y-font-scale",s[p.fontSize]||"1");}catch(e){}})();`,
         />
       </head>
       <body className="flex min-h-full flex-col">
-        <ErrorBoundary>
-          <Providers initialLanguage={language}>{children}</Providers>
-        </ErrorBoundary>
+        <Providers initialLanguage={language}>
+          <ErrorBoundary>{children}</ErrorBoundary>
+        </Providers>
       </body>
     </html>
   );

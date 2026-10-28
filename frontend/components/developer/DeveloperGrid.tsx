@@ -38,7 +38,7 @@ export function DeveloperGrid({
   skeletonCount = 3,
   emptyDescription = "Try adjusting your search or check back later.",
 }: DeveloperGridProps) {
- const ui = useUi();
+  const ui = useUi();
   if (isError) {
     return (
       <ErrorState
@@ -51,7 +51,9 @@ export function DeveloperGrid({
   if (isLoading) {
     return (
       <div role="status" aria-live="polite" className={GRID_CLASSNAME}>
-        <span className="sr-only"><UiText text={"Loading developers…"} /></span>
+        <span className="sr-only">
+          <UiText text={"Loading developers…"} />
+        </span>
         {Array.from({ length: skeletonCount }).map((_, index) => (
           <DeveloperCardSkeleton key={index} aria-hidden />
         ))}
@@ -61,7 +63,10 @@ export function DeveloperGrid({
 
   if (developers.length === 0) {
     return (
-      <EmptyState title={ui("No developers found")} description={emptyDescription} />
+      <EmptyState
+        title={ui("No developers found")}
+        description={emptyDescription}
+      />
     );
   }
 

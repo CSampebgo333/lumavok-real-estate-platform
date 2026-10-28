@@ -1,7 +1,6 @@
 "use client";
 import { UiText, useUi } from "@/components/common/UiText";
 
-
 import { motion } from "framer-motion";
 
 import { EmptyState } from "@/components/common/EmptyState";
@@ -77,7 +76,10 @@ export function PortfolioCompositionTable({
       title={ui("Portfolio Composition")}
       description={
         portfolio
-          ? `${portfolio.totalListings} listing${portfolio.totalListings === 1 ? "" : "s"} across every status.`
+          ? ui("{{value0}} listing{{value1}} across every status.", {
+              value0: portfolio.totalListings,
+              value1: portfolio.totalListings === 1 ? "" : "s",
+            })
           : undefined
       }
     >
@@ -98,8 +100,12 @@ export function PortfolioCompositionTable({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead><UiText text={"Status"} /></TableHead>
-                <TableHead className="text-right"><UiText text={"Share of portfolio"} /></TableHead>
+                <TableHead>
+                  <UiText text={"Status"} />
+                </TableHead>
+                <TableHead className="text-right">
+                  <UiText text={"Share of portfolio"} />
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -107,7 +113,9 @@ export function PortfolioCompositionTable({
                 .filter((entry) => entry.count > 0)
                 .map((entry) => (
                   <TableRow key={entry.status}>
-                    <TableCell><UiText text={PROPERTY_STATUS_LABEL[entry.status]} /></TableCell>
+                    <TableCell>
+                      <UiText text={PROPERTY_STATUS_LABEL[entry.status]} />
+                    </TableCell>
                     <TableCell>
                       <ShareBar
                         count={entry.count}
@@ -122,8 +130,12 @@ export function PortfolioCompositionTable({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead><UiText text={"Category"} /></TableHead>
-                <TableHead className="text-right"><UiText text={"Share of portfolio"} /></TableHead>
+                <TableHead>
+                  <UiText text={"Category"} />
+                </TableHead>
+                <TableHead className="text-right">
+                  <UiText text={"Share of portfolio"} />
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -131,7 +143,9 @@ export function PortfolioCompositionTable({
                 .filter((entry) => entry.count > 0)
                 .map((entry) => (
                   <TableRow key={entry.category}>
-                    <TableCell><UiText text={CATEGORY_LABEL[entry.category]} /></TableCell>
+                    <TableCell>
+                      <UiText text={CATEGORY_LABEL[entry.category]} />
+                    </TableCell>
                     <TableCell>
                       <ShareBar
                         count={entry.count}

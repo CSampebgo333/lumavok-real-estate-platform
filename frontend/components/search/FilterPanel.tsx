@@ -1,7 +1,6 @@
 "use client";
 import { UiText } from "@/components/common/UiText";
 
-
 import { Button } from "@/components/ui/button";
 import {
   PROPERTY_CATEGORIES,

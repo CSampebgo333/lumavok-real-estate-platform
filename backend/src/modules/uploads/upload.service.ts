@@ -4,7 +4,7 @@ import { createClient } from "@supabase/supabase-js";
 import { getEnv } from "../../config/env.js";
 import { prisma } from "../../config/prisma.js";
 import { requireDeveloperId } from "../../middleware/auth.js";
-import { BadRequestError, ConflictError } from "../../utils/errors.js";
+import { ApiError, BadRequestError, ConflictError } from "../../utils/errors.js";
 const BUCKET = "property-media",
   TTL = 120;
 const UUID =
@@ -18,12 +18,13 @@ function storage() {
     );
   return createClient(env.SUPABASE_URL, env.SUPABASE_STORAGE_KEY, {
     auth: { persistSession: false, autoRefreshToken: false },
+    global: { fetch: (input,init) => fetch(input,{...init,signal:AbortSignal.any([...(init?.signal?[init.signal]:[]),AbortSignal.timeout(10000)])}) },
   }).storage.from(BUCKET);
 }
 function keyFor(developerId: string, id: string) {
   requireDeveloperId(developerId);
   if (!UUID.test(id)) throw new BadRequestError("Invalid upload ID");
-  return developerId + "/" + id + ".webp";
+  return developerId + "/" + id.toLowerCase() + ".webp";
 }
 export async function encodeImage(bytes: Buffer): Promise<Buffer> {
   if (!bytes.length || bytes.length > 10 * 1024 * 1024)
@@ -60,25 +61,14 @@ export async function encodeImage(bytes: Buffer): Promise<Buffer> {
 }
 export async function saveFile(developerId: string, bytes: Buffer) {
   requireDeveloperId(developerId);
-  const encoded = await encodeImage(bytes),
-    id = crypto.randomUUID(),
-    key = keyFor(developerId, id);
-  const { error } = await storage().upload(key, encoded, {
-    contentType: "image/webp",
-    upsert: false,
-    cacheControl: "60",
-  });
-  if (error) throw new BadRequestError("Upload failed", "UPLOAD_FAILED");
-  const { data, error: signedError } = await storage().createSignedUrl(
-    key,
-    TTL,
-  );
-  if (signedError)
-    throw new BadRequestError(
-      "Upload preview unavailable",
-      "UPLOAD_PREVIEW_FAILED",
-    );
-  return { publicId: id, url: data.signedUrl };
+  const encoded=await encodeImage(bytes),id=crypto.randomUUID(),key=keyFor(developerId,id),bucket=storage();
+  await prisma.storageAsset.create({data:{id,propertyDeveloperId:developerId,storageKey:key,state:"UPLOADING"}});
+  const {error}=await bucket.upload(key,encoded,{contentType:"image/webp",upsert:false,cacheControl:"60"});
+  if(error){await prisma.storageAsset.update({where:{id},data:{state:"DELETING"}});throw new ApiError(503,"Upload failed","UPLOAD_FAILED")}
+  await prisma.storageAsset.update({where:{id},data:{state:"AVAILABLE"}});
+  const {data,error:signedError}=await bucket.createSignedUrl(key,TTL);
+  if(signedError)throw new ApiError(503,"Upload preview unavailable","UPLOAD_PREVIEW_FAILED");
+  return {publicId:id,url:data.signedUrl};
 }
 export async function mediaForRead(m: any) {
   if (m.storageProvider !== "supabase")
@@ -86,8 +76,8 @@ export async function mediaForRead(m: any) {
   // Callers have already loaded this child through the scoped parent RLS policy.
   const { data, error } = await storage().createSignedUrl(m.storageKey, TTL);
   if (error)
-    throw new BadRequestError(
-      "Media is temporarily unavailable",
+    throw new ApiError(
+      503,"Media is temporarily unavailable",
       "MEDIA_UNAVAILABLE",
     );
   return { url: data.signedUrl, publicId: m.publicId, order: m.order };
@@ -98,6 +88,7 @@ export async function validateMediaReferences(
   existing: any[],
 ) {
   requireDeveloperId(developerId);
+  items=items.map(m=>({...m,publicId:UUID.test(m.publicId)?m.publicId.toLowerCase():m.publicId}));
   if (new Set(items.map((m) => m.publicId)).size !== items.length)
     throw new BadRequestError("Duplicate media");
   if (new Set(items.map((m) => m.order)).size !== items.length)
@@ -115,6 +106,8 @@ export async function validateMediaReferences(
         altText: old.altText,
         url: old.url,
         publicId: old.publicId,
+        assetId: old.assetId,
+        assetState: old.assetState,
         storageProvider: old.storageProvider,
         storageKey: old.storageKey,
         order: index,
@@ -122,13 +115,15 @@ export async function validateMediaReferences(
       });
       continue;
     }
-    const key = keyFor(developerId, item.publicId),
-      name = item.publicId + ".webp";
+    const key=keyFor(developerId,item.publicId),name=item.publicId+".webp";
+    const [asset]=await prisma.$queryRaw<Array<{id:string;state:string;storage_key:string}>>`SELECT id::text,state,storage_key FROM public.storage_asset WHERE id=${item.publicId}::uuid AND property_developer_id=${developerId} FOR UPDATE`;
+    if(!asset||asset.state!=="AVAILABLE"||asset.storage_key!==key)throw new BadRequestError("Upload is unavailable or belongs to another seller","INVALID_MEDIA_OWNER");
     const { data, error } = await storage().list(developerId, {
       search: name,
       limit: 2,
     });
-    if (error || !data?.some((o) => o.name === name))
+    if(error)throw new ApiError(503,"Media storage unavailable","STORAGE_UNAVAILABLE");
+    if (!data?.some((o) => o.name === name))
       throw new BadRequestError(
         "Upload is missing or belongs to another seller",
         "INVALID_MEDIA_OWNER",
@@ -136,6 +131,8 @@ export async function validateMediaReferences(
     output.push({
       url: "storage://" + BUCKET + "/" + key,
       publicId: item.publicId,
+      assetId: asset.id,
+      assetState: "AVAILABLE",
       storageProvider: "supabase",
       storageKey: key,
       order: index,
@@ -145,18 +142,20 @@ export async function validateMediaReferences(
   return output;
 }
 export async function deleteUpload(developerId: string, publicId: string) {
-  requireDeveloperId(developerId);
-  const key = keyFor(developerId, publicId);
-  // Attached files must first be removed from the listing. Never unlink live media
-  // and delete the object as two independently committed operations.
-  if (
-    await prisma.propertyMedia.findFirst({
-      where: { publicId, property: { propertyDeveloperId: developerId } },
-    })
-  )
-    throw new ConflictError(
-      "Remove this image from the listing before deleting the file",
-    );
-  const { error } = await storage().remove([key]);
-  if (error) throw new BadRequestError("Delete failed", "DELETE_FAILED");
+  requireDeveloperId(developerId);const key=keyFor(developerId,publicId),id=publicId.toLowerCase();
+  let shouldDelete=false;
+  try {
+    shouldDelete=await prisma.$transaction(async tx=>{
+      const [asset]=await tx.$queryRaw<Array<{id:string;state:string}>>`SELECT id::text,state FROM public.storage_asset WHERE id=${id}::uuid AND property_developer_id=${developerId} FOR UPDATE`;
+      if(!asset)throw new BadRequestError("Upload is unavailable","INVALID_MEDIA_OWNER");
+      if(asset.state==="DELETED")return false;
+      if(await tx.propertyMedia.findFirst({where:{assetId:id},select:{id:true}}))throw new ConflictError("Remove this image from all listings before deleting the file");
+      // The composite FK also checks references hidden by RLS. Commit this
+      // tombstone before the external deletion; future attachment is impossible.
+      await tx.storageAsset.update({where:{id},data:{state:"DELETING"}});return true;
+    });
+  } catch(error){if((error as {code?:string}).code==="P2003")throw new ConflictError("This upload is still attached to a listing");throw error}
+  if(!shouldDelete)return;
+  const {error}=await storage().remove([key]);if(error)throw new ApiError(503,"Deletion will need to be retried","DELETE_FAILED");
+  await prisma.storageAsset.update({where:{id},data:{state:"DELETED"}});
 }

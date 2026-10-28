@@ -99,7 +99,7 @@ describe("MediaUploader", () => {
     expect(uploadFile).not.toHaveBeenCalled();
   });
 
-  it("removing an already-uploaded photo calls deleteUpload", async () => {
+  it("removing a photo edits the draft without destroying a persisted asset", async () => {
     const user = userEvent.setup();
     deleteUpload.mockResolvedValue(undefined);
     render(
@@ -112,7 +112,7 @@ describe("MediaUploader", () => {
 
     await user.click(screen.getByRole("button", { name: "Remove photo" }));
 
-    expect(deleteUpload).toHaveBeenCalledWith("pub-a");
+    expect(deleteUpload).not.toHaveBeenCalled();
     expect(screen.queryByText("Cover")).not.toBeInTheDocument();
   });
 

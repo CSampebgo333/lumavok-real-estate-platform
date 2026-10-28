@@ -1,7 +1,6 @@
 "use client";
 import { UiText, useUi } from "@/components/common/UiText";
 
-
 import { useContentLocale as useLanguage } from "@/hooks/useContentLocale";
 import { api } from "@/lib/api";
 import { useRouter } from "next/navigation";
@@ -71,7 +70,9 @@ function ListingEditorStatusLine({
     <div className="flex items-center gap-2">
       <PropertyStatusBadge status={status} />
       {showUnsaved && (
-        <span aria-live="polite" className="text-muted-foreground text-sm"><UiText text={"Unsaved changes"} />{" "}</span>
+        <span aria-live="polite" className="text-muted-foreground text-sm">
+          <UiText text={"Unsaved changes"} />{" "}
+        </span>
       )}
     </div>
   );
@@ -367,7 +368,9 @@ function ListingFormInner({
         });
         version.current = published.rowVersion;
         if (changed(form.getValues(), values)) {
-          toast.info(ui("Published. Save the additional changes before leaving."));
+          toast.info(
+            ui("Published. Save the additional changes before leaving."),
+          );
           return;
         }
         router.push(ROUTES.LISTINGS);
@@ -417,8 +420,12 @@ function ListingFormInner({
             disabled={!!identity}
             onChange={(e) => setContentLanguage(e.target.value)}
           >
-            <option value="fr"><UiText text={"Français"} /></option>
-            <option value="en"><UiText text={"English"} /></option>
+            <option value="fr">
+              <UiText text={"Français"} />
+            </option>
+            <option value="en">
+              <UiText text={"English"} />
+            </option>
           </select>
         </label>
       )}

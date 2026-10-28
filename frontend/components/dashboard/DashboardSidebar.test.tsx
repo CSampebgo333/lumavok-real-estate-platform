@@ -125,7 +125,9 @@ describe("DashboardSidebar", () => {
     getUnreadCount.mockResolvedValue(0);
     renderWithQueryClient(<DashboardSidebar />);
 
-    expect(screen.getByRole("link",{name:"Profile & Company"})).toHaveAttribute("href","/profile");
+    expect(
+      screen.getByRole("link", { name: "Profile & Company" }),
+    ).toHaveAttribute("href", "/profile");
     expect(screen.queryByText("Account Settings")).not.toBeInTheDocument();
     expect(screen.queryByText("Soon")).not.toBeInTheDocument();
     expect(

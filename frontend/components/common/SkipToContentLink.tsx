@@ -1,4 +1,3 @@
-
 import { UiText } from "@/components/common/UiText";
 /**
  * Visually hidden until focused — lets keyboard users jump past the top bar
@@ -11,6 +10,8 @@ export function SkipToContentLink({ targetId }: { targetId: string }) {
     <a
       href={`#${targetId}`}
       className="bg-background text-foreground focus-visible:ring-ring/50 sr-only rounded-md border px-4 py-2 text-sm font-medium focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus-visible:ring-3 focus-visible:outline-none"
-    ><UiText text={"Skip to main content"} />{" "}</a>
+    >
+      <UiText text={"Skip to main content"} />{" "}
+    </a>
   );
 }

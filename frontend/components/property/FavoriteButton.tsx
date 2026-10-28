@@ -1,4 +1,5 @@
 "use client";
+import { useUi } from "@/components/common/UiText";
 
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -33,8 +34,9 @@ export function FavoriteButton({
   size = "sm",
   className,
 }: FavoriteButtonProps) {
+  const ui = useUi();
   const router = useRouter();
-  const isAuthenticated = useAuthStore(state => state.isAuthenticated);
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const isFavorited = useIsFavorited(propertyId);
   const toggle = useToggleFavorite();
 
@@ -45,17 +47,23 @@ export function FavoriteButton({
       aria-pressed={isFavorited}
       aria-label={
         isFavorited
-          ? `Remove ${propertyTitle} from saved properties`
-          : `Save ${propertyTitle}`
+          ? ui("Remove {{value0}} from saved properties", {
+              value0: propertyTitle,
+            })
+          : ui("Save {{value0}}", { value0: propertyTitle })
       }
       onClick={(event) => {
         event.preventDefault();
         event.stopPropagation();
         if (!isAuthenticated) {
-          router.push(`/login?redirect=${encodeURIComponent(window.location.pathname)}`);
+          router.push(
+            `/login?redirect=${encodeURIComponent(window.location.pathname)}`,
+          );
           return;
         }
-        toggle.mutate(propertyId, { onError: error => toast.error(getErrorMessage(error)) });
+        toggle.mutate(propertyId, {
+          onError: (error) => toast.error(getErrorMessage(error)),
+        });
       }}
       className={cn(
         "focus-visible:ring-ring inline-flex items-center justify-center rounded-full transition-transform duration-150 focus-visible:ring-3 focus-visible:outline-none active:scale-90",

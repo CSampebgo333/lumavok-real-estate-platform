@@ -1,4 +1,3 @@
-
 import { UiText } from "@/components/common/UiText";
 import Link from "next/link";
 
@@ -50,7 +49,9 @@ export function AuthCard({
               <UiText text={title} />
             </h1>
             {description && (
-              <p className="text-muted-foreground text-sm"><UiText text={description} /></p>
+              <p className="text-muted-foreground text-sm">
+                <UiText text={description} />
+              </p>
             )}
           </div>
 

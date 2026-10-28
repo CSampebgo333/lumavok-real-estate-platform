@@ -18,9 +18,7 @@ describe("getPostLoginDestination", () => {
     expect(getPostLoginDestination(makeUser({ role: "DEVELOPER" }))).toBe(
       "/dashboard",
     );
-    expect(getPostLoginDestination(makeUser({ role: "ADMIN" }))).toBe(
-      "/admin",
-    );
+    expect(getPostLoginDestination(makeUser({ role: "ADMIN" }))).toBe("/admin");
   });
 
   it("sends USER role home", () => {

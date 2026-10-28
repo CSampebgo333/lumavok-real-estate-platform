@@ -1,3 +1,4 @@
+import { localizedMetadata } from "@/lib/localizedMetadata";
 import type { Metadata } from "next";
 
 import { AnalyticsView } from "@/components/dashboard/analytics/AnalyticsView";
@@ -9,10 +10,12 @@ import {
   type RawAnalyticsSearchParams,
 } from "@/lib/analyticsFilters";
 
-export const metadata: Metadata = {
-  title: `Analytics | ${APP_NAME}`,
-  description: "Track appointment conversion and portfolio composition.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return localizedMetadata({
+    title: `Analytics | ${APP_NAME}`,
+    description: "Track appointment conversion and portfolio composition.",
+  });
+}
 
 interface AnalyticsPageProps {
   searchParams: Promise<RawAnalyticsSearchParams>;
