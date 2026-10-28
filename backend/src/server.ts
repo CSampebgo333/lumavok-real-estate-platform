@@ -23,10 +23,13 @@ async function main() {
     console.log(`   Health check: http://localhost:${env.PORT}/api/health`);
   });
   const shutdown = () => {
-    server.close(() => { void prisma.$disconnect().then(() => process.exit(0)); });
+    server.close(() => {
+      void prisma.$disconnect().then(() => process.exit(0));
+    });
     setTimeout(() => process.exit(1), 10000).unref();
   };
-  process.once("SIGTERM", shutdown); process.once("SIGINT", shutdown);
+  process.once("SIGTERM", shutdown);
+  process.once("SIGINT", shutdown);
 }
 
 main().catch((err) => {

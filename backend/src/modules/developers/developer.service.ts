@@ -58,8 +58,17 @@ export async function getDevelopers(params: GetDevelopersParams = {}) {
       { businessName: { contains: params.q, mode: "insensitive" } },
       { city: { contains: params.q, mode: "insensitive" } },
     ];
-  if(params.sort && !["name_asc","rating_desc","listings_desc"].includes(params.sort))throw new BadRequestError("Invalid sort");
-  const orderBy: any = params.sort==="name_asc" ? [{businessName:"asc"},{id:"asc"}] : params.sort==="listings_desc" ? [{properties:{_count:"desc"}},{id:"asc"}] : [{averageRating:"desc"},{id:"asc"}];
+  if (
+    params.sort &&
+    !["name_asc", "rating_desc", "listings_desc"].includes(params.sort)
+  )
+    throw new BadRequestError("Invalid sort");
+  const orderBy: any =
+    params.sort === "name_asc"
+      ? [{ businessName: "asc" }, { id: "asc" }]
+      : params.sort === "listings_desc"
+        ? [{ properties: { _count: "desc" } }, { id: "asc" }]
+        : [{ averageRating: "desc" }, { id: "asc" }];
   const [items, total] = await Promise.all([
     prisma.propertyDeveloper.findMany({ where, skip, take, orderBy, include }),
     prisma.propertyDeveloper.count({ where }),

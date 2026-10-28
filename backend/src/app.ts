@@ -50,7 +50,11 @@ export function createApp(options: { authRateLimit?: number } = {}) {
     rateLimit({
       windowMs: 15 * 60 * 1000,
       limit: options.authRateLimit ?? 50,
-      message: {success:false,code:"RATE_LIMITED",message:"Too many requests. Please try again later."},
+      message: {
+        success: false,
+        code: "RATE_LIMITED",
+        message: "Too many requests. Please try again later.",
+      },
       standardHeaders: "draft-8",
       legacyHeaders: false,
       validate: { xForwardedForHeader: false },
@@ -58,8 +62,17 @@ export function createApp(options: { authRateLimit?: number } = {}) {
   );
 
   app.use((req, _res, next) => {
-    if(Object.values(req.query).some(v=>typeof v!=="string"))return next(new BadRequestError("Query parameters must be single strings","INVALID_QUERY"));
-    if(Object.values(req.query).some(v=>String(v).length>500))return next(new BadRequestError("Query parameter is too long","INVALID_QUERY"));
+    if (Object.values(req.query).some((v) => typeof v !== "string"))
+      return next(
+        new BadRequestError(
+          "Query parameters must be single strings",
+          "INVALID_QUERY",
+        ),
+      );
+    if (Object.values(req.query).some((v) => String(v).length > 500))
+      return next(
+        new BadRequestError("Query parameter is too long", "INVALID_QUERY"),
+      );
     if (req.query.lang !== undefined && typeof req.query.lang !== "string")
       return next(
         new BadRequestError(
@@ -78,8 +91,12 @@ export function createApp(options: { authRateLimit?: number } = {}) {
   });
 
   app.get("/api/ready", async (_req, res) => {
-    try { await prisma.$queryRaw`SELECT 1`; res.json({status:"ready"}); }
-    catch { res.status(503).json({status:"unavailable"}); }
+    try {
+      await prisma.$queryRaw`SELECT 1`;
+      res.json({ status: "ready" });
+    } catch {
+      res.status(503).json({ status: "unavailable" });
+    }
   });
   app.use("/api/v1/auth", authRouter);
   app.use("/api/v1/sellers/me", profileRouter);

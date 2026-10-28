@@ -8,6 +8,7 @@ import { useAuthStore } from "@/store/authStore";
 /** Configured Axios instance for all backend API calls. */
 export const api = axios.create({
   baseURL: API_BASE_URL,
+  timeout: 20000,
   withCredentials: true,
 });
 

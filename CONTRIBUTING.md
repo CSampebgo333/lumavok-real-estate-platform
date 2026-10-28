@@ -1,52 +1,15 @@
-# Contributing to ByTe Real Estate Platform
+# Contributing
 
-This repository follows the rules defined in the development roadmap and is intentionally strict about branch hygiene, PR quality, and review flow.
+Use Node 24 and `npm run setup`. Create a branch from `main`; open a PR with the problem, resulting behavior, compatibility impact and actual validation. Keep changes scoped and prefer additive migrations. All normal code checks must pass before merge. Configure required CI jobs and review protection in GitHub before teammates begin shared development; configuration files do not create those settings automatically.
 
-## Branching
+The canonical schema is `database/full-database-design/schema.prisma`; SQL migrations also contain constraints, triggers, partial indexes and RLS. Never edit an applied migration, use `db push` on shared data or synthesize missing applied history. Generate a new migration through the supported tooling and review the SQL. Test both fresh and observed schemas, ordinary runtime permissions, denied cross-account operations and rollback/recovery implications.
 
-- Branch from `develop` for normal work.
-- Use `feature/*` for new work, `fix/*` for bug fixes, and `chore/*` for maintenance.
-- Keep branch names lowercase and hyphen-separated.
-- Do not commit directly to `main` or `develop`.
+Preserve original Burkina seed files. Use disposable architecture/E2E fixtures for new scenarios. Never point tests at a shared or production database. Native PostgreSQL tests accept loopback hosts and explicit disposable flags only.
 
-## Commit Messages
+Add interface copy to both dictionaries with identical keys and interpolation placeholders. Localized database content uses exact-language translation rows; do not save fallback text as if authored in the requested language. Keep numeric facts and identifiers neutral. Test French and English behavior, not only dictionary presence.
 
-Use Conventional Commits:
+Never commit `.env` files, private backups, real credentials or production-content manifests. Run `npm run scan:secrets`. Do not log request credentials, Auth tokens or provider errors containing secrets. A fake credential in a test must be clearly scoped to an isolated fixture.
 
-```text
-<type>(<scope>): <subject>
-```
+Changing ownership, roles, public visibility, currency/period semantics or media lifetime requires authorization and RLS tests. Avoid static client-side permissions as the only security check. Run `npm run check`, `npm test`, `npm run build`, `npm run audit` and relevant E2E tests. A failed or unrun check belongs in the PR description.
 
-Examples:
-
-- `feat(properties): add property search filters`
-- `fix(auth): refresh token rotation`
-- `docs(readme): clarify local setup`
-
-Rules:
-
-- Keep the subject imperative and under 72 characters.
-- Do not end the subject with a period.
-- Include the relevant BYTE issue reference in the footer when applicable.
-
-## Pull Requests
-
-- Open PRs against `develop` unless the work is a hotfix.
-- Keep PRs focused and small enough to review quickly.
-- Add screenshots or screen recordings for frontend changes.
-- Ensure lint, tests, and build checks pass before requesting review.
-- Request Emmanuel review before merging.
-
-## Code Quality
-
-- Avoid `any` in TypeScript.
-- Avoid `console.log` in committed code.
-- Prefer typed errors and validation schemas.
-- Update `CHANGELOG.md` when user-facing behavior changes.
-- Update `.env.example` when adding new environment variables.
-
-## Issue Flow
-
-- Use the GitHub issue templates for bugs, features, and tasks.
-- Keep MVP scope aligned with the roadmap.
-- Move deferred work into `v2-backlog` after the Phase 2 scope freeze.
+Publishing source is separate from deploying it. Release and deployment require explicit operational approval, protected environments and completed staging/backup gates. Database migrations are never automatically run by application startup or container deployment.

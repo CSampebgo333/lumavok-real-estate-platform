@@ -13,6 +13,7 @@ services:
     cap_drop: [ALL]
     networks: [internal]
   web:
+    env_file: ${WEB_ENV_FILE:-./infrastructure/web.env}
     image: ${FRONTEND_IMAGE:?Supply an approved frontend image digest}
     environment:
       NODE_ENV: production

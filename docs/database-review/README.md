@@ -1,3 +1,5 @@
+> Historical evidence. The consolidated schema, access model and operations are documented in the root README and current `docs/` files. This document is retained for provenance, not as current setup instructions.
+
 # Lumavok approved architecture implementation
 
 These files describe a reviewed implementation candidate. Nothing here has been applied to the shared Supabase database. The Burkina Faso seeds are unchanged.

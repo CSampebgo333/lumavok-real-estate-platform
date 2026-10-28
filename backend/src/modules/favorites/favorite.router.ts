@@ -7,6 +7,10 @@ const router = Router();
 const authenticateHandler = authenticate as unknown as RequestHandler;
 
 router.get("/", authenticateHandler, favoriteController.getFavorites);
-router.post("/:propertyId", authenticateHandler, favoriteController.toggleFavorite);
+router.post(
+  "/:propertyId",
+  authenticateHandler,
+  favoriteController.toggleFavorite,
+);
 
 export default router;

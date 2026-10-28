@@ -97,6 +97,7 @@ test("profile translations and explicitly public contact email persist", async (
   await page.goto("/profile");
   await page.getByLabel("Content language").selectOption("en");
   await expect(page.getByLabel("Biography")).toHaveValue(/A local agency/);
+  await expect(page.getByLabel("City", { exact: true })).toHaveValue("c1");
   await page
     .getByLabel("Biography")
     .fill("An English profile managed by the seller.");
@@ -116,7 +117,7 @@ test("profile translations and explicitly public contact email persist", async (
     page.getByRole("link", { name: "public-contact@example.test" }),
   ).toBeVisible();
 });
-test("a rental draft preserves canonical location, price, currency and rental period", async ({
+test("a rental listing preserves its draft terms, uploads a photo and publishes", async ({
   page,
 }) => {
   await login(page);
@@ -139,4 +140,39 @@ test("a rental draft preserves canonical location, price, currency and rental pe
   await expect(page.getByLabel("Rental period", { exact: true })).toHaveValue(
     "MONTH",
   );
+  await page
+    .getByLabel("Description", { exact: true })
+    .fill(
+      "A family rental home in Ouagadougou with clear monthly rental terms.",
+    );
+  await page
+    .getByLabel("Address", { exact: true })
+    .fill("Zone du Bois, Ouagadougou");
+  const image = await page.screenshot({ type: "png" });
+  await page.getByLabel("Add photos").setInputFiles({
+    name: "fixture-photo.png",
+    mimeType: "image/png",
+    buffer: image,
+  });
+  await expect(page.getByText("Cover", { exact: true })).toBeVisible();
+  const publish = page.waitForResponse(
+    (r) => r.url().includes("/status") && r.request().method() === "PATCH",
+  );
+  await page.getByRole("button", { name: "Publish", exact: true }).click();
+  const published = await publish;
+  expect(published.status()).toBe(200);
+  const data = await published.json();
+  await page.goto("/properties/" + encodeURIComponent(data.data.slug));
+  await expect(
+    page.getByRole("heading", { name: "Browser test draft", level: 1 }),
+  ).toBeVisible();
+  const photo = page.locator("main img").first();
+  await expect(photo).toBeVisible();
+  await expect
+    .poll(() =>
+      photo.evaluate(
+        (img: HTMLImageElement) => img.complete && img.naturalWidth > 0,
+      ),
+    )
+    .toBe(true);
 });

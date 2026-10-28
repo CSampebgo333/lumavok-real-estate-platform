@@ -51,7 +51,12 @@ export async function getNotifications(
     prisma.notification.count({ where }),
   ]);
   const locale = await localeConfig();
-  return paginateResult(items.map(n => mapNotification(n, locale.requested)), total, page, pageSize);
+  return paginateResult(
+    items.map((n) => mapNotification(n, locale.requested)),
+    total,
+    page,
+    pageSize,
+  );
 }
 
 export async function getUnreadCount(developerId: string): Promise<number> {
@@ -79,8 +84,11 @@ export async function markAsRead(developerId: string, id: string) {
 
 export async function markAllAsRead(developerId: string) {
   requireDeveloperId(developerId);
-  const updated=await prisma.notification.updateMany({where:{propertyDeveloperId:developerId,status:"UNREAD"},data:{status:"READ",readAt:new Date()}});
-  return {updatedCount:updated.count};
+  const updated = await prisma.notification.updateMany({
+    where: { propertyDeveloperId: developerId, status: "UNREAD" },
+    data: { status: "READ", readAt: new Date() },
+  });
+  return { updatedCount: updated.count };
 }
 
 export function mapNotification(n: any, lang: string) {

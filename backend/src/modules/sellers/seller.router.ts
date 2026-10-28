@@ -12,8 +12,14 @@ const schema = z
   .object({
     businessName: z.string().trim().min(1).max(120),
     cityId: z.string().min(1),
-    phoneNumber: z.string().trim().regex(/^\+[1-9]\d{6,14}$/),
-    whatsappNumber: z.string().trim().regex(/^\+[1-9]\d{6,14}$/),
+    phoneNumber: z
+      .string()
+      .trim()
+      .regex(/^\+[1-9]\d{6,14}$/),
+    whatsappNumber: z
+      .string()
+      .trim()
+      .regex(/^\+[1-9]\d{6,14}$/),
   })
   .strict();
 router.get(
@@ -21,7 +27,10 @@ router.get(
   authorize("ADMIN") as unknown as RequestHandler,
   async (req, res, next) => {
     try {
-      const {page,pageSize,skip,take}=parsePagination({page:Number(req.query.page??1),pageSize:Number(req.query.pageSize??20)});
+      const { page, pageSize, skip, take } = parsePagination({
+        page: Number(req.query.page ?? 1),
+        pageSize: Number(req.query.pageSize ?? 20),
+      });
       const profiles = await prisma.propertyDeveloper.findMany({
         where: { sellerStatus: "PENDING", deletedAt: null },
         select: {
@@ -31,11 +40,14 @@ router.get(
           userId: true,
           createdAt: true,
         },
-        take,skip,
-        orderBy:[{createdAt:"asc"},{id:"asc"}],
+        take,
+        skip,
+        orderBy: [{ createdAt: "asc" }, { id: "asc" }],
       });
-      const total=await prisma.propertyDeveloper.count({where:{sellerStatus:"PENDING",deletedAt:null}});
-      sendSuccess(res,paginateResult(profiles,total,page,pageSize));
+      const total = await prisma.propertyDeveloper.count({
+        where: { sellerStatus: "PENDING", deletedAt: null },
+      });
+      sendSuccess(res, paginateResult(profiles, total, page, pageSize));
     } catch (error) {
       next(error);
     }

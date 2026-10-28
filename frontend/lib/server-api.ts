@@ -19,7 +19,10 @@ async function read<T>(path: string): Promise<T> {
   const origin = process.env.BACKEND_API_URL ?? "http://localhost:4000";
   const url = new URL(origin + "/api/v1" + path);
   url.searchParams.set("lang", language);
-  const response = await fetch(url, { cache: "no-store" });
+  const response = await fetch(url, {
+    cache: "no-store",
+    signal: AbortSignal.timeout(10000),
+  });
   if (!response.ok) throw new CatalogueError(response.status);
   return ((await response.json()) as ApiResponse<T>).data;
 }

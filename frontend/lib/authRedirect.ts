@@ -1,12 +1,14 @@
 import { ROUTES } from "@/constants/routes";
 import type { User } from "@/types";
 
-/** Where a signed-in user lands: developers/admins go to the dashboard, everyone else home. */
+/** Route to the workspace supported by the freshly verified account. */
 export function getPostLoginDestination(user: User): string {
   return user.role === "ADMIN"
     ? ROUTES.ADMIN
     : user.role === "DEVELOPER"
-      ? ROUTES.DASHBOARD
+      ? user.developerId
+        ? ROUTES.DASHBOARD
+        : "/sell"
       : ROUTES.HOME;
 }
 

@@ -4,6 +4,15 @@ import { getEnv } from "./env.js";
 export function getSupabase() {
   const env = getEnv();
   return createClient(env.SUPABASE_URL, env.SUPABASE_PUBLISHABLE_KEY, {
+    global: {
+      fetch: (input, init) =>
+        fetch(input, {
+          ...init,
+          signal: init?.signal
+            ? AbortSignal.any([init.signal, AbortSignal.timeout(10000)])
+            : AbortSignal.timeout(10000),
+        }),
+    },
     auth: {
       persistSession: false,
       autoRefreshToken: false,

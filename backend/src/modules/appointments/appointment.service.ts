@@ -44,7 +44,10 @@ function dayBounds() {
   start.setUTCHours(0, 0, 0, 0);
   return { now, start, end: new Date(start.getTime() + 86400000) };
 }
-export function mapAppointment(a: any, locale: { requested: string; fallback: string }) {
+export function mapAppointment(
+  a: any,
+  locale: { requested: string; fallback: string },
+) {
   const t = resolveTranslation<any>(
     a.property?.translations ?? [],
     locale.requested,
@@ -108,7 +111,13 @@ export async function getAppointments(
     { id: "asc" },
   ];
   const [items, total] = await Promise.all([
-    prisma.appointment.findMany({ where, skip, take, orderBy, include: appointmentInclude }),
+    prisma.appointment.findMany({
+      where,
+      skip,
+      take,
+      orderBy,
+      include: appointmentInclude,
+    }),
     prisma.appointment.count({ where }),
   ]);
   return paginateResult(
@@ -181,7 +190,10 @@ async function change(
       },
     });
     return mapAppointment(
-      await tx.appointment.findUniqueOrThrow({ where: { id }, include: appointmentInclude }),
+      await tx.appointment.findUniqueOrThrow({
+        where: { id },
+        include: appointmentInclude,
+      }),
       locale,
     );
   });
@@ -232,7 +244,19 @@ export async function bulkUpdateStatus(
 }
 
 export function historyMessage(type: string, original: string, lang: string) {
- const events: Record<string,[string,string]> = {
- LISTING_PUBLISHED:["Listing published.","Annonce publiée."], LISTING_SUSPENDED:["Listing suspended.","Annonce suspendue."], DRAFT_REMINDER:["A listing is waiting to be published.","Une annonce attend d’être publiée."], APPOINTMENT_REQUESTED:["Viewing requested.","Visite demandée."], APPOINTMENT_CONFIRMED:["Viewing confirmed.","Visite confirmée."], APPOINTMENT_RESCHEDULED:["Viewing rescheduled.","Visite reprogrammée."], APPOINTMENT_COMPLETED:["Viewing completed.","Visite terminée."], APPOINTMENT_CANCELLED:["Viewing cancelled.","Visite annulée."], APPOINTMENT_NO_SHOW:["Client did not attend.","Client absent."]};
- return events[type]?.[lang==="fr"?1:0]??original;
+  const events: Record<string, [string, string]> = {
+    LISTING_PUBLISHED: ["Listing published.", "Annonce publiée."],
+    LISTING_SUSPENDED: ["Listing suspended.", "Annonce suspendue."],
+    DRAFT_REMINDER: [
+      "A listing is waiting to be published.",
+      "Une annonce attend d’être publiée.",
+    ],
+    APPOINTMENT_REQUESTED: ["Viewing requested.", "Visite demandée."],
+    APPOINTMENT_CONFIRMED: ["Viewing confirmed.", "Visite confirmée."],
+    APPOINTMENT_RESCHEDULED: ["Viewing rescheduled.", "Visite reprogrammée."],
+    APPOINTMENT_COMPLETED: ["Viewing completed.", "Visite terminée."],
+    APPOINTMENT_CANCELLED: ["Viewing cancelled.", "Visite annulée."],
+    APPOINTMENT_NO_SHOW: ["Client did not attend.", "Client absent."],
+  };
+  return events[type]?.[lang === "fr" ? 1 : 0] ?? original;
 }

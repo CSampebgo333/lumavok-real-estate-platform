@@ -21,7 +21,9 @@ export function NavbarAuthSection() {
   const { t } = useTranslation("common");
 
   if (isAuthenticated && user) {
-    const hasDashboard = user.role === "DEVELOPER" || user.role === "ADMIN";
+    const hasDashboard =
+      (user.role === "DEVELOPER" && !!user.developerId) ||
+      user.role === "ADMIN";
 
     return (
       <div className="flex items-center gap-3 text-sm">

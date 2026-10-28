@@ -1,3 +1,5 @@
+> Historical evidence. The consolidated schema, access model and operations are documented in the root README and current `docs/` files. This document is retained for provenance, not as current setup instructions.
+
 // ============================================================
 // LUMAVOK REAL ESTATE PLATFORM - DATABASE DESIGN
 // ============================================================

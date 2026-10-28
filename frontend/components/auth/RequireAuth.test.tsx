@@ -18,7 +18,7 @@ vi.mock("@/store/authStore", () => ({
 const mockedUseAuthStore = vi.mocked(useAuthStore);
 
 interface MockState {
-  user: { role: "USER" | "DEVELOPER" | "ADMIN" } | null;
+  user: { role: "USER" | "DEVELOPER" | "ADMIN"; developerId?: string } | null;
   isAuthenticated: boolean;
   isBootstrapping: boolean;
 }
@@ -103,7 +103,7 @@ describe("RequireAuth", () => {
     expect(screen.queryByText("Dashboard content")).not.toBeInTheDocument();
   });
 
-  it("allows an ADMIN into a DEVELOPER-gated route (role inheritance, ARCHITECTURE.md §6)", () => {
+  it("keeps ADMIN in its own workspace instead of pretending it has a seller identity", () => {
     mockAuthState({
       user: { role: "ADMIN" },
       isAuthenticated: true,
@@ -116,8 +116,8 @@ describe("RequireAuth", () => {
       </RequireAuth>,
     );
 
-    expect(screen.getByText("Dashboard content")).toBeInTheDocument();
-    expect(replace).not.toHaveBeenCalled();
+    expect(screen.queryByText("Dashboard content")).not.toBeInTheDocument();
+    expect(replace).toHaveBeenCalledWith("/forbidden");
   });
 
   it("allows an exact role match", () => {
@@ -198,4 +198,30 @@ describe("RequireAuth", () => {
       expect(replace).not.toHaveBeenCalled();
     });
   });
+});
+
+it("admits an active seller and blocks a seller role without an active profile", () => {
+  mockAuthState({
+    user: { role: "DEVELOPER", developerId: "dev1" },
+    isAuthenticated: true,
+    isBootstrapping: false,
+  });
+  const { rerender } = render(
+    <RequireAuth role="DEVELOPER">
+      <p>Seller workspace</p>
+    </RequireAuth>,
+  );
+  expect(screen.getByText("Seller workspace")).toBeInTheDocument();
+  mockAuthState({
+    user: { role: "DEVELOPER" },
+    isAuthenticated: true,
+    isBootstrapping: false,
+  });
+  rerender(
+    <RequireAuth role="DEVELOPER">
+      <p>Seller workspace</p>
+    </RequireAuth>,
+  );
+  expect(screen.queryByText("Seller workspace")).not.toBeInTheDocument();
+  expect(replace).toHaveBeenCalledWith("/forbidden");
 });

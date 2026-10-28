@@ -22,7 +22,8 @@ test(
       missing: "00000000-0000-4000-8000-000000000005",
     };
     const tokens = new Map<string, string>();
-    const storageObjects=new Map<string,Buffer>();let failStorageDelete=false;
+    const storageObjects = new Map<string, Buffer>();
+    let failStorageDelete = false;
     const jwt = (id: string) =>
       "test." +
       Buffer.from(JSON.stringify({ session_id: id })).toString("base64url") +
@@ -64,16 +65,55 @@ test(
     process.env.NODE_ENV = "test";
     process.env.SUPABASE_URL = "https://auth.example.test";
     process.env.SUPABASE_PUBLISHABLE_KEY = "sb_publishable_test";
-    process.env.SUPABASE_STORAGE_KEY="fixture_storage_only";
+    process.env.SUPABASE_STORAGE_KEY = "fixture_storage_only";
     process.env.AUTH_REDIRECT_URL = "http://localhost:3000/reset-password";
     const originalFetch = globalThis.fetch;
     globalThis.fetch = async (input: any, init: any) => {
-      const url=String(input),part=url.split("/storage/v1/")[1];
-      const json=(data:unknown,status=200)=>new Response(JSON.stringify(data),{status,headers:{"Content-Type":"application/json"}});
-      if(part?.startsWith("object/list/")){const body=JSON.parse(String(init.body)),prefix=body.prefix+"/";return json([...storageObjects.keys()].filter(k=>k.startsWith(prefix)).map(k=>({name:k.slice(prefix.length),id:k,metadata:{mimetype:"image/webp"}})))}
-      if(part?.startsWith("object/sign/property-media/"))return json({signedURL:"/object/sign/property-media/"+part.split("object/sign/property-media/")[1]+"?token=fixture"});
-      if(part?.startsWith("object/property-media/")&&init?.method==="POST"){const key=part.split("object/property-media/")[1];storageObjects.set(key,Buffer.from(init.body));return json({Key:"property-media/"+key})}
-      if(part==="object/property-media"&&init?.method==="DELETE"){if(failStorageDelete)return json({message:"Fixture storage unavailable",statusCode:"503"},503);for(const key of JSON.parse(String(init.body)).prefixes)storageObjects.delete(key);return json([])}
+      const url = String(input),
+        part = url.split("/storage/v1/")[1];
+      const json = (data: unknown, status = 200) =>
+        new Response(JSON.stringify(data), {
+          status,
+          headers: { "Content-Type": "application/json" },
+        });
+      if (part?.startsWith("object/list/")) {
+        const body = JSON.parse(String(init.body)),
+          prefix = body.prefix + "/";
+        return json(
+          [...storageObjects.keys()]
+            .filter((k) => k.startsWith(prefix))
+            .map((k) => ({
+              name: k.slice(prefix.length),
+              id: k,
+              metadata: { mimetype: "image/webp" },
+            })),
+        );
+      }
+      if (part?.startsWith("object/sign/property-media/"))
+        return json({
+          signedURL:
+            "/object/sign/property-media/" +
+            part.split("object/sign/property-media/")[1] +
+            "?token=fixture",
+        });
+      if (
+        part?.startsWith("object/property-media/") &&
+        init?.method === "POST"
+      ) {
+        const key = part.split("object/property-media/")[1];
+        storageObjects.set(key, Buffer.from(init.body));
+        return json({ Key: "property-media/" + key });
+      }
+      if (part === "object/property-media" && init?.method === "DELETE") {
+        if (failStorageDelete)
+          return json(
+            { message: "Fixture storage unavailable", statusCode: "503" },
+            503,
+          );
+        for (const key of JSON.parse(String(init.body)).prefixes)
+          storageObjects.delete(key);
+        return json([]);
+      }
       const authorization =
         new Headers(init?.headers).get("authorization") ?? "";
       const id = tokens.get(authorization.replace(/^Bearer /, ""));
@@ -115,6 +155,7 @@ test(
       assert.equal(fr.body.data.id, en.body.data.id);
       assert.equal(fr.body.data.price, en.body.data.price);
       assert.equal(fr.body.data.category, "house");
+      assert.equal(fr.body.data.developer.activeListings, 1);
       await api.get("/api/v1/properties?lang=zz").expect(400);
       await api.get("/api/v1/properties/private-draft?lang=en").expect(404);
       await api.get("/api/v1/properties/draft/related?lang=en").expect(404);
@@ -282,44 +323,192 @@ test(
       });
 
       await api.get("/api/ready").expect(200);
-      await api.post("/api/v1/auth/login").set("Content-Type","application/json").send("{broken").expect(400);
+      await api
+        .post("/api/v1/auth/login")
+        .set("Content-Type", "application/json")
+        .send("{broken")
+        .expect(400);
       await api.post("/api/v1/viewings").send({}).expect(401);
       await api.get("/api/v1/sellers/pending").set(auth("buyer")).expect(403);
-      const approvals=await api.get("/api/v1/sellers/pending").set(auth("admin")).expect(200);assert.equal(approvals.body.data.total,0);
-      const profile=await api.get("/api/v1/sellers/me?lang=fr").set(auth("one")).expect(200);
-      const profilePatch={businessName:"Agence Faso",cityId:"c1",phoneNumber:"+22670000000",whatsappNumber:"+22670000000",publicEmail:"contact@example.test",bio:"Présentation française",specialization:"Maisons",contentLanguage:"fr",expectedUpdatedAt:profile.body.data.updatedAt};
-      await api.patch("/api/v1/sellers/me").set(auth("one")).send({...profilePatch,sellerStatus:"ACTIVE"}).expect(400);
-      await api.patch("/api/v1/sellers/me").set(auth("one")).send(profilePatch).expect(200);
-      await api.patch("/api/v1/sellers/me").set(auth("one")).send(profilePatch).expect(409);
-      const exactEnglish=await api.get("/api/v1/sellers/me?lang=en").set(auth("one")).expect(200);assert.equal(exactEnglish.body.data.bio,"");
-      const publicProfile=await api.get("/api/v1/developers/dev-one?lang=en").expect(200);assert.equal(publicProfile.body.data.bio,"Présentation française");assert.equal(publicProfile.body.data.email,"contact@example.test");assert.equal(publicProfile.body.data.phoneNumber,undefined);
-      const slot=new Date(Date.now()+3*86400000).toISOString();
-      const viewing=await api.post("/api/v1/viewings").set(auth("two")).send({propertyId:"p1",scheduledFor:slot}).expect(201);
-      await api.post("/api/v1/viewings").set(auth("two")).send({propertyId:"p1",scheduledFor:slot}).expect(409);
-      await api.post("/api/v1/viewings").set(auth("one")).send({propertyId:"p1",scheduledFor:slot}).expect(400);
-      await api.post("/api/v1/viewings").set(auth("two")).send({propertyId:"draft",scheduledFor:slot}).expect(404);
-      await api.post("/api/v1/viewings").set(auth("two")).send({propertyId:"p1",scheduledFor:"2020-01-01T00:00:00Z"}).expect(400);
-      const mine=await api.get("/api/v1/viewings?lang=en").set(auth("two")).expect(200);assert.equal(mine.body.data.items[0].id,viewing.body.data.id);
-      await api.get("/api/v1/developers/me/appointments/"+viewing.body.data.id).set(auth("two")).expect(404);
-      await api.get("/api/v1/developers/me/appointments/"+viewing.body.data.id).set(auth("one")).expect(200);
-      const notifs=await api.get("/api/v1/developers/me/notifications?lang=fr").set(auth("one")).expect(200);assert.ok(notifs.body.data.items.some((n:any)=>n.title==="Visite demandée."));
-      const overview=await api.get("/api/v1/developers/me/dashboard?lang=fr").set(auth("one")).expect(200);assert.equal(overview.body.data.appointmentOverview.requested.length,5);assert.equal(overview.body.data.metrics.appointmentRequests,25);
-      const analytics=await api.get("/api/v1/developers/me/analytics?period=7d&lang=fr").set(auth("one")).expect(200);assert.equal(analytics.body.data.funnel.period,"7d");assert.equal(analytics.body.data.funnel.totalRequested,26);assert.equal(analytics.body.data.stats[0].label,"Total des annonces");assert.ok(analytics.body.data.portfolio.byCategory.every((r:any)=>r.category===r.category.toLowerCase()));
-      await api.post("/api/v1/favorites/p1").set(auth("two")).expect(200);const favorites=await api.get("/api/v1/favorites").set(auth("two")).expect(200);assert.deepEqual(favorites.body.data.ids,["p1"]);
-      const otherFavorites=await api.get("/api/v1/favorites").set(auth("one")).expect(200);assert.deepEqual(otherFavorites.body.data.ids,[]);
+      const approvals = await api
+        .get("/api/v1/sellers/pending")
+        .set(auth("admin"))
+        .expect(200);
+      assert.equal(approvals.body.data.total, 0);
+      const profile = await api
+        .get("/api/v1/sellers/me?lang=fr")
+        .set(auth("one"))
+        .expect(200);
+      const profilePatch = {
+        businessName: "Agence Faso",
+        cityId: "c1",
+        phoneNumber: "+22670000000",
+        whatsappNumber: "+22670000000",
+        publicEmail: "contact@example.test",
+        bio: "Présentation française",
+        specialization: "Maisons",
+        contentLanguage: "fr",
+        expectedUpdatedAt: profile.body.data.updatedAt,
+      };
+      await api
+        .patch("/api/v1/sellers/me")
+        .set(auth("one"))
+        .send({ ...profilePatch, sellerStatus: "ACTIVE" })
+        .expect(400);
+      await api
+        .patch("/api/v1/sellers/me")
+        .set(auth("one"))
+        .send(profilePatch)
+        .expect(200);
+      await api
+        .patch("/api/v1/sellers/me")
+        .set(auth("one"))
+        .send(profilePatch)
+        .expect(409);
+      const exactEnglish = await api
+        .get("/api/v1/sellers/me?lang=en")
+        .set(auth("one"))
+        .expect(200);
+      assert.equal(exactEnglish.body.data.bio, "");
+      const publicProfile = await api
+        .get("/api/v1/developers/dev-one?lang=en")
+        .expect(200);
+      assert.equal(publicProfile.body.data.bio, "Présentation française");
+      assert.equal(publicProfile.body.data.email, "contact@example.test");
+      assert.equal(publicProfile.body.data.phoneNumber, undefined);
+      const slot = new Date(Date.now() + 3 * 86400000).toISOString();
+      const viewing = await api
+        .post("/api/v1/viewings")
+        .set(auth("two"))
+        .send({ propertyId: "p1", scheduledFor: slot })
+        .expect(201);
+      await api
+        .post("/api/v1/viewings")
+        .set(auth("two"))
+        .send({ propertyId: "p1", scheduledFor: slot })
+        .expect(409);
+      await api
+        .post("/api/v1/viewings")
+        .set(auth("one"))
+        .send({ propertyId: "p1", scheduledFor: slot })
+        .expect(400);
+      await api
+        .post("/api/v1/viewings")
+        .set(auth("two"))
+        .send({ propertyId: "draft", scheduledFor: slot })
+        .expect(404);
+      await api
+        .post("/api/v1/viewings")
+        .set(auth("two"))
+        .send({ propertyId: "p1", scheduledFor: "2020-01-01T00:00:00Z" })
+        .expect(400);
+      const mine = await api
+        .get("/api/v1/viewings?lang=en")
+        .set(auth("two"))
+        .expect(200);
+      assert.equal(mine.body.data.items[0].id, viewing.body.data.id);
+      await api
+        .get("/api/v1/developers/me/appointments/" + viewing.body.data.id)
+        .set(auth("two"))
+        .expect(404);
+      await api
+        .get("/api/v1/developers/me/appointments/" + viewing.body.data.id)
+        .set(auth("one"))
+        .expect(200);
+      const notifs = await api
+        .get("/api/v1/developers/me/notifications?lang=fr")
+        .set(auth("one"))
+        .expect(200);
+      assert.ok(
+        notifs.body.data.items.some((n: any) => n.title === "Visite demandée."),
+      );
+      const overview = await api
+        .get("/api/v1/developers/me/dashboard?lang=fr")
+        .set(auth("one"))
+        .expect(200);
+      assert.equal(overview.body.data.appointmentOverview.requested.length, 5);
+      assert.equal(overview.body.data.metrics.appointmentRequests, 25);
+      const analytics = await api
+        .get("/api/v1/developers/me/analytics?period=7d&lang=fr")
+        .set(auth("one"))
+        .expect(200);
+      assert.equal(analytics.body.data.funnel.period, "7d");
+      assert.equal(analytics.body.data.funnel.totalRequested, 26);
+      assert.equal(analytics.body.data.stats[0].label, "Total des annonces");
+      assert.ok(
+        analytics.body.data.portfolio.byCategory.every(
+          (r: any) => r.category === r.category.toLowerCase(),
+        ),
+      );
+      await api.post("/api/v1/favorites/p1").set(auth("two")).expect(200);
+      const favorites = await api
+        .get("/api/v1/favorites")
+        .set(auth("two"))
+        .expect(200);
+      assert.deepEqual(favorites.body.data.ids, ["p1"]);
+      const otherFavorites = await api
+        .get("/api/v1/favorites")
+        .set(auth("one"))
+        .expect(200);
+      assert.deepEqual(otherFavorites.body.data.ids, []);
 
-      const image=Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=","base64");
-      const uploaded=await api.post("/api/v1/uploads/file").set(auth("one")).attach("file",image,{filename:"image.png",contentType:"image/png"}).expect(201);
-      const upload=uploaded.body.data;
-      const patchMedia=async(media:any[])=>{const current=await api.get(`/api/v1/developers/me/listings/${listing.id}?lang=fr`).set(auth("one")).expect(200);return api.patch(`/api/v1/developers/me/listings/${listing.id}`).set(auth("one")).send({contentLanguage:"fr",rowVersion:current.body.data.rowVersion,media});};
-      const attached=await patchMedia([{...upload,order:0}]);assert.equal(attached.status,200);
-      await api.delete("/api/v1/uploads/"+upload.publicId).set(auth("two")).expect(400);
-      await api.delete("/api/v1/uploads/"+upload.publicId).set(auth("one")).expect(409);
-      assert.equal(storageObjects.size,1);
-      const detached=await patchMedia([]);assert.equal(detached.status,200);
-      failStorageDelete=true;await api.delete("/api/v1/uploads/"+upload.publicId).set(auth("one")).expect(503);
-      const forbiddenAttachment=await patchMedia([{...upload,order:0}]);assert.equal(forbiddenAttachment.status,400);
-      failStorageDelete=false;await api.delete("/api/v1/uploads/"+upload.publicId).set(auth("one")).expect(200);await api.delete("/api/v1/uploads/"+upload.publicId).set(auth("one")).expect(200);assert.equal(storageObjects.size,0);
+      const image = Buffer.from(
+        "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=",
+        "base64",
+      );
+      const uploaded = await api
+        .post("/api/v1/uploads/file")
+        .set(auth("one"))
+        .attach("file", image, {
+          filename: "image.png",
+          contentType: "image/png",
+        })
+        .expect(201);
+      const upload = uploaded.body.data;
+      const patchMedia = async (media: any[]) => {
+        const current = await api
+          .get(`/api/v1/developers/me/listings/${listing.id}?lang=fr`)
+          .set(auth("one"))
+          .expect(200);
+        return api
+          .patch(`/api/v1/developers/me/listings/${listing.id}`)
+          .set(auth("one"))
+          .send({
+            contentLanguage: "fr",
+            rowVersion: current.body.data.rowVersion,
+            media,
+          });
+      };
+      const attached = await patchMedia([{ ...upload, order: 0 }]);
+      assert.equal(attached.status, 200);
+      await api
+        .delete("/api/v1/uploads/" + upload.publicId)
+        .set(auth("two"))
+        .expect(400);
+      await api
+        .delete("/api/v1/uploads/" + upload.publicId)
+        .set(auth("one"))
+        .expect(409);
+      assert.equal(storageObjects.size, 1);
+      const detached = await patchMedia([]);
+      assert.equal(detached.status, 200);
+      failStorageDelete = true;
+      await api
+        .delete("/api/v1/uploads/" + upload.publicId)
+        .set(auth("one"))
+        .expect(503);
+      const forbiddenAttachment = await patchMedia([{ ...upload, order: 0 }]);
+      assert.equal(forbiddenAttachment.status, 400);
+      failStorageDelete = false;
+      await api
+        .delete("/api/v1/uploads/" + upload.publicId)
+        .set(auth("one"))
+        .expect(200);
+      await api
+        .delete("/api/v1/uploads/" + upload.publicId)
+        .set(auth("one"))
+        .expect(200);
+      assert.equal(storageObjects.size, 0);
       // Removed Auth sessions are denied even when the provider accepts the JWT.
       await prisma.$transaction(async (tx) => {
         await tx.$executeRaw`SET LOCAL ROLE postgres`;

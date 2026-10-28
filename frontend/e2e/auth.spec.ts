@@ -6,7 +6,7 @@ test("login rejects wrong credentials and restores a server session on reload", 
   await page.getByLabel("Email", { exact: true }).fill("seller@example.test");
   await page.getByLabel("Password", { exact: true }).fill("incorrect");
   await page.getByRole("button", { name: "Sign in", exact: true }).click();
-  await expect(page.getByRole("alert")).toBeVisible();
+  await expect(page.locator('form [role="alert"]')).toBeVisible();
   await page
     .getByLabel("Password", { exact: true })
     .fill("FixturePassword123!");
@@ -24,6 +24,13 @@ test("anonymous users redirect and buyers cannot enter seller or admin workspace
   await login(page, "buyer@example.test");
   await page.goto("/admin");
   await expect(page).toHaveURL(/\/forbidden$/);
+  await page.goto("/dashboard");
+  await expect(page).toHaveURL(/\/forbidden$/);
+  await page.getByRole("button", { name: "Log out", exact: true }).click();
+  await expect(
+    page.getByRole("link", { name: "Log in", exact: true }),
+  ).toBeVisible();
+  await login(page, "admin@example.test");
   await page.goto("/dashboard");
   await expect(page).toHaveURL(/\/forbidden$/);
 });
@@ -89,7 +96,7 @@ test("recovery is non-enumerating and scrubs the token from the browser URL", as
   await page
     .getByRole("button", { name: "Reset password", exact: true })
     .click();
-  await expect(page.getByRole("alert")).toBeVisible();
+  await expect(page.locator('form [role="alert"]')).toBeVisible();
 });
 test("logout clears the cookie and persists after reload", async ({
   page,

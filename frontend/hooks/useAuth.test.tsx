@@ -7,17 +7,15 @@ vi.mock("@/services", () => ({ authService: { logout: vi.fn() } }));
 vi.mock("sonner", () => ({ toast: { error: vi.fn() } }));
 beforeEach(() => {
   vi.mocked(authService.logout).mockReset();
-  useAuthStore
-    .getState()
-    .setAuth(
-      {
-        id: "buyer",
-        email: "buyer@example.test",
-        role: "USER",
-        fullName: "Buyer",
-      },
-      "token",
-    );
+  useAuthStore.getState().setAuth(
+    {
+      id: "buyer",
+      email: "buyer@example.test",
+      role: "USER",
+      fullName: "Buyer",
+    },
+    "token",
+  );
 });
 it("retains the session if the server cannot revoke it", async () => {
   vi.mocked(authService.logout).mockRejectedValue(new Error("Unavailable"));

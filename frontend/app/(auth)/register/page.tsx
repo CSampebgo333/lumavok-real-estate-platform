@@ -19,7 +19,7 @@ export default function RegisterPage() {
   return (
     <AuthCard
       title="Create your account"
-      description="Browse and save properties across African markets"
+      description="Browse and save properties in Burkina Faso"
       footer={
         <>
           <UiText text={"Already have an account?"} />{" "}
@@ -32,7 +32,10 @@ export default function RegisterPage() {
         </>
       }
     >
-      <RegisterForm />
+      <RegisterForm
+        termsUrl={process.env.TERMS_URL}
+        privacyUrl={process.env.PRIVACY_URL}
+      />
     </AuthCard>
   );
 }

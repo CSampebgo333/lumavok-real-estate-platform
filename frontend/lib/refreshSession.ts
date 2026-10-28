@@ -14,7 +14,7 @@ export function refreshSession(): Promise<AuthSession> {
     .post<ApiResponse<AuthSession>>(
       `${API_BASE_URL}/auth/refresh`,
       {},
-      { withCredentials: true },
+      { withCredentials: true, timeout: 20000 },
     )
     .then((response) => {
       if (useAuthStore.getState().sessionRevision !== revision)

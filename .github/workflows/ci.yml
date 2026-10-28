@@ -48,7 +48,7 @@ jobs:
       - run: npm --prefix database/full-database-design run test:native
         env:
           NODE_ENV: test
-          LUMAVOK_ALLOW_DISPOSABLE_DATABASE: '1'
+          LUMAVOK_ALLOW_DISPOSABLE_DATABASE: "1"
           LUMAVOK_NATIVE_TEST_URL: postgresql://postgres:disposable-ci-password@127.0.0.1:5432/postgres
   browser:
     runs-on: ubuntu-latest
@@ -56,7 +56,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        mobile: ['0', '1']
+        mobile: ["0", "1"]
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
       - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
@@ -67,7 +67,7 @@ jobs:
         working-directory: frontend
       - run: npm run test:e2e
         env:
-          CI: 'true'
+          CI: "true"
           E2E_MOBILE: ${{ matrix.mobile }}
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
@@ -86,3 +86,19 @@ jobs:
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
       - run: docker build --file ${{ matrix.component }}/Dockerfile --tag lumavok-test:${{ matrix.component }} .
+      - name: Smoke-test production runtime
+        shell: bash
+        env:
+          COMPONENT: ${{ matrix.component }}
+        run: |
+          if [[ "$COMPONENT" == backend ]]; then
+            docker run --rm --entrypoint node lumavok-test:backend --input-type=module -e 'await import("sharp"); await import("@prisma/client");'
+          else
+            docker run --detach --name lumavok-web-check --publish 127.0.0.1:3000:3000 lumavok-test:frontend
+            trap 'docker logs lumavok-web-check; docker rm --force lumavok-web-check' EXIT
+            for attempt in {1..30}; do
+              if curl --fail --silent http://127.0.0.1:3000/login > /dev/null; then exit 0; fi
+              sleep 2
+            done
+            exit 1
+          fi

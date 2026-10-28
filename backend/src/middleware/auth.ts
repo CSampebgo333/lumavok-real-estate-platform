@@ -1,7 +1,11 @@
 import type { Response, NextFunction } from "express";
 import { getSupabase } from "../config/supabase.js";
 import { databaseContext, prisma } from "../config/prisma.js";
-import { ApiError, UnauthorizedError, ForbiddenError } from "../utils/errors.js";
+import {
+  ApiError,
+  UnauthorizedError,
+  ForbiddenError,
+} from "../utils/errors.js";
 import type { AuthenticatedRequest } from "../types/index.js";
 export async function authenticate(
   req: AuthenticatedRequest,
@@ -12,7 +16,8 @@ export async function authenticate(
     const header = req.headers.authorization;
     if (!header?.startsWith("Bearer ")) throw new UnauthorizedError();
     const { data, error } = await getSupabase().auth.getUser(header.slice(7));
-    if (error && (error.status===0 || (error.status??0)>=500)) throw new ApiError(503,"Authentication unavailable","AUTH_UNAVAILABLE");
+    if (error && (error.status === 0 || (error.status ?? 0) >= 500))
+      throw new ApiError(503, "Authentication unavailable", "AUTH_UNAVAILABLE");
     if (error || !data.user?.email_confirmed_at)
       throw new UnauthorizedError("A verified session is required");
     const context = databaseContext.getStore();
@@ -24,7 +29,9 @@ export async function authenticate(
     );
     if (
       typeof claims.session_id !== "string" ||
-      !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(claims.session_id)
+      !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+        claims.session_id,
+      )
     )
       throw new UnauthorizedError();
     const [session] = await prisma.$queryRaw<
@@ -61,7 +68,17 @@ export async function authenticate(
     };
     next();
   } catch (error) {
-    next(error instanceof ApiError ? error : error instanceof SyntaxError ? new UnauthorizedError("Invalid or expired session") : new ApiError(503,"Authentication temporarily unavailable","AUTH_UNAVAILABLE"));
+    next(
+      error instanceof ApiError
+        ? error
+        : error instanceof SyntaxError
+          ? new UnauthorizedError("Invalid or expired session")
+          : new ApiError(
+              503,
+              "Authentication temporarily unavailable",
+              "AUTH_UNAVAILABLE",
+            ),
+    );
   }
 }
 export function authorize(...roles: string[]) {

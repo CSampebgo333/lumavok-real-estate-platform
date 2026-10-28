@@ -6,10 +6,10 @@ backend_image="${2:?Backend image digest required}"
 for image in "$frontend_image" "$backend_image"; do
   [[ "$image" =~ ^ghcr.io/[a-z0-9._/-]+@sha256:[0-9a-f]{64}$ ]] || exit 1
 done
-[[ -f api.env && -f compose.yml ]] || { echo 'Provision server configuration first'; exit 1; }
+[[ -f api.env && -f web.env && -f compose.yml ]] || { echo 'Provision server configuration first'; exit 1; }
 exec 9>.deploy.lock
 flock -n 9 || { echo 'Another deployment is active'; exit 1; }
-export FRONTEND_IMAGE="$frontend_image" BACKEND_IMAGE="$backend_image" API_ENV_FILE=/srv/lumavok/api.env
+export FRONTEND_IMAGE="$frontend_image" BACKEND_IMAGE="$backend_image" API_ENV_FILE=/srv/lumavok/api.env WEB_ENV_FILE=/srv/lumavok/web.env
 previous=.release.env
 if [[ -f "$previous" ]]; then cp "$previous" .release.previous.env; fi
 docker compose pull

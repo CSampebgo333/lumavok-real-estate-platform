@@ -1,6 +1,22 @@
 {
- "name":"lumavok-real-estate-platform","version":"1.0.0","private":true,
- "description":"Bilingual real estate platform for Burkina Faso",
- "engines":{"node":">=24 <25","npm":">=11 <13"},
- "scripts":{"setup":"node scripts/workspaces.mjs install","check":"node scripts/workspaces.mjs check","test":"node scripts/workspaces.mjs test","build":"node scripts/workspaces.mjs build","audit":"node scripts/workspaces.mjs audit","scan:secrets":"node scripts/scan-secrets.mjs","dev:web":"npm --prefix frontend run dev","dev:api":"npm --prefix backend run dev","dev:fixture":"node scripts/fixture.mjs","test:e2e":"npm --prefix frontend run e2e"}
+  "name": "lumavok-real-estate-platform",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Bilingual real estate platform for Burkina Faso",
+  "engines": {
+    "node": ">=24 <25",
+    "npm": ">=11 <13"
+  },
+  "scripts": {
+    "setup": "node scripts/workspaces.mjs install",
+    "check": "node scripts/workspaces.mjs check",
+    "test": "node scripts/workspaces.mjs test",
+    "build": "node scripts/workspaces.mjs build",
+    "audit": "node scripts/workspaces.mjs audit",
+    "scan:secrets": "node scripts/scan-secrets.mjs",
+    "dev:web": "npm --prefix frontend run dev",
+    "dev:api": "npm --prefix backend run dev",
+    "dev:fixture": "node scripts/fixture.mjs",
+    "test:e2e": "npm --prefix frontend run e2e"
+  }
 }

@@ -18,7 +18,7 @@ vi.mock("@/store/authStore", () => ({
 const mockedUseAuthStore = vi.mocked(useAuthStore);
 
 interface MockState {
-  user: { role: "USER" | "DEVELOPER" | "ADMIN" } | null;
+  user: { role: "USER" | "DEVELOPER" | "ADMIN"; developerId?: string } | null;
   isAuthenticated: boolean;
 }
 
@@ -60,7 +60,10 @@ describe("RedirectIfAuthenticated", () => {
   });
 
   it("redirects an already-authenticated DEVELOPER to the dashboard", () => {
-    mockAuthState({ user: { role: "DEVELOPER" }, isAuthenticated: true });
+    mockAuthState({
+      user: { role: "DEVELOPER", developerId: "dev1" },
+      isAuthenticated: true,
+    });
 
     render(
       <RedirectIfAuthenticated>

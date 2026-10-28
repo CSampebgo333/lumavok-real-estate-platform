@@ -9,11 +9,35 @@ export function errorHandler(
   res: Response,
   _next: NextFunction,
 ): void {
-  const parser = err as Error & { type?: string; status?: number; code?: string };
-  if (parser.type === "entity.parse.failed" || parser.type === "entity.too.large" || parser.type === "encoding.unsupported") {
-    res.status(parser.type === "entity.too.large" ? 413 : 400).json({ success: false, code: "INVALID_BODY", message: "Invalid or oversized request body" }); return;
+  const parser = err as Error & {
+    type?: string;
+    status?: number;
+    code?: string;
+  };
+  if (
+    parser.type === "entity.parse.failed" ||
+    parser.type === "entity.too.large" ||
+    parser.type === "encoding.unsupported"
+  ) {
+    res
+      .status(parser.type === "entity.too.large" ? 413 : 400)
+      .json({
+        success: false,
+        code: "INVALID_BODY",
+        message: "Invalid or oversized request body",
+      });
+    return;
   }
-  if (parser.code === "LIMIT_FILE_SIZE") { res.status(413).json({success:false,code:"FILE_TOO_LARGE",message:"File is too large"});return; }
+  if (parser.code === "LIMIT_FILE_SIZE") {
+    res
+      .status(413)
+      .json({
+        success: false,
+        code: "FILE_TOO_LARGE",
+        message: "File is too large",
+      });
+    return;
+  }
   if (err instanceof ZodError) {
     res.status(400).json({
       success: false,

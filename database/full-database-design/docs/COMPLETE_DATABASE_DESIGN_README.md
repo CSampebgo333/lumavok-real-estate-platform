@@ -1,3 +1,5 @@
+> Historical evidence. The consolidated schema, access model and operations are documented in the root README and current `docs/` files. This document is retained for provenance, not as current setup instructions.
+
 # Lumavok Real Estate Platform — Complete Database Blueprint
 
 > **Last updated:** 29/06/2026

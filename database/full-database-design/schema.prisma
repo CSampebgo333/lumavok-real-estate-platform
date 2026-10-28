@@ -339,15 +339,15 @@ model PropertyMedia {
 
   property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
 
-  assetId String? @map("asset_id") @db.Uuid
-  assetState String @default("AVAILABLE") @map("asset_state")
-  asset StorageAsset? @relation(fields:[assetId,assetState],references:[id,state],onDelete:Restrict,onUpdate:Restrict,map:"property_media_asset_state_fkey")
+  assetId    String?       @map("asset_id") @db.Uuid
+  assetState String        @default("AVAILABLE") @map("asset_state")
+  asset      StorageAsset? @relation(fields: [assetId, assetState], references: [id, state], onDelete: Restrict, onUpdate: Restrict, map: "property_media_asset_state_fkey")
 
   storageProvider String  @default("legacy") @map("storage_provider")
   storageKey      String? @map("storage_key")
 
-  @@index([assetId],map:"idx_media_asset")
   @@unique([propertyId, order], map: "uq_media_property_order")
+  @@index([assetId], map: "idx_media_asset")
   @@index([propertyId], map: "idx_media_property")
   @@index([propertyId, isPrimary], map: "idx_media_primary")
   @@map("property_media")
@@ -441,8 +441,8 @@ model PropertyAnalytics {
 
 // ─────────────────────────────────────────────
 // 1.13 Report — user complaints / admin moderation
-// Polymorphic target (PROPERTY or PROPERTY_DEVELOPER) — see DATABASE.md
-// for why target_id has no DB-level foreign key.
+// Explicit property/seller FKs and SQL CHECK constraints keep the retained
+// target_type/target_id fields consistent with their referenced entity.
 // ─────────────────────────────────────────────
 
 model Report {
@@ -599,16 +599,17 @@ model PropertyDeveloperTranslation {
 }
 
 model StorageAsset {
- id String @id @db.Uuid
- propertyDeveloperId String @map("property_developer_id")
- bucket String @default("property-media")
- storageKey String @unique @map("storage_key")
- state String @default("UPLOADING")
- createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
- updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(3)
- developer PropertyDeveloper @relation(fields:[propertyDeveloperId],references:[id],onDelete:Restrict)
- media PropertyMedia[]
- @@unique([id,state],map:"uq_storage_asset_state")
- @@index([propertyDeveloperId,createdAt],map:"idx_asset_owner_created")
- @@map("storage_asset")
+  id                  String            @id @db.Uuid
+  propertyDeveloperId String            @map("property_developer_id")
+  bucket              String            @default("property-media")
+  storageKey          String            @unique @map("storage_key")
+  state               String            @default("UPLOADING")
+  createdAt           DateTime          @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt           DateTime          @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(3)
+  developer           PropertyDeveloper @relation(fields: [propertyDeveloperId], references: [id], onDelete: Restrict)
+  media               PropertyMedia[]
+
+  @@unique([id, state], map: "uq_storage_asset_state")
+  @@index([propertyDeveloperId, createdAt], map: "idx_asset_owner_created")
+  @@map("storage_asset")
 }

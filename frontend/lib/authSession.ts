@@ -6,6 +6,7 @@ export function mapSession(raw: AuthSession): AuthSession {
     ...raw,
     user: {
       ...raw.user,
+      fullName: raw.user.fullName?.trim() || raw.user.email,
       role: (role === "PROPERTY_DEVELOPER" ? "DEVELOPER" : role) as UserRole,
     },
   };

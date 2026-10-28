@@ -21,14 +21,23 @@ export function useAuthBootstrap() {
 
   useEffect(() => {
     let cancelled = false;
+    const revision = useAuthStore.getState().sessionRevision;
 
     authService
       .refresh()
       .then((session) => {
-        if (!cancelled) setAuth(session.user, session.accessToken);
+        if (cancelled) return;
+        const state = useAuthStore.getState();
+        if (
+          state.sessionRevision === revision ||
+          (state.user?.id === session.user.id &&
+            state.accessToken === session.accessToken)
+        )
+          setAuth(session.user, session.accessToken);
       })
       .catch((error: unknown) => {
-        if (cancelled) return;
+        if (cancelled || useAuthStore.getState().sessionRevision !== revision)
+          return;
         // An absent/ended session is normal for anonymous visitors; a provider
         // outage keeps the protected view blocked with a retryable explanation.
         if (

@@ -79,6 +79,7 @@ describe("NavbarAuthSection", () => {
         fullName: "Kofi Mensah",
         email: "kofi@example.com",
         role: "DEVELOPER",
+        developerId: "dev1",
       },
       "token",
     );

@@ -162,3 +162,18 @@ it("submits as POST so a pre-hydration native submit cannot put fields in the UR
   const { container } = render(<RegisterForm />);
   expect(container.querySelector("form")).toHaveAttribute("method", "post");
 });
+
+it("links approved HTTPS policies without permitting script URLs", () => {
+  render(
+    <RegisterForm
+      termsUrl="https://policies.example.test/terms"
+      privacyUrl="javascript:alert(1)"
+    />,
+  );
+  expect(
+    screen.getByRole("link", { name: "Terms of Service" }),
+  ).toHaveAttribute("href", "https://policies.example.test/terms");
+  expect(
+    screen.queryByRole("link", { name: "Privacy Policy" }),
+  ).not.toBeInTheDocument();
+});

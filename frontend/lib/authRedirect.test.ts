@@ -15,9 +15,11 @@ function makeUser(overrides: Partial<User> = {}): User {
 
 describe("getPostLoginDestination", () => {
   it("sends each role to its own workspace", () => {
-    expect(getPostLoginDestination(makeUser({ role: "DEVELOPER" }))).toBe(
-      "/dashboard",
-    );
+    expect(
+      getPostLoginDestination(
+        makeUser({ role: "DEVELOPER", developerId: "dev1" }),
+      ),
+    ).toBe("/dashboard");
     expect(getPostLoginDestination(makeUser({ role: "ADMIN" }))).toBe("/admin");
   });
 
@@ -57,4 +59,10 @@ describe("getSafeRedirectPath (open-redirect protection)", () => {
     expect(getSafeRedirectPath(null)).toBeUndefined();
     expect(getSafeRedirectPath("")).toBeUndefined();
   });
+});
+
+it("sends an unavailable seller profile to its account status rather than an unusable dashboard", () => {
+  expect(getPostLoginDestination(makeUser({ role: "DEVELOPER" }))).toBe(
+    "/sell",
+  );
 });

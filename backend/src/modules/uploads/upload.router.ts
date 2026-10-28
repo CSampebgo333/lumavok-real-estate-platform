@@ -1,6 +1,6 @@
 import { Router } from "express";
-import {rateLimit} from "express-rate-limit";
-import type {AuthenticatedRequest} from "../../types/index.js";
+import { rateLimit } from "express-rate-limit";
+import type { AuthenticatedRequest } from "../../types/index.js";
 import multer from "multer";
 import type { RequestHandler } from "express";
 import * as uploadController from "./upload.controller.js";
@@ -25,7 +25,18 @@ router.post(
   "/file",
   authenticateHandler,
   developerOnly,
-  rateLimit({windowMs:60*60*1000,limit:100,keyGenerator:req=>(req as AuthenticatedRequest).user.developerId!,standardHeaders:"draft-8",legacyHeaders:false,message:{success:false,code:"RATE_LIMITED",message:"Upload limit reached. Try again later."}}),
+  rateLimit({
+    windowMs: 60 * 60 * 1000,
+    limit: 100,
+    keyGenerator: (req) => (req as AuthenticatedRequest).user.developerId!,
+    standardHeaders: "draft-8",
+    legacyHeaders: false,
+    message: {
+      success: false,
+      code: "RATE_LIMITED",
+      message: "Upload limit reached. Try again later.",
+    },
+  }),
   upload.single("file"),
   uploadController.uploadFile,
 );

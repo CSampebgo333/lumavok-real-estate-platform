@@ -45,6 +45,7 @@ describe("Session lifecycle (real store + real hooks, no mocked selectors)", () 
         fullName: "Ama Boateng",
         email: "demo@byte.africa",
         role: "DEVELOPER",
+        developerId: "dev1",
       },
       accessToken: "restored-token",
     });
@@ -70,7 +71,11 @@ describe("Session lifecycle (real store + real hooks, no mocked selectors)", () 
   });
 
   it("leaves the user anonymous when the refresh cookie is invalid/absent — no crash, no infinite spinner", async () => {
-    refresh.mockRejectedValue(new Error("No refresh cookie"));
+    refresh.mockRejectedValue({
+      isAxiosError: true,
+      response: { status: 401 },
+      message: "No refresh cookie",
+    });
 
     render(
       <AppRoot>
@@ -106,7 +111,7 @@ describe("Session lifecycle (real store + real hooks, no mocked selectors)", () 
     );
 
     // useAuth().logout() (exercised via the button click in NavbarAuthSection's
-    // own unit tests) always ends by calling clearAuth() on the store — this
+    // own unit tests) calls clearAuth() after server revocation — this
     // test isolates that this state transition alone correctly propagates back
     // out to every subscribed component, independent of the click handler.
     useAuthStore.getState().clearAuth();

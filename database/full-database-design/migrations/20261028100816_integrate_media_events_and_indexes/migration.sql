@@ -1,4 +1,4 @@
--- Additive migration: domain notifications and indexes for measured query patterns.
+-- Additive migration: domain notifications and indexes for implemented query patterns.
 -- Supabase CLI created the local filename; subsequent telemetry was blocked.
 -- This reviewed SQL is maintained and replayed through the Prisma chain.
 BEGIN;

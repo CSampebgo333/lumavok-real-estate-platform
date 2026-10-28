@@ -45,6 +45,19 @@ export const propertyInclude = {
       isVerified: true,
       averageRating: true,
       profileImageUrl: true,
+      _count: {
+        select: {
+          properties: {
+            where: {
+              status: "ACTIVE" as const,
+              deletedAt: null,
+              currencyCode: { not: null },
+              sourceLanguageCode: { not: null },
+              translations: { some: { isPublished: true } },
+            },
+          },
+        },
+      },
     },
   },
 };
@@ -145,7 +158,7 @@ export async function mapProperty(
           region: "",
           isVerified: p.developer.isVerified,
           rating: Number(p.developer.averageRating) || undefined,
-          activeListings: 0,
+          activeListings: p.developer._count?.properties ?? 0,
         }
       : undefined,
   };
@@ -153,10 +166,27 @@ export async function mapProperty(
 export async function getProperties(params: GetPropertiesParams = {}) {
   const locale = await localeConfig(),
     { skip, take, page, pageSize } = parsePagination(params);
-  if(params.sort && !["newest","price_asc","price_desc","popular"].includes(params.sort))throw new BadRequestError("Invalid sort");
-  for(const value of [params.minPrice,params.maxPrice])if(value!==undefined&&(!Number.isFinite(value)||value<0))throw new BadRequestError("Invalid price");
-  if(params.minPrice!==undefined&&params.maxPrice!==undefined&&params.minPrice>params.maxPrice)throw new BadRequestError("Invalid price range");
-  if(params.minBedrooms!==undefined&&(!Number.isInteger(params.minBedrooms)||params.minBedrooms<0||params.minBedrooms>1000))throw new BadRequestError("Invalid bedroom count");
+  if (
+    params.sort &&
+    !["newest", "price_asc", "price_desc", "popular"].includes(params.sort)
+  )
+    throw new BadRequestError("Invalid sort");
+  for (const value of [params.minPrice, params.maxPrice])
+    if (value !== undefined && (!Number.isFinite(value) || value < 0))
+      throw new BadRequestError("Invalid price");
+  if (
+    params.minPrice !== undefined &&
+    params.maxPrice !== undefined &&
+    params.minPrice > params.maxPrice
+  )
+    throw new BadRequestError("Invalid price range");
+  if (
+    params.minBedrooms !== undefined &&
+    (!Number.isInteger(params.minBedrooms) ||
+      params.minBedrooms < 0 ||
+      params.minBedrooms > 1000)
+  )
+    throw new BadRequestError("Invalid bedroom count");
   const where: any = { ...publicPropertyWhere };
   if (params.developerId) where.propertyDeveloperId = params.developerId;
   if (params.category) where.category = normalizeCategory(params.category);
@@ -195,7 +225,9 @@ export async function getProperties(params: GetPropertiesParams = {}) {
       ? [{ price: "asc" }, { id: "asc" }]
       : params.sort === "price_desc"
         ? [{ price: "desc" }, { id: "asc" }]
-        : params.sort==="popular" ? [{favoriteCount:"desc"},{createdAt:"desc"},{id:"asc"}] : [{ createdAt: "desc" }, { id: "asc" }];
+        : params.sort === "popular"
+          ? [{ favoriteCount: "desc" }, { createdAt: "desc" }, { id: "asc" }]
+          : [{ createdAt: "desc" }, { id: "asc" }];
   const [items, total] = await Promise.all([
     prisma.property.findMany({
       where,

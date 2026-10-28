@@ -9,22 +9,20 @@ import { Button } from "@/components/ui/button";
 import { Loading } from "@/components/common/Loading";
 import { ROUTES } from "@/constants/routes";
 import { useAuthStore } from "@/store/authStore";
-import type { UserRole } from "@/types";
+import type { User, UserRole } from "@/types";
 
 interface RequireAuthProps {
   children: React.ReactNode;
-  /** Minimum role required, per the inheritance model in docs/ARCHITECTURE.md §6 (ADMIN > DEVELOPER > USER). */
+  /** Workspace role. Seller routes require an active seller identity. */
   role?: UserRole;
 }
 
-const ROLE_RANK: Record<UserRole, number> = { USER: 0, DEVELOPER: 1, ADMIN: 2 };
-
-function hasRequiredRole(
-  userRole: UserRole | undefined,
-  requiredRole: UserRole,
-) {
+function hasRequiredRole(user: User | null, requiredRole: UserRole) {
+  if (!user) return false;
+  if (requiredRole === "USER") return true;
   return (
-    userRole !== undefined && ROLE_RANK[userRole] >= ROLE_RANK[requiredRole]
+    user.role === requiredRole &&
+    (requiredRole !== "DEVELOPER" || !!user.developerId)
   );
 }
 
@@ -47,8 +45,7 @@ export function RequireAuth({ children, role }: RequireAuthProps) {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const isBootstrapping = useAuthStore((state) => state.isBootstrapping);
 
-  const isForbidden =
-    isAuthenticated && !!role && !hasRequiredRole(user?.role, role);
+  const isForbidden = isAuthenticated && !!role && !hasRequiredRole(user, role);
 
   useEffect(() => {
     if (isBootstrapping || bootstrapError) return;

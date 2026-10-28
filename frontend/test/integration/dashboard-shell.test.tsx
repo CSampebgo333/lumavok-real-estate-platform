@@ -26,6 +26,7 @@ describe("Dashboard shell (real store, RequireAuth + chrome + Home page composed
         fullName: "Kwame Mensah",
         email: "developer@byte.africa",
         role: "DEVELOPER",
+        developerId: "dev1",
       },
       "token",
     );
@@ -63,6 +64,7 @@ describe("Dashboard shell (real store, RequireAuth + chrome + Home page composed
         fullName: "Kwame Mensah",
         email: "developer@byte.africa",
         role: "DEVELOPER",
+        developerId: "dev1",
       },
       "token",
     );

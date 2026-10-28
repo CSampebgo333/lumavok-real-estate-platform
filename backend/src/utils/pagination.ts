@@ -22,7 +22,9 @@ export function parsePagination(params: PaginationParams): {
 } {
   if (
     (params.page !== undefined &&
-      (!Number.isSafeInteger(params.page) || params.page < 1 || params.page>1000000)) ||
+      (!Number.isSafeInteger(params.page) ||
+        params.page < 1 ||
+        params.page > 1000000)) ||
     (params.pageSize !== undefined &&
       (!Number.isSafeInteger(params.pageSize) || params.pageSize < 1))
   )

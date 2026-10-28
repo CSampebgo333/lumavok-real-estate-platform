@@ -15,12 +15,14 @@ jobs:
     environment: release
     timeout-minutes: 25
     env:
+      RELEASE_ENABLED: ${{ vars.RELEASE_ENABLED }}
       APPROVED_SHA: ${{ inputs.commit_sha }}
       GH_TOKEN: ${{ github.token }}
     steps:
       - name: Require successful CI for the exact commit
         shell: bash
         run: |
+          [[ "$RELEASE_ENABLED" == true ]] || { echo "Release environment is not enabled"; exit 1; }
           [[ "$APPROVED_SHA" =~ ^[0-9a-f]{40}$ ]] || exit 1
           gh api "repos/$GITHUB_REPOSITORY/actions/workflows/ci.yml/runs?head_sha=$APPROVED_SHA&status=success" > "$RUNNER_TEMP/lumavok-ci.json"
           jq -e '.workflow_runs | any(.conclusion == "success" and .head_sha == env.APPROVED_SHA)' "$RUNNER_TEMP/lumavok-ci.json"

@@ -18,7 +18,20 @@ import { registerSchema, type RegisterValues } from "@/lib/validation/auth";
 import { withPasswordMatchResolver } from "@/lib/validation/withPasswordMatchResolver";
 import { authService } from "@/services";
 
-export function RegisterForm() {
+function policyUrl(value?: string): string | undefined {
+  try {
+    const url = new URL(value ?? "");
+    return url.protocol === "https:" ? url.href : undefined;
+  } catch {
+    return undefined;
+  }
+}
+export function RegisterForm({
+  termsUrl,
+  privacyUrl,
+}: { termsUrl?: string; privacyUrl?: string } = {}) {
+  const termsHref = policyUrl(termsUrl),
+    privacyHref = policyUrl(privacyUrl);
   const ui = useUi();
   const router = useRouter();
   const { language } = useContentLocale();
@@ -148,13 +161,38 @@ export function RegisterForm() {
             />
           </span>
         </label>
+        {(termsHref || privacyHref) && (
+          <p className="text-muted-foreground text-sm">
+            {termsHref && (
+              <a
+                href={termsHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline"
+              >
+                <UiText text="Terms of Service" />
+              </a>
+            )}
+            {termsHref && privacyHref && " · "}
+            {privacyHref && (
+              <a
+                href={privacyHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline"
+              >
+                <UiText text="Privacy Policy" />
+              </a>
+            )}
+          </p>
+        )}
         {errors.acceptTerms?.message && (
           <p
             id="register-terms-error"
             role="alert"
             className="text-destructive text-xs"
           >
-            {errors.acceptTerms.message}
+            {ui(errors.acceptTerms.message)}
           </p>
         )}
       </div>

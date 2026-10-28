@@ -96,6 +96,7 @@ function ProfileForm({
   const ui = useUi(),
     cities = useLocations(),
     cache = useQueryClient();
+  const [cityId, setCityId] = useState(profile?.cityId ?? "");
   const [busy, setBusy] = useState(false),
     [error, setError] = useState<string | null>(null);
   async function submit(e: React.FormEvent<HTMLFormElement>) {
@@ -152,7 +153,8 @@ function ProfileForm({
           id="cityId"
           name="cityId"
           required
-          defaultValue={profile?.cityId ?? ""}
+          value={cityId}
+          onChange={(e) => setCityId(e.target.value)}
           className="border-border rounded border p-2"
         >
           <option value="">{ui("Choose a city…")}</option>
