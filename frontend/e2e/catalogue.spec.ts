@@ -84,3 +84,18 @@ test("nonce CSP protects documents and the application hydrates", async ({
     "text",
   );
 });
+
+test("unknown routes return a translated French 404", async ({
+  page,
+  context,
+}) => {
+  await context.addCookies([
+    { name: "lumavok-language", value: "fr", domain: "localhost", path: "/" },
+  ]);
+  const response = await page.goto("/this-route-does-not-exist");
+  expect(response?.status()).toBe(404);
+  await expect(
+    page.getByRole("heading", { name: "Page introuvable", level: 1 }),
+  ).toBeVisible();
+  await expect(page.locator("html")).toHaveAttribute("lang", "fr");
+});

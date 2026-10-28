@@ -1,3 +1,5 @@
+"use client";
+import { useUi } from "@/components/common/UiText";
 import type { ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
@@ -14,14 +16,17 @@ interface SwipeableStatRowProps {
  * stacking six of them vertically pushes everything else below the fold on a
  * phone; swiping keeps "glance at the number you care about" a horizontal
  * gesture instead of a long scroll. Native scroll, no library — full
- * keyboard/touch support for free, same reasoning as `Sparkline` being a
- * plain SVG instead of a charting dependency.
+ * touch scrolling plus an explicitly focusable, labeled keyboard region.
  */
 export function SwipeableStatRow({ items, className }: SwipeableStatRowProps) {
+  const ui = useUi();
   return (
     <div
+      role="region"
+      aria-label={ui("Analytics statistics")}
+      tabIndex={0}
       className={cn(
-        "flex snap-x snap-mandatory gap-3 overflow-x-auto pb-1",
+        "focus-visible:ring-ring/50 flex snap-x snap-mandatory gap-3 overflow-x-auto rounded pb-1 outline-none focus-visible:ring-3",
         "sm:grid sm:snap-none sm:grid-cols-2 sm:overflow-visible sm:pb-0",
         "lg:grid-cols-4",
         className,

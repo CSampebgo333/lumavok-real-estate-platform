@@ -27,11 +27,17 @@ For actual PostgreSQL 17 testing, start an isolated loopback instance with a dis
 - Original Burkina seed hashes pass unchanged.
 - SQL suites replay fresh and observed-schema fixtures and verify constraints, RLS, counters, multilingual lookup, asset ownership/lifecycle and internal function permissions.
 - API suites execute Express + Prisma + SQL under the ordinary runtime role, including denied cross-owner operations, optimistic edits, seller approval, appointment transactions and media deletion failures/retries.
-- Frontend regression suite: 693 tests passed before final authority/location regressions; the final CI result supersedes this intermediate count.
+- Latest local frontend regression suite: **697/697 passed**. Publication scan, both typechecks, ESLint and Prettier passed. All three full dependency audits reported **zero vulnerabilities**, including development dependencies. The final CI result identifies the exact published source.
 - Additional session tests cover single-flight refresh, stale-response rejection, account-safe retry, provider outage versus ended session and query-cache clearing on role/account changes.
 - Native PostgreSQL 17 and the backend container build succeeded in CI run [40680260530](https://github.com/CSampebgo333/lumavok-real-estate-platform/actions/runs/40680260530). Other jobs in that intermediate run failed or were superseded and do not constitute a green release.
 - An intermediate full desktop run exposed a fixture-only SQL return-type issue. It was corrected after direct login reproduction; all eleven desktop Auth/workflow scenarios have since passed across the corrected focused runs, including profile save and uploaded-image publication; full desktop/mobile CI results will be recorded below. Failed attempts are not counted as passing.
 - Fresh dependency audit found a low-severity development-only transitive issue under the unused shadcn CLI. That generator dependency was removed; checked-in UI components do not require it. Final audits must pass for all workspaces.
+
+## Browser and delivery verification
+
+The complete local desktop suite passed **62/62** scenarios, including translated unknown-route handling. In CI run [40685367193](https://github.com/CSampebgo333/lumavok-real-estate-platform/actions/runs/40685367193), the earlier source passed all **60 desktop** scenarios, 697 frontend tests, SQL/API tests, dependency audits, native PostgreSQL 17 and both production container builds/smoke checks. Mobile passed 59/60 and identified a keyboard-focus omission in the horizontal analytics row. The row is now focusable and labeled in both languages. The corrected mobile analytics axe check and explicit phone keyboard-scrolling regression both passed locally (2/2).
+
+The [CI workflow](https://github.com/CSampebgo333/lumavok-real-estate-platform/actions/workflows/ci.yml) and retained Playwright reports provide the complete per-commit desktop/mobile results for the final published candidate. The latest jobs must all be green before `main` is promoted. Failed intermediate attempts are superseded only by successful checks of corrected source.
 
 ## Limits
 

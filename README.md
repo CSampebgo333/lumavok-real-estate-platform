@@ -1,5 +1,7 @@
 # Lumavok Real Estate Platform
 
+[![CI](https://github.com/CSampebgo333/lumavok-real-estate-platform/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/CSampebgo333/lumavok-real-estate-platform/actions/workflows/ci.yml)
+
 English/French property discovery and seller management for Burkina Faso. This repository consolidates the separately developed frontend, API and database into one maintained application. The original repository and its branches remain intact.
 
 **Release status:** integrated release candidate. Local and CI verification are recorded in [TESTING.md](docs/TESTING.md). **No production deployment or production database migration has been performed.** Existing-project rollout is deliberately blocked until the two missing historical migration files are recovered and staging gates pass; see [DEPLOYMENT.md](docs/DEPLOYMENT.md).
