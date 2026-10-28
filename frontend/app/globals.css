@@ -1,0 +1,464 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --border: oklch(0.922 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --radius: 0.625rem;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  /* Brand: a deep ink-teal — the one deliberate hue in the system (see the
+     Premium Experience audit). Replaces the unstyled shadcn grayscale
+     default (every token previously had chroma 0). Flows through every
+     component that already reads --primary/--ring — no component changes
+     needed for this to take effect. */
+  --primary: oklch(0.32 0.06 217);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  /* A single warm accent, used sparingly for premium/favorite/verified
+     signals only (StatusBadge "Verified", the active favorite heart) — never
+     for structural UI, so it stays a highlight, not a second brand color. */
+  --brand-gold: oklch(0.72 0.14 75);
+  --brand-gold-foreground: oklch(0.205 0.03 75);
+  --destructive: oklch(0.577 0.245 27.325);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.32 0.06 217 / 0.5);
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  /* Was the unmodified grayscale default — the dashboard shell's active nav
+     state never picked up the brand teal introduced for the public site
+     (see the Dashboard UX audit). Aligned to --primary so the brand is
+     consistent across both surfaces. */
+  --sidebar-primary: oklch(0.32 0.06 217);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.32 0.06 217 / 0.5);
+  /* The dashboard shell's layout contract for the mobile bottom nav (see
+     DashboardShell): its own height, the bottom clearance every dashboard
+     page's <main> reserves below `md`, and the offset any page-level sticky/
+     fixed bottom element (e.g. ListingPublishBar) must add on top of its own
+     `bottom-0` so the nav never renders over it. One number, three
+     consumers — change it here, not in each consumer. */
+  --dashboard-mobile-nav-h: 3.5rem;
+
+  /* Motion system tokens — shared timing/easing for the Premium Experience
+     motion pass (see frontend/CLAUDE.md). Cinematic surfaces (hero, gallery,
+     scroll reveals) use --ease-cinematic, a slower, weighted curve; UI
+     feedback (hover, press, toggles) uses --ease-standard, snappier and more
+     mechanical. Keep new motion work referencing these rather than inventing
+     new curves/durations per component. */
+  --ease-cinematic: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --duration-fast: 150ms;
+  --duration-base: 300ms;
+  --duration-slow: 600ms;
+  --duration-cinematic: 1200ms;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-border: var(--border);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --radius-DEFAULT: var(--radius);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  /* Two-tier heading system, deliberately not one font for everything:
+     `font-display` (Newsreader) carries the editorial voice on page titles and
+     major section headings, while `font-heading` stays on the UI sans for the
+     dense stuff — card titles, dialog/drawer titles, dashboard section headers.
+     A serif at 15–16px inside a data table reads as a mistake, not as premium. */
+  --font-display: var(--font-newsreader);
+  --font-heading: var(--font-sans);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-brand-gold: var(--brand-gold);
+  --color-brand-gold-foreground: var(--brand-gold-foreground);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+  --spacing-dashboard-mobile-nav: var(--dashboard-mobile-nav-h);
+}
+
+/*
+ * `w-full` is load-bearing, not decorative: both containers are rendered as a
+ * direct child of a `flex flex-col` <main> (see app/(public)/layout.tsx and
+ * DashboardShell). `mx-auto` sets *auto* cross-axis margins, and per the
+ * flexbox spec auto cross margins disable `align-items: stretch` — so without
+ * an explicit width the container is shrink-to-fit sized instead of filling
+ * its parent. When any descendant's min-content exceeds the viewport (a wide
+ * dashboard table), shrink-to-fit resolves to that min-content and the whole
+ * page scrolls horizontally, instead of the table scrolling inside its own
+ * `overflow-x-auto` region as designed. Making the width explicit keeps the
+ * container at the parent's width and lets the intended scroll container do
+ * its job. Do not remove.
+ */
+@utility container-page {
+  @apply mx-auto w-full max-w-6xl px-4 sm:px-6;
+}
+
+/* Wider than container-page: dashboard tables need the extra room desktop screens have. */
+@utility container-dashboard {
+  @apply mx-auto w-full max-w-(--breakpoint-xl) px-4 py-6 lg:px-6;
+}
+
+/* ---------------------------------------------------------------------------
+ * The primary card family: property cards, developer cards and their
+ * skeletons. The homepage category tiles deliberately stay outside it — they
+ * are full-bleed image tiles with their own aspect ratio and overlay, not
+ * content cards, and giving them `bg-card` would be meaningless.
+ *
+ * Edge treatment is a ring rather than a border on purpose. A ring is painted
+ * outside the box without occupying layout, so cards sitting in a grid stay
+ * geometrically aligned with their skeletons and with each other; mixing the
+ * two (as this codebase was doing) shifts content by a pixel per side.
+ *
+ * `card-interactive` is the single hover signature. PropertyCard and
+ * DeveloperCard had drifted to different lift distances (4px vs 2px) and only
+ * one of them changed its ring colour, so two cards on the same page answered
+ * the pointer differently. 2px is the restrained end deliberately.
+ *
+ * Reduced motion is already handled globally: the prefers-reduced-motion block
+ * at the bottom of this file flattens transition durations to ~0, so the hover
+ * state still applies, it just doesn't animate. Do not add a motion-reduce:
+ * variant here — it would be redundant.
+ * ------------------------------------------------------------------------- */
+@utility card-surface {
+  @apply bg-card ring-border rounded-xl ring-1;
+}
+
+@utility card-interactive {
+  @apply hover:ring-primary/30 transition-[box-shadow,transform,--tw-ring-color] duration-300 hover:-translate-y-0.5 hover:shadow-lg;
+}
+
+/* ---------------------------------------------------------------------------
+ * Page-shell vertical rhythm.
+ *
+ * Three intentional spacings, replacing the nine ad-hoc `py-*` combinations
+ * that had accumulated on `container-page` (py-4/6/8/10/12/16/20/24 and two
+ * responsive variants). Surfaces that are deliberately different — the
+ * full-bleed homepage hero, the dashboard's own `container-dashboard` — keep
+ * their own spacing and are not forced into this scale.
+ * ------------------------------------------------------------------------- */
+
+/* Editorial header band at the top of a discovery page. */
+@utility page-band {
+  @apply py-12 sm:py-16;
+}
+
+/* Standard content section. */
+@utility page-section {
+  @apply py-10 sm:py-14;
+}
+
+/* ---------------------------------------------------------------------------
+ * Type scale.
+ *
+ * Five tiers, expressed as utilities rather than repeated class strings so the
+ * scale is enforceable — before this existed the app had four different h1
+ * sizes (20/24/30/36px) and three h2 sizes across surfaces that are supposed to
+ * feel like one product.
+ *
+ * Tiers 1–2 use the display face; 3–5 stay on the UI sans. Semantic heading
+ * level and visual tier are chosen independently: a page can legitimately have
+ * an `h2` styled as a subsection.
+ * ------------------------------------------------------------------------- */
+
+/* Tier 1 — page title. Discovery pages, entity pages, hero. */
+@utility text-page-title {
+  @apply font-display text-3xl leading-[1.15] font-semibold tracking-tight text-balance sm:text-4xl;
+}
+
+/* Tier 2 — section heading. Major bands within a page. */
+@utility text-section-title {
+  @apply font-display text-2xl leading-snug font-semibold tracking-tight;
+}
+
+/* Tier 3 — subsection heading inside an entity page ("Description", "Contact",
+   "Active listings"). Stays on the UI sans: at this size a serif starts to
+   compete with the body copy it is introducing rather than framing it.
+   Matches the `text-lg font-semibold` these headings already used, so this
+   codifies the existing convention instead of introducing a new size.
+
+   Note this is a different family from the card/dialog/drawer chrome titles in
+   components/ui, which are `font-heading text-base font-medium` and are already
+   internally consistent — those are chrome labels, not content headings. */
+@utility text-subsection-title {
+  @apply font-heading text-lg leading-snug font-semibold tracking-tight;
+}
+
+/* Tier 4 — supporting lede that sits under a tier-1 title. */
+@utility text-page-lede {
+  @apply text-muted-foreground max-w-2xl leading-relaxed;
+}
+
+/* Tier 5 — eyebrow above a tier-1 title, and generic meta text. */
+@utility text-eyebrow {
+  @apply text-muted-foreground text-sm font-medium tracking-wide uppercase;
+}
+
+/* Dashboard page title. Deliberately a separate, smaller tier: the dashboard is
+   a working tool, so it keeps the display face for continuity with the public
+   product but not the editorial size. */
+@utility text-dashboard-title {
+  @apply font-display text-xl leading-tight font-semibold tracking-tight sm:text-2xl;
+}
+
+body {
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  /* Lighter, desaturated-slightly variant of the same brand hue — keeps
+     enough contrast against the dark background without glowing. */
+  --primary: oklch(0.78 0.07 217);
+  --primary-foreground: oklch(0.145 0.02 217);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --brand-gold: oklch(0.78 0.13 75);
+  --brand-gold-foreground: oklch(0.205 0.03 75);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.78 0.07 217 / 0.5);
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  /* Was an unrelated blue-purple (the unmodified shadcn default) — aligned
+     to dark-mode --primary, same reasoning as the light-mode token above. */
+  --sidebar-primary: oklch(0.78 0.07 217);
+  --sidebar-primary-foreground: oklch(0.145 0.02 217);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.78 0.07 217 / 0.5);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
+}
+
+/* Global safety net for the Premium Experience motion system (hover zoom,
+   card lift, gallery crossfade, scroll reveal): every one of those is
+   transform/opacity-only and driven by Tailwind's transition utilities, so
+   flattening duration to ~0 here is sufficient to satisfy
+   prefers-reduced-motion without needing a motion-reduce: variant on every
+   individual utility class. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /*
+   * The rules above can't reach framer-motion, which writes inline styles
+   * rather than CSS transitions — and `MotionConfig reducedMotion="user"`
+   * only suppresses transform, deliberately leaving opacity animating.
+   *
+   * The gap this closes is the pre-hydration window: `useReducedMotion` is a
+   * `useSyncExternalStore` hook whose `getServerSnapshot()` returns false, and
+   * React uses that same snapshot for the hydration render — so the server and
+   * first client render both emit the "hidden" state (opacity 0, y 24) even for
+   * a user who has asked for no motion. The JS fix in MotionReveal only takes
+   * effect once the store re-reads after hydration.
+   *
+   * `!important` beats framer's inline styles, so reveal content is at its
+   * final position and fully opaque from the very first paint, with no
+   * dependence on hydration timing. Applies to every route using the shared
+   * primitives, not just one page.
+   */
+  [data-motion-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Accessibility preferences.
+ *
+ * Everything below is driven by attributes the preference layer writes onto
+ * <html> (see lib/preferences.ts applyPreferences). Keeping it here — rather
+ * than as `dark:` / conditional classes inside components — means the whole
+ * component library inherits these capabilities without modification, and a
+ * preference can be added or reset in exactly one place.
+ * ------------------------------------------------------------------------- */
+
+/* Text scaling. Tailwind sizes in rem, so scaling the root font size scales
+   type, padding, gaps and rem-based max-widths together — the layout keeps its
+   proportions instead of text overflowing fixed boxes. Deliberately not
+   `transform: scale()`, which would blur text and create horizontal overflow. */
+:root {
+  --a11y-font-scale: 1;
+}
+
+html {
+  font-size: calc(100% * var(--a11y-font-scale));
+}
+
+/* Reading spacing. `em`-based so they track the scaled font size. Applied to
+   body copy containers rather than globally: forcing extra leading onto every
+   button and badge would break control heights, not improve readability. */
+:root[data-line-spacing="increased"] p,
+:root[data-line-spacing="increased"] li,
+:root[data-line-spacing="increased"] dd,
+:root[data-line-spacing="increased"] blockquote {
+  line-height: 2 !important;
+}
+
+:root[data-letter-spacing="increased"] p,
+:root[data-letter-spacing="increased"] li,
+:root[data-letter-spacing="increased"] dd,
+:root[data-letter-spacing="increased"] blockquote,
+:root[data-letter-spacing="increased"] h1,
+:root[data-letter-spacing="increased"] h2,
+:root[data-letter-spacing="increased"] h3 {
+  letter-spacing: 0.05em !important;
+}
+
+/* App-level reduced motion. Mirrors the prefers-reduced-motion block above so
+   the panel's "Reduced" setting behaves identically to the OS setting —
+   including the [data-motion-reveal] guarantee that content is never left
+   hidden by an animation that did not run. This is the same architecture, keyed
+   on a second selector; it is not a second motion system. */
+:root[data-motion="reduced"] *,
+:root[data-motion="reduced"] *::before,
+:root[data-motion="reduced"] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+:root[data-motion="reduced"] [data-motion-reveal] {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+/* High contrast. Re-points the existing semantic tokens rather than adding new
+   ones, so every component that already reads --foreground / --border / --ring
+   gets stronger contrast with no component changes.
+
+   The muted-foreground move is the substantive one: at its standard value it
+   measures 4.6:1 on white — passing, but with almost no headroom. Here it goes
+   to pure black/white, and borders go from a hairline grey to a clearly visible
+   edge, which is what actually helps low-vision users find inputs and cards. */
+:root[data-contrast="high"] {
+  --foreground: oklch(0 0 0);
+  --muted-foreground: oklch(0.25 0 0);
+  --card-foreground: oklch(0 0 0);
+  --popover-foreground: oklch(0 0 0);
+  --secondary-foreground: oklch(0 0 0);
+  --accent-foreground: oklch(0 0 0);
+  --border: oklch(0.45 0 0);
+  --input: oklch(0.35 0 0);
+  --primary: oklch(0.24 0.07 217);
+  --ring: oklch(0.24 0.07 217 / 0.85);
+  --sidebar-foreground: oklch(0 0 0);
+  --sidebar-border: oklch(0.45 0 0);
+  --sidebar-ring: oklch(0.24 0.07 217 / 0.85);
+  --destructive: oklch(0.45 0.24 27.325);
+  --brand-gold-foreground: oklch(0.15 0.03 75);
+}
+
+:root[data-contrast="high"].dark {
+  --foreground: oklch(1 0 0);
+  --muted-foreground: oklch(0.88 0 0);
+  --card-foreground: oklch(1 0 0);
+  --popover-foreground: oklch(1 0 0);
+  --secondary-foreground: oklch(1 0 0);
+  --accent-foreground: oklch(1 0 0);
+  --border: oklch(1 0 0 / 45%);
+  --input: oklch(1 0 0 / 50%);
+  --primary: oklch(0.9 0.06 217);
+  --primary-foreground: oklch(0.12 0.02 217);
+  --ring: oklch(0.9 0.06 217 / 0.85);
+  --sidebar-foreground: oklch(1 0 0);
+  --sidebar-border: oklch(1 0 0 / 45%);
+  --destructive: oklch(0.78 0.19 22.216);
+}
+
+/* Focus indicators must survive high contrast — a subtle ring is exactly what
+   this mode exists to fix. */
+:root[data-contrast="high"] :focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+/* Glass relies on translucency for legibility, which is the first thing to fail
+   when a user asks for maximum contrast. Make those surfaces opaque instead. */
+:root[data-contrast="high"] [data-glass-surface] {
+  background-color: var(--background);
+  backdrop-filter: none;
+}

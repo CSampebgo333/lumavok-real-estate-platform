@@ -1,0 +1,170 @@
+"use client";
+import { UiText, useUi } from "@/components/common/UiText";
+
+
+import { useContentLocale } from "@/hooks/useContentLocale";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+
+import { PasswordInput } from "@/components/auth/PasswordInput";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { FormField } from "@/components/ui/form-field";
+import { Input } from "@/components/ui/input";
+import { useAuth } from "@/hooks/useAuth";
+import { getPostLoginDestination } from "@/lib/authRedirect";
+import { getErrorMessage } from "@/lib/errors";
+import { registerSchema, type RegisterValues } from "@/lib/validation/auth";
+import { withPasswordMatchResolver } from "@/lib/validation/withPasswordMatchResolver";
+import { authService } from "@/services";
+
+export function RegisterForm() {
+  const ui = useUi();
+  const router = useRouter();
+  const { language } = useContentLocale();
+  const [confirmationPending, setConfirmationPending] = useState(false);
+  const { setAuth } = useAuth();
+  const [formError, setFormError] = useState<string | null>(null);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<RegisterValues>({
+    resolver: withPasswordMatchResolver(registerSchema),
+  });
+
+  async function onSubmit(values: RegisterValues) {
+    setFormError(null);
+
+    try {
+      const session = await authService.register(values);
+      if ("requiresEmailConfirmation" in session) {
+        setConfirmationPending(true);
+        return;
+      }
+      // Auto-login after registration — low-friction onboarding matches the
+      // product's public-access-first philosophy (docs/ARCHITECTURE.md §1).
+      setAuth(session.user, session.accessToken);
+      router.push(getPostLoginDestination(session.user));
+    } catch (error) {
+      setFormError(getErrorMessage(error));
+    }
+  }
+
+  if (confirmationPending)
+    return (
+      <p role="status">
+        {language === "fr"
+          ? "Vérifiez votre e-mail pour confirmer votre compte."
+          : ui("Check your email to confirm your account.")}
+      </p>
+    );
+
+  // `method="post"` keeps a pre-hydration native submit out of the URL — see
+  // the full explanation in LoginForm.
+  return (
+    <form
+      method="post"
+      onSubmit={handleSubmit(onSubmit)}
+      noValidate
+      className="flex flex-col gap-4"
+    >
+      <FormField
+        label={ui("Full name")}
+        htmlFor="register-name"
+        error={errors.fullName?.message}
+      >
+        <Input
+          id="register-name"
+          autoComplete="name"
+          aria-invalid={!!errors.fullName}
+          {...register("fullName")}
+        />
+      </FormField>
+
+      <FormField
+        label={ui("Email")}
+        htmlFor="register-email"
+        error={errors.email?.message}
+      >
+        <Input
+          id="register-email"
+          type="email"
+          autoComplete="email"
+          aria-invalid={!!errors.email}
+          {...register("email")}
+        />
+      </FormField>
+
+      <FormField
+        label={ui("Password")}
+        htmlFor="register-password"
+        error={errors.password?.message}
+      >
+        <PasswordInput
+          id="register-password"
+          autoComplete="new-password"
+          aria-invalid={!!errors.password}
+          {...register("password")}
+        />
+      </FormField>
+
+      <FormField
+        label={ui("Confirm password")}
+        htmlFor="register-confirm-password"
+        error={errors.confirmPassword?.message}
+      >
+        <PasswordInput
+          id="register-confirm-password"
+          autoComplete="new-password"
+          aria-invalid={!!errors.confirmPassword}
+          {...register("confirmPassword")}
+        />
+      </FormField>
+
+      <div className="flex flex-col gap-1.5">
+        <label
+          htmlFor="register-terms"
+          className="flex items-start gap-2 text-sm"
+        >
+          {/* This field predates FormField's layout and can't use it — the
+              control sits inside its label rather than beside it. The error
+              association is therefore wired by hand, following the same
+              contract FormField applies everywhere else: id derived from the
+              control id, referenced only while the error exists. */}
+          <Checkbox
+            id="register-terms"
+            className="mt-0.5"
+            aria-invalid={!!errors.acceptTerms}
+            aria-describedby={
+              errors.acceptTerms ? "register-terms-error" : undefined
+            }
+            {...register("acceptTerms")}
+          />
+          <span><UiText text={"I agree to the Terms of Service and Privacy Policy."} /></span>
+        </label>
+        {errors.acceptTerms?.message && (
+          <p
+            id="register-terms-error"
+            role="alert"
+            className="text-destructive text-xs"
+          >
+            {errors.acceptTerms.message}
+          </p>
+        )}
+      </div>
+
+      {formError && (
+        <p role="alert" className="text-destructive text-sm">
+          {formError}
+        </p>
+      )}
+
+      <Button type="submit" disabled={isSubmitting} className="w-full">
+        {isSubmitting ? ui("Creating account…") : ui("Create account")}
+      </Button>
+    </form>
+  );
+}

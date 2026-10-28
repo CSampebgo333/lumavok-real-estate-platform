@@ -1,0 +1,246 @@
+"use client";
+import { UiText, useUi } from "@/components/common/UiText";
+
+
+import { useFormContext, useWatch } from "react-hook-form";
+
+import { DashboardSection } from "@/components/dashboard/DashboardSection";
+import { FormField } from "@/components/ui/form-field";
+import { Input } from "@/components/ui/input";
+import type { PropertyCategory } from "@/constants/categories";
+import type { ListingFormValues } from "@/lib/validation/listing";
+
+/** Covers every mock listing today (max 5) with headroom — see services/mocks/properties.mock.ts. */
+const BEDROOM_BATHROOM_OPTIONS = Array.from(
+  { length: 11 },
+  (_, index) => index,
+);
+
+const SELECT_CLASSNAME =
+  "border-border bg-background h-9 w-full rounded-md border px-3 text-sm";
+
+/**
+ * Which measurement/structural fields apply to each category — the same
+ * "don't show every field to every property type" rule the reconciliation
+ * asked for (Part 5), applied here instead of duplicated per-category form
+ * variants. LAND is the one category with no bedrooms/bathrooms/car
+ * spaces/year-built concept at all; its only measurement is land size.
+ */
+const CATEGORY_FIELDS: Record<
+  PropertyCategory,
+  {
+    bedrooms: boolean;
+    bathrooms: boolean;
+    carSpaces: boolean;
+    yearBuilt: boolean;
+    buildingSize: boolean;
+    landSize: boolean;
+  }
+> = {
+  house: {
+    bedrooms: true,
+    bathrooms: true,
+    carSpaces: true,
+    yearBuilt: true,
+    buildingSize: true,
+    landSize: false,
+  },
+  apartment: {
+    bedrooms: true,
+    bathrooms: true,
+    carSpaces: true,
+    yearBuilt: true,
+    buildingSize: true,
+    landSize: false,
+  },
+  land: {
+    bedrooms: false,
+    bathrooms: false,
+    carSpaces: false,
+    yearBuilt: false,
+    buildingSize: false,
+    landSize: true,
+  },
+  commercial: {
+    bedrooms: false,
+    bathrooms: false,
+    carSpaces: true,
+    yearBuilt: true,
+    buildingSize: true,
+    landSize: false,
+  },
+  office: {
+    bedrooms: false,
+    bathrooms: false,
+    carSpaces: true,
+    yearBuilt: true,
+    buildingSize: true,
+    landSize: false,
+  },
+};
+
+const numberField = (
+  register: ReturnType<typeof useFormContext<ListingFormValues>>["register"],
+  name: "bedrooms" | "bathrooms" | "carSpaces" | "yearBuilt",
+) =>
+  register(name, {
+    setValueAs: (value: string) => (value === "" ? undefined : Number(value)),
+  });
+
+/**
+ * Category-aware structural details — bedrooms/bathrooms/car spaces/year
+ * built for House & Apartment, land size for Land, building size + car
+ * spaces for Commercial/Office. Renders nothing beyond the category prompt
+ * until a category is chosen, mirroring ListingAmenitiesSection's pattern.
+ */
+export function ListingMeasurementsSection() {
+  const ui = useUi();
+  const {
+    control,
+    register,
+    formState: { errors },
+  } = useFormContext<ListingFormValues>();
+  const category = useWatch({ control, name: "category" }) as
+    PropertyCategory | undefined;
+
+  if (!category) {
+    return (
+      <DashboardSection
+        title={ui("Details")}
+        description={ui("Choose a category in Basics to see the relevant details.")}
+      >
+        <p className="text-muted-foreground text-sm"><UiText text={"No category selected yet."} />{" "}</p>
+      </DashboardSection>
+    );
+  }
+
+  const fields = CATEGORY_FIELDS[category];
+
+  return (
+    <DashboardSection
+      title={ui("Details")}
+      description={ui("Structural details buyers and renters look for.")}
+    >
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {fields.landSize && (
+          <FormField
+            label={ui("Land size (m²)")}
+            htmlFor="listing-land-size"
+            error={errors.landSizeSqm?.message}
+          >
+            <Input
+              id="listing-land-size"
+              type="number"
+              min={0}
+              inputMode="decimal"
+              aria-invalid={!!errors.landSizeSqm}
+              {...register("landSizeSqm", {
+                setValueAs: (value: string) =>
+                  value === "" ? undefined : Number(value),
+              })}
+            />
+          </FormField>
+        )}
+
+        {fields.buildingSize && (
+          <FormField
+            label={ui("Building size (m²)")}
+            htmlFor="listing-building-size"
+            error={errors.buildingSizeSqm?.message}
+          >
+            <Input
+              id="listing-building-size"
+              type="number"
+              min={0}
+              inputMode="decimal"
+              aria-invalid={!!errors.buildingSizeSqm}
+              {...register("buildingSizeSqm", {
+                setValueAs: (value: string) =>
+                  value === "" ? undefined : Number(value),
+              })}
+            />
+          </FormField>
+        )}
+
+        {fields.bedrooms && (
+          <FormField
+            label={ui("Bedrooms")}
+            htmlFor="listing-bedrooms"
+            error={errors.bedrooms?.message}
+          >
+            <select
+              id="listing-bedrooms"
+              aria-invalid={!!errors.bedrooms}
+              className={SELECT_CLASSNAME}
+              {...numberField(register, "bedrooms")}
+            >
+              <option value=""><UiText text={"Select…"} /></option>
+              {BEDROOM_BATHROOM_OPTIONS.map((count) => (
+                <option key={count} value={count}>
+                  {count === 0 ? ui("Studio (0)") : count}
+                </option>
+              ))}
+            </select>
+          </FormField>
+        )}
+
+        {fields.bathrooms && (
+          <FormField
+            label={ui("Bathrooms")}
+            htmlFor="listing-bathrooms"
+            error={errors.bathrooms?.message}
+          >
+            <select
+              id="listing-bathrooms"
+              aria-invalid={!!errors.bathrooms}
+              className={SELECT_CLASSNAME}
+              {...numberField(register, "bathrooms")}
+            >
+              <option value=""><UiText text={"Select…"} /></option>
+              {BEDROOM_BATHROOM_OPTIONS.map((count) => (
+                <option key={count} value={count}>
+                  {count}
+                </option>
+              ))}
+            </select>
+          </FormField>
+        )}
+
+        {fields.carSpaces && (
+          <FormField
+            label={ui("Car spaces")}
+            htmlFor="listing-car-spaces"
+            error={errors.carSpaces?.message}
+          >
+            <Input
+              id="listing-car-spaces"
+              type="number"
+              min={0}
+              inputMode="numeric"
+              aria-invalid={!!errors.carSpaces}
+              {...numberField(register, "carSpaces")}
+            />
+          </FormField>
+        )}
+
+        {fields.yearBuilt && (
+          <FormField
+            label={ui("Year built")}
+            htmlFor="listing-year-built"
+            error={errors.yearBuilt?.message}
+          >
+            <Input
+              id="listing-year-built"
+              type="number"
+              min={1800}
+              max={new Date().getFullYear() + 1}
+              inputMode="numeric"
+              aria-invalid={!!errors.yearBuilt}
+              {...numberField(register, "yearBuilt")}
+            />
+          </FormField>
+        )}
+      </div>
+    </DashboardSection>
+  );
+}

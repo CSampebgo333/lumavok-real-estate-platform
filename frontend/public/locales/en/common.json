@@ -1,0 +1,108 @@
+{
+  "nav": {
+    "properties": "Properties",
+    "developers": "Developers",
+    "saved": "Saved",
+    "search": "Search",
+    "dashboard": "Dashboard",
+    "login": "Log in",
+    "logout": "Log out",
+    "browse": "Browse"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "close": "Close",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+
+    "contact": "Contact",
+    "active": "active",
+    "verified": "Verified",
+    "view": "View",
+    "directory": "Directory"
+  },
+  "auth": {
+    "welcome": "Welcome",
+    "loginTitle": "Login",
+    "registerTitle": "Register",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Forgot password?",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "account": "Account",
+    "signIn": "Sign in",
+    "createAccount": "Create an account"
+  },
+  "properties": {
+    "title": "Properties",
+    "subtitle": "Discover our selection of properties",
+    "noResults": "No properties found",
+    "viewDetails": "View details",
+    "price": "Price",
+    "bedrooms": "Bedrooms",
+    "bathrooms": "Bathrooms",
+    "area": "Area",
+
+    "sale": "For Sale",
+    "rent": "For Rent",
+    "popular": "Popular",
+    "similar": "Similar properties",
+    "backTo": "Back to properties"
+  },
+  "language": {
+    "fr": "Français",
+    "en": "English",
+    "toggle": "Switch language"
+  },
+  "text": {
+    "foot": "Property discovery and trust platform for African markets.",
+    "copyright": "All rights reserved.",
+    "searchRes": "Search Results",
+    "devMain": "The developers behind every Lumavok listing",
+    "devDescription": "Every property on Lumavok is listed by a named developer. Browse who they are, where they build, and what they currently have available.",
+    "noSavedMain": "Couldn't load properties",
+    "noSavedDesc": "No refresh token provided",
+    "savedMain": "Saved Properties",
+    "savedTitle": "Your shortlist",
+    "savedCount": "properties saved",
+    "propertiesDescription": "Every listing is published by a named developer. Narrow the catalogue by location, property type and budget."
+  },
+  "filter": {
+    "key": "Keyword",
+    "category": "Category",
+    "type": "Listing Type",
+    "loc": "Location",
+    "minPrice": "Min Price",
+    "maxPrice": "Max Price",
+    "apply": "Apply",
+    "listings": "Listings",
+    "sort": "Sort by",
+    "new": "Newest",
+    "priceL": "Price: Low to High",
+    "priceH": "Price: High to Low",
+    "keyHolder": "Title, city, address...",
+    "categAll": "All Categories",
+    "categAppart": "Appartments",
+    "categHouses": "Houses",
+    "categLand": "Land",
+    "categComm": "Commercial",
+    "categOffice": "Offcice Space",
+    "typeSR": "Sale & Rent",
+    "locHolder": "All Locations",
+    "bedroomCount": "Any",
+
+    "keyHolderDev": "Company name, city...",
+    "sortHR": "Highest Rated",
+    "sortML": "Most Listings",
+    "sortName": "Name A-Z"
+  }
+}

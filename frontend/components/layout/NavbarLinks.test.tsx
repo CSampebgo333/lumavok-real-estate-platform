@@ -1,0 +1,88 @@
+import { render, screen } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import i18n from "@/lib/i18n";
+beforeEach(async () => { await i18n.changeLanguage("fr"); });
+
+import { NavbarLinks } from "./NavbarLinks";
+
+const usePathname = vi.hoisted(() => vi.fn());
+vi.mock("next/navigation", () => ({ usePathname }));
+
+describe("NavbarLinks", () => {
+  it("renders every public destination, including Saved", () => {
+    usePathname.mockReturnValue("/");
+    render(<NavbarLinks />);
+
+    expect(
+      screen.getByRole("link", { name: "Propriétés" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: "Promoteurs" }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Favoris" })).toHaveAttribute(
+      "href",
+      "/saved",
+    );
+    expect(screen.getByRole("link", { name: "Recherche" })).toBeInTheDocument();
+  });
+
+  it("marks the current route with aria-current=page", () => {
+    usePathname.mockReturnValue("/properties");
+    render(<NavbarLinks />);
+
+    expect(screen.getByRole("link", { name: "Propriétés" })).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
+    expect(
+      screen.getByRole("link", { name: "Promoteurs" }),
+    ).not.toHaveAttribute("aria-current");
+  });
+
+  it("keeps a section active on its nested routes", () => {
+    usePathname.mockReturnValue("/properties/luxury-3br-apartment-east-legon");
+    render(<NavbarLinks />);
+
+    expect(screen.getByRole("link", { name: "Propriétés" })).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
+  });
+
+  it("marks nothing active on a route outside the nav", () => {
+    usePathname.mockReturnValue("/login");
+    render(<NavbarLinks />);
+
+    for (const name of ["Propriétés", "Promoteurs", "Favoris", "Recherche"]) {
+      expect(screen.getByRole("link", { name })).not.toHaveAttribute(
+        "aria-current",
+      );
+    }
+  });
+
+  it("signals the active link by weight as well as colour, not colour alone", () => {
+    usePathname.mockReturnValue("/saved");
+    render(<NavbarLinks />);
+
+    // WCAG 1.4.1: colour must not be the only visual channel carrying meaning.
+    expect(screen.getByRole("link", { name: "Favoris" }).className).toContain(
+      "font-medium",
+    );
+  });
+});
+
+/**
+ * WCAG 2.5.8 (AA) requires a 24x24 CSS-pixel target. These links measured 18px
+ * tall on mobile before this padding was added. jsdom computes no layout, so
+ * the real measurement is a Playwright check (e2e/saved-properties.spec.ts);
+ * this asserts the class that produces it survives refactors.
+ */
+it("gives each link vertical padding so the touch target clears the AA minimum", () => {
+  usePathname.mockReturnValue("/");
+  render(<NavbarLinks />);
+
+  for (const name of ["Propriétés", "Promoteurs", "Favoris", "Recherche"]) {
+    expect(screen.getByRole("link", { name }).className).toContain("py-1.5");
+  }
+});

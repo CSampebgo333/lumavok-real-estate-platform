@@ -1,0 +1,178 @@
+"use client";
+import { UiText } from "@/components/common/UiText";
+
+
+import { Bath, Bed, Building2, MapPin, Ruler, TrendingUp } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { useState } from "react";
+
+import { Badge } from "@/components/ui/badge";
+import { FavoriteButton } from "@/components/property/FavoriteButton";
+import { MotionImage } from "@/components/motion";
+import { ROUTES } from "@/constants/routes";
+import { useFavoriteCount } from "@/hooks/useFavorites";
+import { formatPrice, formatRentPeriod } from "@/lib/formatters";
+import { formatPropertyLocation } from "@/lib/propertyLocation";
+import { getPrimaryMeasurement } from "@/lib/propertyMeasurements";
+import { cn } from "@/lib/utils";
+import type { Property } from "@/types";
+
+// For Translation
+import { useTranslation } from "react-i18next";
+
+/** Above this, a property earns a "Popular" signal on its card — see favoriteService for what backs the count. */
+const POPULAR_THRESHOLD = 100;
+
+interface PropertyCardProps {
+  property: Property;
+  /** Only the first visible row of cards should eagerly load — see PropertyGrid/homepage callers. */
+  priority?: boolean;
+  /** Set by Similar Properties (see lib/similarProperties.ts) — an explainable, per-card reason this specific card was suggested. Never shown when absent, e.g. on a plain catalogue grid. Kept for screen readers even when `matchTags` renders the compact version. */
+  reason?: string;
+  /** Compact scannable version of `reason` (e.g. ["Similar location", "3 shared features"]) — see lib/similarProperties.ts. */
+  matchTags?: string[];
+}
+
+export function PropertyCard({
+  property,
+  priority = false,
+  reason,
+  matchTags,
+}: PropertyCardProps) {
+  const coverImage = property.media[0];
+  const measurement = getPrimaryMeasurement(property);
+  const favoriteCount = useFavoriteCount(
+    property.id,
+    property.favoriteCount ?? 0,
+  );
+  const isPopular = favoriteCount >= POPULAR_THRESHOLD;
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageFailed, setImageFailed] = useState(false);
+
+  const { t } = useTranslation("common");
+
+  return (
+    <article className="card-surface card-interactive relative flex flex-col overflow-hidden">
+      {/*
+        A normal block-level flex container, not `display: contents` — a
+        `contents` element has no box of its own, which left Playwright (and
+        potentially real pointer/touch input) computing a click point outside
+        the visible card and missing the link entirely. FavoriteButton stays
+        correctly on top as an absolutely-positioned sibling regardless.
+      */}
+      <Link
+        href={ROUTES.PROPERTY_DETAIL(property.slug)}
+        className="flex flex-1 flex-col"
+      >
+        <div className="bg-muted relative aspect-[4/3] w-full overflow-hidden">
+          {coverImage && !imageFailed ? (
+            <MotionImage className="absolute inset-0">
+              <Image
+                src={coverImage.url}
+                alt={property.title}
+                fill
+                sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+                priority={priority}
+                onLoad={() => setImageLoaded(true)}
+                onError={() => setImageFailed(true)}
+                className={cn(
+                  "object-cover opacity-0 transition-opacity duration-500",
+                  imageLoaded && "opacity-100",
+                )}
+              />
+            </MotionImage>
+          ) : (
+            <div className="text-muted-foreground flex h-full w-full items-center justify-center">
+              <Building2 className="size-8" aria-hidden />
+            </div>
+          )}
+
+          <div className="absolute top-3 left-3 flex flex-wrap gap-1.5">
+            <Badge className="bg-background/90 text-foreground border-0 backdrop-blur-sm">
+              {property.listingType === "SALE"
+                ? t("properties.sale")
+                : t("properties.rent")}
+            </Badge>
+            {isPopular && (
+              <Badge className="bg-brand-gold text-brand-gold-foreground border-0">
+                <TrendingUp className="size-3" aria-hidden />
+                {t("properties.popular")}
+              </Badge>
+            )}
+          </div>
+        </div>
+
+        <div className="flex flex-1 flex-col gap-2 p-4">
+          <p className="font-heading truncate text-[0.95rem] font-semibold tracking-tight">
+            {property.title}
+          </p>
+
+          <p className="text-muted-foreground flex items-center gap-1 text-xs">
+            <MapPin className="size-3.5 shrink-0" aria-hidden />
+            <span className="truncate">{formatPropertyLocation(property)}</span>
+          </p>
+
+          {(property.bedrooms !== undefined ||
+            property.bathrooms !== undefined ||
+            measurement) && (
+            <div className="text-muted-foreground flex items-center gap-3 text-xs">
+              {property.bedrooms !== undefined && (
+                <span className="flex items-center gap-1">
+                  <Bed className="size-3.5" aria-hidden />
+                  {property.bedrooms}{" "}<UiText text={"bd"} />{" "}</span>
+              )}
+              {property.bathrooms !== undefined && (
+                <span className="flex items-center gap-1">
+                  <Bath className="size-3.5" aria-hidden />
+                  {property.bathrooms}{" "}<UiText text={"ba"} />{" "}</span>
+              )}
+              {measurement && (
+                <span className="flex items-center gap-1">
+                  <Ruler className="size-3.5" aria-hidden />
+                  {measurement.value} m²
+                </span>
+              )}
+            </div>
+          )}
+
+          <p className="mt-auto pt-1 text-base font-semibold tracking-tight">
+            {formatPrice(
+              property.price,
+              property.currencyCode,
+              property.requestedLanguage,
+            )}
+            {property.listingType === "RENT" && (
+              <span className="text-muted-foreground text-xs font-normal">
+                {" "}
+                {formatRentPeriod(
+                  property.rentPeriod,
+                  property.requestedLanguage,
+                )}
+              </span>
+            )}
+          </p>
+
+          {matchTags && matchTags.length > 0 ? (
+            <p className="text-muted-foreground border-border border-t pt-2 text-xs">
+              {matchTags.join(" · ")}
+              {reason && <span className="sr-only"> — {reason}</span>}
+            </p>
+          ) : (
+            reason && (
+              <p className="text-muted-foreground border-border border-t pt-2 text-xs italic">
+                {reason}
+              </p>
+            )
+          )}
+        </div>
+      </Link>
+
+      <FavoriteButton
+        propertyId={property.id}
+        propertyTitle={property.title}
+        className="absolute top-3 right-3 z-10"
+      />
+    </article>
+  );
+}
