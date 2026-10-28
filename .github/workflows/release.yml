@@ -26,7 +26,7 @@ jobs:
           [[ "$APPROVED_SHA" =~ ^[0-9a-f]{40}$ ]] || exit 1
           gh api "repos/$GITHUB_REPOSITORY/actions/workflows/ci.yml/runs?head_sha=$APPROVED_SHA&status=success" > "$RUNNER_TEMP/lumavok-ci.json"
           jq -e '.workflow_runs | any(.conclusion == "success" and .head_sha == env.APPROVED_SHA)' "$RUNNER_TEMP/lumavok-ci.json"
-      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           ref: ${{ inputs.commit_sha }}
       - name: Build and publish immutable release candidates

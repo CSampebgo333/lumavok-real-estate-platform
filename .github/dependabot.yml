@@ -11,6 +11,11 @@ updates:
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 5
+    groups:
+      react:
+        patterns: ["react", "react-dom", "@types/react", "@types/react-dom"]
+      test-toolchain:
+        patterns: ["vitest", "@vitest/*", "vite", "@vitejs/*"]
 
   - package-ecosystem: "npm"
     directory: "/backend"

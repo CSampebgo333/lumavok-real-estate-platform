@@ -27,6 +27,7 @@ export function createApp(options: { authRateLimit?: number } = {}) {
   const env = getEnv();
   const app = express();
   app.set("trust proxy", env.TRUST_PROXY_HOPS);
+  app.set("query parser", "simple");
 
   app.use(helmet());
   app.use((_req, res, next) => {
@@ -62,7 +63,10 @@ export function createApp(options: { authRateLimit?: number } = {}) {
   );
 
   app.use((req, _res, next) => {
-    if (Object.values(req.query).some((v) => typeof v !== "string"))
+    if (
+      Object.keys(req.query).some((key) => /[\[\]]/.test(key)) ||
+      Object.values(req.query).some((v) => typeof v !== "string")
+    )
       return next(
         new BadRequestError(
           "Query parameters must be single strings",

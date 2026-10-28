@@ -100,4 +100,4 @@ No service-role key, private backup, production record export or reviewed produc
 
 `docs/database-review/` retains the dated initial database audit. Earlier design documents under the database folder are historical; this README and the current documents above describe the consolidated application. The old confidential roadmap and handoff are excluded from this public repository.
 
-No license grant has been inferred from public visibility. The repository owners should choose an appropriate license before external distribution.
+This project retains its existing [MIT license](LICENSE), copyright Emmanuel Adoum.

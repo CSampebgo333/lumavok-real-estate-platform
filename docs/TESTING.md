@@ -24,6 +24,7 @@ For actual PostgreSQL 17 testing, start an isolated loopback instance with a dis
 
 ## Executed evidence
 
+- Consolidation commit `7edfdc62a7f3eb7f34cf86556f61d199633c09e4` passed all six jobs in [CI run 40686920541](https://github.com/CSampebgo333/lumavok-real-estate-platform/actions/runs/40686920541): 697 frontend tests, 6 SQL/seed tests, 2 backend tests, native PostgreSQL 17 verification, 63 desktop and 63 mobile scenarios, all dependency audits, and both production container builds/smoke checks.
 - Original Burkina seed hashes pass unchanged.
 - SQL suites replay fresh and observed-schema fixtures and verify constraints, RLS, counters, multilingual lookup, asset ownership/lifecycle and internal function permissions.
 - API suites execute Express + Prisma + SQL under the ordinary runtime role, including denied cross-owner operations, optimistic edits, seller approval, appointment transactions and media deletion failures/retries.
@@ -38,6 +39,14 @@ For actual PostgreSQL 17 testing, start an isolated loopback instance with a dis
 The complete local desktop suite passed **62/62** scenarios, including translated unknown-route handling. In CI run [40685367193](https://github.com/CSampebgo333/lumavok-real-estate-platform/actions/runs/40685367193), the earlier source passed all **60 desktop** scenarios, 697 frontend tests, SQL/API tests, dependency audits, native PostgreSQL 17 and both production container builds/smoke checks. Mobile passed 59/60 and identified a keyboard-focus omission in the horizontal analytics row. The row is now focusable and labeled in both languages. The corrected mobile analytics axe check and explicit phone keyboard-scrolling regression both passed locally (2/2).
 
 The [CI workflow](https://github.com/CSampebgo333/lumavok-real-estate-platform/actions/workflows/ci.yml) and retained Playwright reports provide the complete per-commit desktop/mobile results for the final published candidate. The latest jobs must all be green before `main` is promoted. Failed intermediate attempts are superseded only by successful checks of corrected source.
+
+## Reconciliation with merged dependency updates
+
+While consolidation was being verified, `main` advanced to `ab3cdcadfc2b89fa2e6c5d92c3491aa4791297cd` through reviewed dependency merges. The reconciliation preserves that commit as a merge parent and keeps the updated packages. React and React DOM are aligned at 19.3.1, Vitest and its coverage provider at 5.0.5, with compatible Node types. Dependabot groups these coupled packages to reduce future partial upgrades. GitHub Actions v7 updates remain pinned to immutable commit SHAs.
+
+Express 5 requires named wildcard routes; the synthetic image transport now handles its path segments correctly. Startup handles the listen callback's error argument. Query parsing is explicitly flat, and HTTP regression checks reject duplicate values and bracketed array/object syntax so malformed filters cannot be silently ignored. All source, browser, native PostgreSQL and container jobs must pass again for this reconciled candidate; the earlier green run alone does not certify the dependency changes.
+
+Local reconciliation checks passed: 697 frontend tests, 6 SQL/seed tests, 2 backend tests, both typechecks and production builds, ESLint, formatting, secret scanning and three dependency audits with zero vulnerabilities. The Chromium download remained unavailable locally; the reconciled browser and container evidence is supplied by the candidate's CI jobs.
 
 ## Limits
 

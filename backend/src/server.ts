@@ -17,7 +17,12 @@ async function main() {
     process.exit(1);
   }
 
-  const server = app.listen(env.PORT, () => {
+  const server = app.listen(env.PORT, (error?: Error) => {
+    if (error) {
+      console.error("Server failed to listen");
+      void prisma.$disconnect().finally(() => process.exit(1));
+      return;
+    }
     console.log(`🚀 Backend API running on http://localhost:${env.PORT}`);
     console.log(`   Environment: ${env.NODE_ENV}`);
     console.log(`   Health check: http://localhost:${env.PORT}/api/health`);

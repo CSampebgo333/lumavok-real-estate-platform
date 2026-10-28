@@ -157,6 +157,19 @@ test(
       assert.equal(fr.body.data.category, "house");
       assert.equal(fr.body.data.developer.activeListings, 1);
       await api.get("/api/v1/properties?lang=zz").expect(400);
+      // Express 5 parses bracketed keys literally; reject nested/array syntax
+      // explicitly so filters and locale cannot be silently ignored.
+      for (const query of [
+        "q%5Bname%5D=house",
+        "q%5B%5D=house",
+        "lang%5Bcode%5D=fr",
+        "lang=en&lang=fr",
+      ]) {
+        const invalid = await api
+          .get(`/api/v1/properties?${query}`)
+          .expect(400);
+        assert.equal(invalid.body.code, "INVALID_QUERY");
+      }
       await api.get("/api/v1/properties/private-draft?lang=en").expect(404);
       await api.get("/api/v1/properties/draft/related?lang=en").expect(404);
       await api.get("/api/v1/properties/by-id/p1?lang=en").expect(200);

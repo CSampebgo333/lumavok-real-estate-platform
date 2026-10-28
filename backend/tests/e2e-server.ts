@@ -210,9 +210,13 @@ const { createApp } = await import("../src/app.js");
 const { prisma } = await import("../src/config/prisma.js");
 const app = express();
 app.get(
-  "/api/v1/test-provider/storage/v1/object/sign/property-media/*",
+  "/api/v1/test-provider/storage/v1/object/sign/property-media/*objectPath",
   (req, res) => {
-    const bytes = assets.get(String(req.params[0]));
+    const objectPath = req.params.objectPath;
+    const key = Array.isArray(objectPath)
+      ? objectPath.join("/")
+      : String(objectPath);
+    const bytes = assets.get(key);
     if (!bytes) return res.sendStatus(404);
     res.type("image/webp").send(bytes);
   },
