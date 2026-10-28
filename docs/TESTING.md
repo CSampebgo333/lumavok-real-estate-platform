@@ -48,9 +48,15 @@ Express 5 requires named wildcard routes; the synthetic image transport now hand
 
 Local reconciliation checks passed: 697 frontend tests, 6 SQL/seed tests, 2 backend tests, both typechecks and production builds, ESLint, formatting, secret scanning and three dependency audits with zero vulnerabilities. The Chromium download remained unavailable locally; the reconciled browser and container evidence is supplied by the candidate's CI jobs.
 
+Coverage generation also passed on reconciliation commit `4cd2e202b71840fe349db784f4d68aad28d99697`: 77.24% statements, 72.55% branches, 72.22% functions and 78.45% lines in the configured frontend scope. These are unit/component metrics, not a claim of complete coverage or managed-provider verification.
+
+That commit passed all six jobs in [PR CI run 40716552260](https://github.com/CSampebgo333/lumavok-real-estate-platform/actions/runs/40716552260), but the independent push run exposed an intermittent mobile keyboard-scrolling failure (62/63 passed). Native arrow increments could leave the mandatory snap row at the same card. Keyboard navigation now targets whole cards and supports Home/End; the browser regression waits for loaded statistics and verifies both directions and both endpoints. This correction requires another green full CI run before promotion; the intermittent failure was not dismissed by rerunning unchanged code.
+
 ## Limits
 
 Local browser download from the usual Playwright CDN was unavailable. Local runs use an isolated Chromium executable supplied through `PLAYWRIGHT_BROWSER_CONFIG`; web security and CSP remain enabled. CI installs the Playwright-supported Chromium and runs desktop/mobile independently. The optional executable override is for local tooling, not part of the production runtime.
+
+After workspace recovery, the replacement local Chromium exited before any browser scenario could run. Those attempted keyboard regression runs are not counted as passes. The corrected source passed typechecking, lint, formatting and its existing stats component tests locally; full browser verification uses CI's supported browser.
 
 PGlite socket fixtures use a single database session and `SET ROLE`; they cannot prove that a real database LOGIN is safe. The separate successful native PostgreSQL job addresses that boundary. Native PostgreSQL and Docker were unavailable locally and were verified remotely instead.
 

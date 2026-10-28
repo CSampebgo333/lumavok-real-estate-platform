@@ -48,10 +48,33 @@ test("analytics statistics support keyboard scrolling on a phone", async ({
   await login(page);
   await page.goto("/analytics");
   const statistics = page.getByRole("region", { name: "Analytics statistics" });
+  await expect(
+    statistics.getByText("Total Listings", { exact: true }),
+  ).toBeVisible();
+  await expect
+    .poll(() => statistics.evaluate((el) => el.scrollWidth - el.clientWidth))
+    .toBeGreaterThan(0);
   await statistics.focus();
   await expect(statistics).toBeFocused();
-  for (let i = 0; i < 5; i++) await page.keyboard.press("ArrowRight");
+  await page.keyboard.press("ArrowRight");
   await expect
     .poll(() => statistics.evaluate((el) => el.scrollLeft))
     .toBeGreaterThan(0);
+  const forward = await statistics.evaluate((el) => el.scrollLeft);
+  await page.keyboard.press("ArrowLeft");
+  await expect
+    .poll(() => statistics.evaluate((el) => el.scrollLeft))
+    .toBeLessThan(forward);
+  await page.keyboard.press("End");
+  await expect
+    .poll(() =>
+      statistics.evaluate(
+        (el) => el.scrollWidth - el.clientWidth - el.scrollLeft,
+      ),
+    )
+    .toBeLessThan(2);
+  await page.keyboard.press("Home");
+  await expect
+    .poll(() => statistics.evaluate((el) => el.scrollLeft))
+    .toBeLessThan(2);
 });
