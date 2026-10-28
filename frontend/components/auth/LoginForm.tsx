@@ -1,0 +1,120 @@
+"use client";
+import { UiText, useUi } from "@/components/common/UiText";
+
+
+import { zodResolver } from "@hookform/resolvers/zod";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+
+import { PasswordInput } from "@/components/auth/PasswordInput";
+import { Button } from "@/components/ui/button";
+import { FormField } from "@/components/ui/form-field";
+import { Input } from "@/components/ui/input";
+import { ROUTES } from "@/constants/routes";
+import { useAuth } from "@/hooks/useAuth";
+import {
+  getPostLoginDestination,
+  getSafeRedirectPath,
+} from "@/lib/authRedirect";
+import { getErrorMessage } from "@/lib/errors";
+import { loginSchema, type LoginValues } from "@/lib/validation/auth";
+import { authService } from "@/services";
+
+interface LoginFormProps {
+  /** Where to send the user after a successful login — set by proxy.ts's ?redirect= when it bounced them here. */
+  redirectTo?: string;
+}
+
+export function LoginForm({ redirectTo }: LoginFormProps) {
+  const ui = useUi();
+  const router = useRouter();
+  const { setAuth } = useAuth();
+  const [formError, setFormError] = useState<string | null>(null);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginValues>({ resolver: zodResolver(loginSchema) });
+
+  async function onSubmit(values: LoginValues) {
+    setFormError(null);
+
+    try {
+      const session = await authService.login(values);
+      setAuth(session.user, session.accessToken);
+      router.push(
+        getSafeRedirectPath(redirectTo) ??
+          getPostLoginDestination(session.user),
+      );
+    } catch (error) {
+      setFormError(getErrorMessage(error));
+    }
+  }
+
+  /*
+   * `method="post"` below is a security control, not a formality. React's
+   * onSubmit handler only exists after hydration; a form submitted before then
+   * is handled natively by the browser, and a form with no method defaults to
+   * GET — which appends every field to the URL. Reproduced on the running app:
+   * an early submit navigated to `/login?email=…&password=Password123`, putting
+   * the password into browser history, server logs and the next request's
+   * Referer header. With `method="post"` the same pre-hydration submit sends the
+   * fields in the request body instead. Keep this on every form that carries a
+   * credential.
+   */
+  return (
+    <form
+      method="post"
+      onSubmit={handleSubmit(onSubmit)}
+      noValidate
+      className="flex flex-col gap-4"
+    >
+      <FormField
+        label={ui("Email")}
+        htmlFor="login-email"
+        error={errors.email?.message}
+      >
+        <Input
+          id="login-email"
+          type="email"
+          autoComplete="email"
+          aria-invalid={!!errors.email}
+          {...register("email")}
+        />
+      </FormField>
+
+      <FormField
+        label={ui("Password")}
+        htmlFor="login-password"
+        error={errors.password?.message}
+      >
+        <PasswordInput
+          id="login-password"
+          autoComplete="current-password"
+          aria-invalid={!!errors.password}
+          {...register("password")}
+        />
+      </FormField>
+
+      <div className="flex justify-end">
+        <Link
+          href={ROUTES.FORGOT_PASSWORD}
+          className="text-primary text-sm hover:underline"
+        ><UiText text={"Forgot password?"} />{" "}</Link>
+      </div>
+
+      {formError && (
+        <p role="alert" className="text-destructive text-sm">
+          {formError}
+        </p>
+      )}
+
+      <Button type="submit" disabled={isSubmitting} className="w-full">
+        {isSubmitting ? ui("Signing in…") : ui("Sign in")}
+      </Button>
+    </form>
+  );
+}

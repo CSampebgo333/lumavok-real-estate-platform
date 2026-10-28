@@ -1,0 +1,228 @@
+"use client";
+import { UiText } from "@/components/common/UiText";
+
+
+import { Button } from "@/components/ui/button";
+import {
+  PROPERTY_CATEGORIES,
+  type PropertyCategory,
+} from "@/constants/categories";
+import { useLocations } from "@/hooks/useLocations";
+import {
+  BEDROOM_CATEGORIES,
+  LISTING_TYPE_OPTIONS,
+} from "@/lib/propertyFilters";
+import type { GetPropertiesParams } from "@/services";
+import type { ListingType } from "@/types";
+
+// For Translation
+import { useTranslation } from "react-i18next";
+
+const BEDROOM_OPTIONS = [1, 2, 3, 4, 5];
+
+interface FilterPanelProps {
+  filters: GetPropertiesParams;
+  onApply: (filters: Partial<GetPropertiesParams>) => void;
+}
+
+const CONTROL_BASE =
+  "border-border bg-background h-9 rounded-md border px-2.5 text-sm transition-colors hover:border-foreground/30 focus-visible:ring-ring/50 focus-visible:ring-2 focus-visible:outline-none";
+const SELECT_CLASSNAME = CONTROL_BASE;
+const INPUT_CLASSNAME = `${CONTROL_BASE} w-28`;
+
+/**
+ * Keyword + price are uncontrolled and submit-on-Apply (avoids a nav per keystroke); category,
+ * listing type, location and bedrooms are controlled directly from `filters` and apply
+ * immediately. Sorting lives in SortSelect, above the grid — it reorders results rather than
+ * narrowing them. The form's `key`
+ * forces a remount — resetting the uncontrolled fields' defaultValue — whenever a filter changes
+ * from elsewhere (e.g. a FilterChip removal), without needing an effect to re-sync local state.
+ */
+export function FilterPanel({ filters, onApply }: FilterPanelProps) {
+  const { data: cities = [] } = useLocations();
+  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    const q = (formData.get("q") as string).trim();
+    const minPrice = formData.get("minPrice") as string;
+    const maxPrice = formData.get("maxPrice") as string;
+
+    onApply({
+      q: q || undefined,
+      minPrice: minPrice ? Number(minPrice) : undefined,
+      maxPrice: maxPrice ? Number(maxPrice) : undefined,
+    });
+  }
+
+  const { t } = useTranslation("common");
+
+  return (
+    <form
+      key={`${filters.q ?? ""}-${filters.minPrice ?? ""}-${filters.maxPrice ?? ""}`}
+      onSubmit={handleSubmit}
+      className="border-border/60 bg-muted/40 flex flex-wrap items-end gap-4 rounded-xl border p-4 sm:p-5"
+    >
+      <div className="flex flex-col gap-1">
+        <label htmlFor="filter-q" className="text-muted-foreground text-xs">
+          {t("filter.key")}
+        </label>
+        <input
+          id="filter-q"
+          name="q"
+          type="text"
+          defaultValue={filters.q ?? ""}
+          placeholder={t("filter.keyHolder")}
+          className={`${INPUT_CLASSNAME} w-48`}
+        />
+      </div>
+
+      <div className="flex flex-col gap-1">
+        <label
+          htmlFor="filter-category"
+          className="text-muted-foreground text-xs"
+        >
+          {t("filter.category")}
+        </label>
+        <select
+          id="filter-category"
+          value={filters.category ?? ""}
+          onChange={(event) =>
+            onApply({
+              category: (event.target.value || undefined) as
+                PropertyCategory | undefined,
+            })
+          }
+          className={SELECT_CLASSNAME}
+        >
+          <option value="">{t("filter.categAll")}</option>
+          {PROPERTY_CATEGORIES.map((category) => (
+            <option key={category.value} value={category.value}>
+              <UiText text={category.label} />
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* Placed directly after Category, before Location/price: Sale-vs-Rent is
+          the first cut most buyers make, and leaving it until after the price
+          inputs would put it below the fold on a narrow viewport. */}
+      <div className="flex flex-col gap-1">
+        <label
+          htmlFor="filter-listing-type"
+          className="text-muted-foreground text-xs"
+        >
+          {t("filter.type")}
+        </label>
+        <select
+          id="filter-listing-type"
+          value={filters.listingType ?? ""}
+          onChange={(event) =>
+            onApply({
+              listingType: (event.target.value || undefined) as
+                ListingType | undefined,
+            })
+          }
+          className={SELECT_CLASSNAME}
+        >
+          <option value="">{t("filter.typeSR")}</option>
+          {LISTING_TYPE_OPTIONS.map((option) => (
+            <option key={option.value} value={option.value}>
+              <UiText text={option.label} />
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="flex flex-col gap-1">
+        <label htmlFor="filter-city" className="text-muted-foreground text-xs">
+          {t("filter.loc")}
+        </label>
+        <select
+          id="filter-city"
+          value={filters.city ?? ""}
+          onChange={(event) =>
+            onApply({ city: event.target.value || undefined })
+          }
+          className={SELECT_CLASSNAME}
+        >
+          <option value="">{t("filter.locHolder")}</option>
+          {cities.map((city) => (
+            <option key={city.id} value={city.name}>
+              {city.name}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="flex flex-col gap-1">
+        <label
+          htmlFor="filter-min-price"
+          className="text-muted-foreground text-xs"
+        >
+          {t("filter.minPrice")}
+        </label>
+        <input
+          id="filter-min-price"
+          name="minPrice"
+          type="number"
+          min={0}
+          inputMode="numeric"
+          defaultValue={filters.minPrice ?? ""}
+          className={INPUT_CLASSNAME}
+        />
+      </div>
+
+      <div className="flex flex-col gap-1">
+        <label
+          htmlFor="filter-max-price"
+          className="text-muted-foreground text-xs"
+        >
+          {t("filter.maxPrice")}
+        </label>
+        <input
+          id="filter-max-price"
+          name="maxPrice"
+          type="number"
+          min={0}
+          inputMode="numeric"
+          defaultValue={filters.maxPrice ?? ""}
+          className={INPUT_CLASSNAME}
+        />
+      </div>
+
+      {(!filters.category || BEDROOM_CATEGORIES.includes(filters.category)) && (
+        <div className="flex flex-col gap-1">
+          <label
+            htmlFor="filter-bedrooms"
+            className="text-muted-foreground text-xs"
+          >
+            {t("properties.bedrooms")}
+          </label>
+          <select
+            id="filter-bedrooms"
+            value={filters.minBedrooms ?? ""}
+            onChange={(event) =>
+              onApply({
+                minBedrooms: event.target.value
+                  ? Number(event.target.value)
+                  : undefined,
+              })
+            }
+            className={SELECT_CLASSNAME}
+          >
+            <option value="">{t("filter.bedroomCount")}</option>
+            {BEDROOM_OPTIONS.map((count) => (
+              <option key={count} value={count}>
+                {count}+
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
+      <Button type="submit" size="lg">
+        {t("filter.apply")}
+      </Button>
+    </form>
+  );
+}

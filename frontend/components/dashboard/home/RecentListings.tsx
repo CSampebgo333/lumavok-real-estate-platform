@@ -1,0 +1,191 @@
+"use client";
+import { UiText, useUi } from "@/components/common/UiText";
+
+
+import Image from "next/image";
+import Link from "next/link";
+import { Building2, MoreHorizontal } from "lucide-react";
+
+import { EmptyState } from "@/components/common/EmptyState";
+import { ErrorState } from "@/components/common/ErrorState";
+import { DashboardSection } from "@/components/dashboard/DashboardSection";
+import { PropertyStatusBadge } from "@/components/dashboard/StatusBadge";
+import { buttonVariants } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { isFeatureEnabled } from "@/constants/features";
+import { ROUTES } from "@/constants/routes";
+import { useRecentListings } from "@/hooks/useDashboard";
+import { formatPrice, formatRelativeTime } from "@/lib/formatters";
+import { isPubliclyVisible } from "@/services";
+import type { Property } from "@/types";
+
+const COLUMN_COUNT = 4;
+
+function ListingActions({ property }: { property: Property }) {
+  const ui = useUi();
+  const canEdit = isFeatureEnabled("DASHBOARD_PROPERTY_EDITOR");
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger
+        aria-label={`Actions for ${property.title}`}
+        className={buttonVariants({ variant: "ghost", size: "icon-sm" })}
+      >
+        <MoreHorizontal />
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        {/* Only for statuses that actually have a public page — this widget
+            shows drafts too, and a draft's public URL 404s. Same rule as My
+            Properties' row menu (services/listing.service.ts). Edit is always
+            offered, so the menu can never end up empty here. */}
+        {isPubliclyVisible(property.status) && (
+          <DropdownMenuItem
+            render={<Link href={ROUTES.PROPERTY_DETAIL(property.slug)} />}
+          ><UiText text={"View listing"} />{" "}</DropdownMenuItem>
+        )}
+        <DropdownMenuItem
+          disabled={!canEdit}
+          {...(canEdit
+            ? { render: <Link href={ROUTES.EDIT_LISTING(property.id)} /> }
+            : {})}
+        >
+          {canEdit ? ui("Edit listing") : ui("Edit listing (soon)")}
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
+/** Latest properties in the developer's portfolio: status, last-updated, and per-row actions. */
+export function RecentListings() {
+  const ui = useUi();
+  const { data, isLoading, isError } = useRecentListings();
+
+  const viewAll = isFeatureEnabled("DASHBOARD_PROPERTIES") ? (
+    <Link
+      href={ROUTES.LISTINGS}
+      className={buttonVariants({ variant: "ghost", size: "sm" })}
+    ><UiText text={"View all"} />{" "}</Link>
+  ) : undefined;
+
+  return (
+    <DashboardSection
+      title={ui("Recent Listings")}
+      description={ui("Your most recently updated properties.")}
+      icon={Building2}
+      action={viewAll}
+      flush
+    >
+      {isError ? (
+        <ErrorState
+          title={ui("Couldn't load your listings.")}
+          description={ui("Please refresh the page to try again.")}
+        />
+      ) : isLoading || !data ? (
+        <RecentListingsSkeleton />
+      ) : data.length === 0 ? (
+        <EmptyState
+          title={ui("No listings yet")}
+          description={ui("Your properties will appear here once you add your first listing.")}
+        />
+      ) : (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="px-4"><UiText text={"Property"} /></TableHead>
+              <TableHead><UiText text={"Status"} /></TableHead>
+              <TableHead><UiText text={"Last updated"} /></TableHead>
+              <TableHead className="px-4 text-right">
+                <span className="sr-only"><UiText text={"Actions"} /></span>
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {data.map((property) => (
+              <TableRow key={property.id}>
+                <TableCell className="px-4">
+                  <div className="flex items-center gap-3">
+                    <div className="bg-muted relative size-10 shrink-0 overflow-hidden rounded-md">
+                      {property.media[0] ? (
+                        <Image
+                          src={property.media[0].url}
+                          alt=""
+                          fill
+                          sizes="40px"
+                          className="object-cover"
+                        />
+                      ) : (
+                        <div className="text-muted-foreground flex h-full w-full items-center justify-center">
+                          <Building2 className="size-4" aria-hidden />
+                        </div>
+                      )}
+                    </div>
+                    <div className="min-w-0">
+                      <span className="block max-w-[20ch] truncate font-medium">
+                        {property.title}
+                      </span>
+                      <span className="text-muted-foreground text-xs">
+                        {property.city} · {formatPrice(property.price)}
+                      </span>
+                    </div>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <PropertyStatusBadge status={property.status} />
+                </TableCell>
+                <TableCell className="text-muted-foreground">
+                  {property.updatedAt
+                    ? formatRelativeTime(property.updatedAt)
+                    : "—"}
+                </TableCell>
+                <TableCell className="px-4 text-right">
+                  <ListingActions property={property} />
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      )}
+    </DashboardSection>
+  );
+}
+
+function RecentListingsSkeleton() {
+  return (
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead className="px-4"><UiText text={"Property"} /></TableHead>
+          <TableHead><UiText text={"Status"} /></TableHead>
+          <TableHead><UiText text={"Last updated"} /></TableHead>
+          <TableHead className="px-4">
+            <span className="sr-only"><UiText text={"Actions"} /></span>
+          </TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {Array.from({ length: 4 }).map((_, index) => (
+          <TableRow key={index}>
+            <TableCell className="px-4" colSpan={COLUMN_COUNT}>
+              <Skeleton className="h-8 w-full" />
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  );
+}

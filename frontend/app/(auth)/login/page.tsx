@@ -1,0 +1,45 @@
+
+import { UiText } from "@/components/common/UiText";
+import type { Metadata } from "next";
+import Link from "next/link";
+
+import { AuthCard } from "@/components/auth/AuthCard";
+import { LoginForm } from "@/components/auth/LoginForm";
+import { APP_NAME } from "@/constants/config";
+import { ROUTES } from "@/constants/routes";
+
+export const metadata: Metadata = {
+  title: `Log in | ${APP_NAME}`,
+  description: `Sign in to your ${APP_NAME} account.`,
+};
+
+interface LoginPageProps {
+  searchParams: Promise<{ redirect?: string; reset?: string }>;
+}
+
+export default async function LoginPage({ searchParams }: LoginPageProps) {
+  const { redirect, reset } = await searchParams;
+
+  return (
+    <AuthCard
+      title="Welcome back"
+      description={`Sign in to your ${APP_NAME} account`}
+      footer={
+        <><UiText text={"Don't have an account?"} />{" "}
+          <Link
+            href={ROUTES.REGISTER}
+            className="font-medium text-white underline underline-offset-2 hover:text-white/80"
+          ><UiText text={"Sign up"} />{" "}</Link>
+        </>
+      }
+    >
+      {reset === "success" && (
+        <p
+          role="status"
+          className="border-border bg-muted rounded-md border p-3 text-center text-sm"
+        ><UiText text={"Your password has been reset. Sign in with your new password."} />{" "}</p>
+      )}
+      <LoginForm redirectTo={redirect} />
+    </AuthCard>
+  );
+}
