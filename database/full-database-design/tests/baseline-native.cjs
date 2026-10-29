@@ -9,6 +9,7 @@ const crypto = require("node:crypto");
 const { spawnSync } = require("node:child_process");
 const { historical, root } = require("../scripts/migration-audit.cjs");
 const {
+  pgEnvironment,
   capture,
   compare,
   writePrivateBaseline,
@@ -100,7 +101,7 @@ test(
         process.env.LUMAVOK_PG_DUMP || "pg_dump",
         ["--no-password", "--format=plain"],
         {
-          env: { ...process.env, PGDATABASE: urls[0] },
+          env: pgEnvironment(urls[0]),
           encoding: "utf8",
           timeout: 30000,
           maxBuffer: 8 * 1024 * 1024,
@@ -117,7 +118,7 @@ test(
           "ON_ERROR_STOP=1",
         ],
         {
-          env: { ...process.env, PGDATABASE: urls[1] },
+          env: pgEnvironment(urls[1]),
           input: dump.stdout,
           encoding: "utf8",
           timeout: 30000,

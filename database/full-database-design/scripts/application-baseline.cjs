@@ -67,10 +67,37 @@ function endpoint(connectionString) {
   };
 }
 
-function dumpUrl(connectionString) {
+function pgEnvironment(connectionString, inherited = process.env) {
+  const target = endpoint(connectionString);
   const url = new URL(connectionString);
-  url.searchParams.delete("schema"); // Prisma-only option; libpq does not accept it.
-  return url.toString();
+  // PGDATABASE is a database name, not an implicitly expanded connection URI.
+  // Clear inherited routing/SSL overrides; never place credentials in argv.
+  const env = Object.fromEntries(
+    Object.entries(inherited).filter(
+      ([key]) =>
+        !key.startsWith("PG") && !["DIRECT_URL", "DATABASE_URL"].includes(key),
+    ),
+  );
+  Object.assign(env, {
+    PGHOST: target.host.replace(/^\[|\]$/g, ""),
+    PGPORT: target.port,
+    PGDATABASE: target.database,
+    PGUSER: target.user,
+    PGCONNECT_TIMEOUT: "15",
+  });
+  if (url.password) env.PGPASSWORD = decodeURIComponent(url.password);
+  else if (inherited.PGPASSWORD) env.PGPASSWORD = inherited.PGPASSWORD;
+  if (inherited.PGPASSFILE) env.PGPASSFILE = inherited.PGPASSFILE;
+  const options = {
+    sslmode: "PGSSLMODE",
+    sslrootcert: "PGSSLROOTCERT",
+    sslcert: "PGSSLCERT",
+    sslkey: "PGSSLKEY",
+    application_name: "PGAPPNAME",
+  };
+  for (const [option, name] of Object.entries(options))
+    if (url.searchParams.has(option)) env[name] = url.searchParams.get(option);
+  return env;
 }
 
 function canonicalSchema(sql) {
@@ -122,11 +149,7 @@ function dumpSchema(connectionString, snapshot) {
       `--snapshot=${snapshot}`,
     ],
     {
-      env: {
-        ...process.env,
-        PGDATABASE: dumpUrl(connectionString),
-        PGCONNECT_TIMEOUT: "15",
-      },
+      env: pgEnvironment(connectionString),
       encoding: "utf8",
       timeout: 120000,
       maxBuffer: 16 * 1024 * 1024,
@@ -261,6 +284,7 @@ function writePrivateBaseline(file, value) {
 }
 
 module.exports = {
+  pgEnvironment,
   endpoint,
   canonicalSchema,
   capture,

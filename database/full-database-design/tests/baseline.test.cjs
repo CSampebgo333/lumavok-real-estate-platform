@@ -12,6 +12,7 @@ const {
   root,
 } = require("../scripts/migration-audit.cjs");
 const {
+  pgEnvironment,
   endpoint,
   canonicalSchema,
   compare,
@@ -213,6 +214,25 @@ test("private baseline needs a reviewed checksum, cannot overwrite files or be w
 });
 
 test("baseline endpoint binding omits credentials and rejects routing overrides", () => {
+  const env = pgEnvironment(
+    "postgresql://fixture:escaped%3Apassword@localhost:5544/fixture?sslmode=require&schema=public",
+    {
+      PATH: "/test",
+      PGHOSTADDR: "unrelated",
+      PGSERVICE: "unrelated",
+      PGDATABASE: "wrong",
+      DIRECT_URL: "must-not-inherit",
+    },
+  );
+  assert.equal(env.PGHOST, "localhost");
+  assert.equal(env.PGPORT, "5544");
+  assert.equal(env.PGDATABASE, "fixture");
+  assert.equal(env.PGUSER, "fixture");
+  assert.equal(env.PGPASSWORD, "escaped:password");
+  assert.equal(env.PGSSLMODE, "require");
+  assert.equal(env.PGHOSTADDR, undefined);
+  assert.equal(env.PGSERVICE, undefined);
+  assert.equal(env.DIRECT_URL, undefined);
   const bound = endpoint(
     "postgresql://user:sensitive@db.example.test/database?sslmode=require&schema=public",
   );

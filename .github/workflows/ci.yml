@@ -52,7 +52,9 @@ jobs:
           from pathlib import Path
           for tool in ("pg_dump", "psql"):
               wrapper = Path(os.environ["RUNNER_TEMP"]) / ("lumavok-" + tool)
-              wrapper.write_text('#!/bin/sh\nexec docker exec -i -e PGDATABASE "$LUMAVOK_POSTGRES_CONTAINER" ' + tool + ' "$@"\n')
+              variables = "PGHOST PGPORT PGDATABASE PGUSER PGPASSWORD PGSSLMODE PGCONNECT_TIMEOUT".split()
+              forwarded = " ".join("-e " + name for name in variables)
+              wrapper.write_text('#!/bin/sh\nexec docker exec -i ' + forwarded + ' "$LUMAVOK_POSTGRES_CONTAINER" ' + tool + ' "$@"\n')
               wrapper.chmod(0o700)
               with open(os.environ["GITHUB_ENV"], "a") as env:
                   env.write("LUMAVOK_" + tool.upper() + "=" + str(wrapper) + "\n")
