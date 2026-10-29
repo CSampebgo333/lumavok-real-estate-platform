@@ -3,7 +3,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends openssl ca-cert
 WORKDIR /app/backend
 COPY backend/package*.json ./
 RUN npm ci
-COPY database/full-database-design/schema.prisma /app/database/full-database-design/schema.prisma
+COPY database/schema.prisma /app/database/schema.prisma
 RUN npm run db:generate
 COPY backend/tsconfig.json ./
 COPY backend/src ./src

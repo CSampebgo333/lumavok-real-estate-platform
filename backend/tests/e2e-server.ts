@@ -8,7 +8,7 @@ import { PGLiteSocketServer } from "@electric-sql/pglite-socket";
 const require = createRequire(import.meta.url);
 const {
   setup,
-} = require("../../database/full-database-design/tests/helpers.cjs");
+} = require("../../database/tests/helpers.cjs");
 if (
   process.env.NODE_ENV === "production" ||
   process.env.LUMAVOK_E2E_FIXTURE !== "1"

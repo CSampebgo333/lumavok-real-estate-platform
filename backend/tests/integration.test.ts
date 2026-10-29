@@ -7,7 +7,7 @@ import { PGLiteSocketServer } from "@electric-sql/pglite-socket";
 const require = createRequire(import.meta.url);
 const {
   setup,
-} = require("../../database/full-database-design/tests/helpers.cjs");
+} = require("../../database/tests/helpers.cjs");
 
 test(
   "HTTP + Prisma + PostgreSQL: catalogue, locale, ownership, seller approval and atomic workflows",

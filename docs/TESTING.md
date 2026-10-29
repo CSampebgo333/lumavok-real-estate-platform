@@ -20,7 +20,7 @@ E2E_MOBILE=1 npm run e2e
 
 `npm test` includes SQL architecture/seed tests, real HTTP + scoped Prisma + PostgreSQL integration, image decoding/lifecycle tests, and frontend unit/component/API-adapter tests. Frontend service tests assert HTTP contracts rather than asserting behavior of a replacement business mock. Browser suites start the real Express API and production-built Next frontend over a disposable PostgreSQL fixture, with synthetic Auth and Storage transport. They cover navigation, locale persistence and content, auth/role boundaries, favorites, seller approval, profile edits, listing terms/upload/publication, viewings/notifications, error states, CSP, theme, keyboard operation and automated accessibility checks.
 
-For actual PostgreSQL 17 testing, start an isolated loopback instance with a disposable administrative account, set `NODE_ENV=test`, `LUMAVOK_ALLOW_DISPOSABLE_DATABASE=1` and `LUMAVOK_NATIVE_TEST_URL`, then run `npm --prefix database/full-database-design run test:native`. The test generates its own random database/login names, verifies the runtime LOGIN/startup/RLS boundary and cleans up only those test resources. Never supply a shared database URL.
+For actual PostgreSQL 17 testing, start an isolated loopback instance with a disposable administrative account, set `NODE_ENV=test`, `LUMAVOK_ALLOW_DISPOSABLE_DATABASE=1` and `LUMAVOK_NATIVE_TEST_URL`, then run `npm --prefix database run test:native`. The test generates its own random database/login names, verifies the runtime LOGIN/startup/RLS boundary and cleans up only those test resources. Never supply a shared database URL.
 
 ## Executed evidence
 

@@ -2,7 +2,7 @@
 
 Use Node 24 and `npm run setup`. Create a branch from `main`; open a PR with the problem, resulting behavior, compatibility impact and actual validation. Keep changes scoped and prefer additive migrations. All normal code checks must pass before merge. Configure required CI jobs and review protection in GitHub before teammates begin shared development; configuration files do not create those settings automatically.
 
-The canonical schema is `database/full-database-design/schema.prisma`; SQL migrations also contain constraints, triggers, partial indexes and RLS. Never edit an applied migration, use `db push` on shared data or synthesize missing applied history. Generate a new migration through the supported tooling and review the SQL. Test both fresh and observed schemas, ordinary runtime permissions, denied cross-account operations and rollback/recovery implications.
+The canonical schema is `database/schema.prisma`; SQL migrations also contain constraints, triggers, partial indexes and RLS. Never edit an applied migration, use `db push` on shared data or synthesize missing applied history. Generate a new migration through the supported tooling and review the SQL. Test both fresh and observed schemas, ordinary runtime permissions, denied cross-account operations and rollback/recovery implications.
 
 Preserve original Burkina seed files. Use disposable architecture/E2E fixtures for new scenarios. Never point tests at a shared or production database. Native PostgreSQL tests accept loopback hosts and explicit disposable flags only.
 

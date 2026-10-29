@@ -23,7 +23,7 @@ jobs:
           cache-dependency-path: |
             frontend/package-lock.json
             backend/package-lock.json
-            database/full-database-design/package-lock.json
+            database/package-lock.json
       - run: npm run setup
       - run: npm run check
       - run: npm run test
@@ -59,7 +59,7 @@ jobs:
               with open(os.environ["GITHUB_ENV"], "a") as env:
                   env.write("LUMAVOK_" + tool.upper() + "=" + str(wrapper) + "\n")
           PY
-      - run: npm --prefix database/full-database-design run test:native
+      - run: npm --prefix database run test:native
         env:
           NODE_ENV: test
           LUMAVOK_ALLOW_DISPOSABLE_DATABASE: "1"

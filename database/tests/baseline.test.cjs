@@ -1,7 +1,6 @@
 const { test } = require("node:test");
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
-const os = require("node:os");
 const path = require("node:path");
 const { spawnSync } = require("node:child_process");
 const {
@@ -159,7 +158,7 @@ test("pg_dump normalization removes only outer metadata and preserves SQL bodies
 
 test("private baseline needs a reviewed checksum, cannot overwrite files or be written into the repository", () => {
   const directory = fs.mkdtempSync(
-    path.join(os.tmpdir(), "lumavok-baseline-test-"),
+    path.join(path.resolve(root, "../.."), "lumavok-baseline-test-"),
   );
   const file = path.join(directory, "fixture.baseline.json");
   try {
