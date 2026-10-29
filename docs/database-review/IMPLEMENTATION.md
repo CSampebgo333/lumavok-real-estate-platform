@@ -1,5 +1,7 @@
 # Lumavok database and bilingual integration review
 
+Historical review record. The original-file-only deployment gate described below was superseded on 29 October 2026 by the optional [verified baseline adoption workflow](../BASELINE_AND_FREE_RESTORE.md); historical SQL is never fabricated and production has not been changed.
+
 Status: implemented in isolated review branches; **not applied to the shared Supabase project**. Architecture approval received before this work. Production deployment and changes to existing shared branches require separate approval.
 
 The database branch starts at `dba` (`cd80160779dcd2bdcebee1e12692d695e7380d42`). The application branch starts at `feature/APP-002-french` (`524deb7e7dc2ac3d20ac3f10dde6f92a312c792e`), which includes the reviewed Claude frontend. These branches were inspected independently. The application branch carries the same reviewed database files so it can be tested as one release. Neither existing branch was overwritten or merged.

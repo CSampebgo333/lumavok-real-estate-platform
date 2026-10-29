@@ -14,7 +14,9 @@
     "migrate:preflight": "node scripts/deploy-reviewed.cjs",
     "content:check": "node scripts/backfill-reviewed-content.cjs",
     "content:apply": "node scripts/backfill-reviewed-content.cjs --apply",
-    "test:native": "node --test tests/native-postgres.cjs",
+    "test:native": "node --test --test-concurrency=1 tests/native-postgres.cjs tests/baseline-native.cjs",
+    "baseline:capture": "node scripts/baseline.cjs capture",
+    "baseline:compare": "node scripts/baseline.cjs compare",
     "migrate:fresh:preflight": "node scripts/deploy-fresh.cjs",
     "migrate:fresh": "node scripts/deploy-fresh.cjs --apply"
   },

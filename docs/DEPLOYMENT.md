@@ -35,7 +35,7 @@ Use the committed example files as templates. Supply real values through a secre
 
 Keep the enum reconciliation before SQL that references the new enum values. No existing domain table/column/record is dropped. The old district FK is replaced by a stricter composite FK. Initial original text, prices, IDs, media, hashes/tokens and original seeds remain. Compatibility changes are explicit in [INTEGRATION.md](INTEGRATION.md).
 
-### Existing Lumavok database: blocked until history is recovered
+### Existing Lumavok database: original history or verified adoption
 
 The observed applied history includes two migrations whose original files were unavailable in every inspected branch:
 
@@ -44,9 +44,9 @@ The observed applied history includes two migrations whose original files were u
 | `20260831000001_expand_enums/migration.sql`           | `d65a7b8abef1ec0a04c18da2dccaabd8e1c0d9b9f8d29a3e21c28d20f64c89e5` |
 | `20260831000002_add_tables_and_columns/migration.sql` | `768cd85a9e674e8f2dd50568b26e8433e64e2eacb8320e46335422d913eee2a5` |
 
-Recover these exact files from the original migration author/deployment artifacts. Do not reconstruct substitutes, edit history or use `migrate resolve` to bypass the mismatch. `npm --prefix database/full-database-design run migrate:preflight` is read-only and fails before contacting a database when required audited files are missing. When they are recovered, it compares local/applied checksums before any deployment. The wrapper also requires explicit approval/target references for `--apply`.
+Recovering these exact files remains one route. Alternatively, use the [verified baseline adoption workflow](BASELINE_AND_FREE_RESTORE.md): preserve the exact recorded checksums, review a private snapshot of the actual application schema and compare it before deployment. Only these two already-applied historical files may be absent. Do not reconstruct substitutes, edit history or use `migrate resolve` to bypass a mismatch. `npm --prefix database/full-database-design run migrate:preflight` remains read-only. Without a reviewed baseline it retains the strict original-file gate. Applying changes requires explicit database, target, backup and restore-test references; adoption also requires baseline approval.
 
-Take a private verified backup and restore it into an isolated staging project. Use the existing-project preflight and replay the reviewed additive chain there. Test production-sized constraint validation and lock duration; new unique indexes may reveal duplicates. Resolve inconsistencies through an approved data correction, not a destructive cleanup hidden in migrations.
+Take a private verified backup and restore it into an isolated local Supabase recovery environment or an already-authorized staging project. A Pro upgrade is not required for the [free local route](BASELINE_AND_FREE_RESTORE.md). Use the existing-project preflight and replay the reviewed additive chain there. Test representative constraint validation and lock duration; new unique indexes may reveal duplicates. Local timing does not prove hosted production performance. Resolve inconsistencies through an approved data correction, not a destructive cleanup hidden in migrations.
 
 ### New isolated project
 

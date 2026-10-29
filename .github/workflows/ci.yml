@@ -45,11 +45,24 @@ jobs:
         with:
           node-version: 24
       - run: npm run setup
+      - name: Use the service's matching PostgreSQL clients
+        run: |
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+          for tool in ("pg_dump", "psql"):
+              wrapper = Path(os.environ["RUNNER_TEMP"]) / ("lumavok-" + tool)
+              wrapper.write_text('#!/bin/sh\nexec docker exec -i -e PGDATABASE "$LUMAVOK_POSTGRES_CONTAINER" ' + tool + ' "$@"\n')
+              wrapper.chmod(0o700)
+              with open(os.environ["GITHUB_ENV"], "a") as env:
+                  env.write("LUMAVOK_" + tool.upper() + "=" + str(wrapper) + "\n")
+          PY
       - run: npm --prefix database/full-database-design run test:native
         env:
           NODE_ENV: test
           LUMAVOK_ALLOW_DISPOSABLE_DATABASE: "1"
           LUMAVOK_NATIVE_TEST_URL: postgresql://postgres:disposable-ci-password@127.0.0.1:5432/postgres
+          LUMAVOK_POSTGRES_CONTAINER: ${{ job.services.postgres.id }}
   browser:
     runs-on: ubuntu-latest
     timeout-minutes: 20

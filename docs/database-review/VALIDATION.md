@@ -1,5 +1,7 @@
 # Validation and integration results
 
+Historical review record. For current tests and the optional adoption route that does not require the unavailable historical SQL files, see [TESTING.md](../TESTING.md) and [BASELINE_AND_FREE_RESTORE.md](../BASELINE_AND_FREE_RESTORE.md). The results below retain their original scope and date.
+
 Validation date: 27 October 2026. These are local review results, not results from a production deployment. No live Supabase data, schema, Auth, Storage or policies were modified. See `validation-results.json` for aggregate machine-readable results.
 
 | Check                               | Actual result                                | Scope                                                                                                                                              |

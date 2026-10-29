@@ -2,6 +2,8 @@
 
 Verified on 29 October 2026. This record separates applied GitHub settings from outstanding database work. No production database migration, restore, data correction or application deployment was performed.
 
+**Subsequent owner decision:** remain on Supabase Free and continue without requiring the unavailable historical files. The [verified adoption and free restore workflow](BASELINE_AND_FREE_RESTORE.md) provides that alternative while preserving the original history. The recovery search results below remain factual; recovering the two files is no longer the only supported path. No actual production baseline/export/restore has been completed through the new workflow.
+
 ## Repository controls applied
 
 The active [Protect main — verified changes ruleset](https://github.com/CSampebgo333/lumavok-real-estate-platform/settings/rules/26078585) targets the default branch, currently `main`. It requires a pull request, resolution of review conversations and an up-to-date branch. Deletion and force pushes are blocked. The bypass list is empty, including for the current owner.
@@ -51,7 +53,7 @@ Recovery checks completed:
 4. Verified that `supabase_migrations.schema_migrations` does not exist in the live project. No successfully applied Prisma migration has nonempty `logs`. There were no pre-existing private or shared SQL snippets available in the current dashboard account.
 5. Ran `migrate:preflight`. It exited with status 1 on the missing `20260831000001_expand_enums` file, before opening a database connection. This is the expected safety result, not a successful migration rehearsal.
 
-The two original `migration.sql` files still need to come from the migration author's working copy or retained deployment artifacts. Preserve exact bytes and line endings and compare both hashes before adding them to the canonical history. A matching schema cannot establish the original file checksum. Do not fabricate replacement history, remove rolled-back records or use `migrate resolve` to bypass this gate.
+If the original `migration.sql` files become available from the author's working copy or deployment artifacts, preserve their exact bytes and line endings and compare both hashes before adding them to canonical history. A matching schema cannot establish their original checksums. Recovery is optional for the reviewed adoption route; it remains required for exact historical replay. Do not fabricate replacement history, remove rolled-back records or use `migrate resolve` to bypass a mismatch.
 
 ## Managed staging and restore blockers
 
@@ -59,15 +61,15 @@ The dashboard confirmed that Lumavok's existing `real-estate` project is healthy
 
 The new-project form refused another free project because the current account already has two active free projects across its organizations. No project was paused, deleted, upgraded or repurposed. The unrelated Maison du Faso Dan Fani project remains outside this task.
 
-The organization's billing panel quotes Pro **from USD 25/month**, with seven days of daily backups. Supabase's [current compute pricing](https://supabase.com/docs/guides/platform/manage-your-usage/compute) adds hourly compute per project and includes USD 10/month in organization compute credits; Nano on a paid plan is billed at Micro rates. An existing Nano plus one Micro staging project running for a full month is therefore an **estimate of about USD 35/month total**, before tax, additional usage or add-ons. This is not an approved purchase or a checkout quote. A separate approved existing staging project is another route. No upgrade or payment was submitted.
+The owner declined a Pro upgrade for now. Continue on Free using a private manual export and an isolated local Supabase restore rehearsal. No upgrade, payment, resource deletion or pause is part of this plan. The hosted project quota does not prevent local testing.
 
 The Supabase connector still cannot access the Lumavok project; its current authorization exposes another organization. Dashboard read-only access was verified through the user's selected GitHub sign-in. That does not provide a securely configured CLI/database connection for backup, restore or runtime testing.
 
-Before a managed rehearsal can run, provide an approved isolated target and a secure operator connection, or approve a quoted paid staging route. Obtain a current private backup through the supported operator workflow; do not publish database dumps, account records, private manifests or credentials in this public repository. A managed database clone does not validate Storage object recovery or all Auth configuration.
+Before a real restore rehearsal can run, configure a secure operator connection and an isolated local target. Obtain a current private backup through the supported operator workflow; do not publish database dumps, account records, private manifests or credentials in this public repository. Schema comparison alone does not validate row preservation, Storage object recovery or all Auth configuration.
 
 ## Rehearsal order and acceptance
 
-1. Recover and hash-check the two original migrations. Keep the existing preflight fail-closed until both match.
+1. Either recover and hash-check the original migrations, or review and verify the actual schema checkpoint using the adoption workflow. Preserve the old history in both cases; keep preflight fail-closed until the selected route passes.
 2. Record the authorized source and distinct isolated target, backup timestamp, PostgreSQL versions and operator approval. Disable copied schedules/outbound integrations in the isolated target before testing and isolate production email and file writes.
 3. Export a consistent private backup using the current Supabase backup/restore procedure; retain a checksum and inventory. Preserve application data, migration history, Auth data and role definitions as applicable. Handle role passwords and provider settings separately through secure configuration.
 4. Restore only into the approved isolated target. Compare schema, constraints, migration checksums, per-table record counts and private content fingerprints before applying new migrations. Test file recovery separately; database metadata alone does not restore file bytes.
