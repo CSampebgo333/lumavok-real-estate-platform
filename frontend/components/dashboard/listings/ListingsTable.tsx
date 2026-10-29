@@ -227,7 +227,7 @@ function ListingCards({
       {listings.map((property) => (
         <li
           key={property.id}
-          data-state={selectedIds.has(property.id) ? ui("selected") : undefined}
+          data-state={selectedIds.has(property.id) ? "selected" : undefined}
           className="border-border data-[state=selected]:bg-muted/50 flex gap-3 rounded-lg border p-3"
         >
           <Checkbox

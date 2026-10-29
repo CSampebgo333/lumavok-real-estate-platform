@@ -10,6 +10,7 @@ The existing frontend, backend, database, tooling and documentation boundaries a
 
 - Recent seller listings assumed XOF for every amount. They now preserve each listing’s currency and use the reactive interface language.
 - Desktop/mobile seller listing prices omitted rental periods. A shared formatter now shows recorded periods for rentals and omits them for sales. Missing currency and rental terms remain visibly unconfirmed in English/French. Public cards/details also disclose missing rental terms through the period formatter. Stored amounts and business facts remain unchanged.
+- French mobile selection translated the internal `data-state="selected"` token to `sélectionné(s)`, breaking its CSS selector. The token now remains language-independent. A regression test reproduced the failure before the fix and checks French rental formatting independently of the content response language.
 - Uniqueness errors exposed internal database field/index names. The API now returns a stable public conflict response; regression tests check that private metadata and provider messages are absent.
 - The README now describes actual architecture, setup, adoption, bilingual behavior and release limits in named-subject prose. Stale comments about Ghana-specific regions and missing API fields were corrected. The earlier operations report points to the newly available connector evidence.
 
@@ -41,7 +42,7 @@ The baseline/free-restore workflow was inspected before changes. No historical S
 - Local desktop browser command: all 63 cases stopped at browser launch because the required Chromium executable is absent; no local browser assertion passed. The application build/server prerequisites completed. The subsequent CI jobs supply browser binaries and passed all 63 desktop and all 63 mobile cases, including bilingual persistence, protected workflows, uploads, rental publication, responsive behavior and axe accessibility checks.
 - Native PostgreSQL 17: 2/2 passed in CI, including synthetic backup/restore with verified adoption and non-owner runtime/RLS guards. This is disposable-fixture restoration, not an actual production-backup restoration.
 - Both container builds and production-runtime smoke checks passed in CI. Docker and PostgreSQL executables remain unavailable locally.
-- All six required jobs passed in [CI run 40947877479](https://github.com/CSampebgo333/lumavok-real-estate-platform/actions/runs/40947877479), testing implementation commit `6f7a913d0d34dab9dbfaa971394ad8d4e86f8856`. This report-only follow-up changes no application behavior. [Pull request 34](https://github.com/CSampebgo333/lumavok-real-estate-platform/pull/34) retains the required checks and review gates.
+- All six required jobs passed in [CI run 40947877479](https://github.com/CSampebgo333/lumavok-real-estate-platform/actions/runs/40947877479), testing implementation commit `6f7a913d0d34dab9dbfaa971394ad8d4e86f8856`. Those counts describe that implementation revision. The subsequent French mobile selection correction passes all 23 listing-table tests locally, including the newly reproduced regression; its current full-suite results are attached to the pull request. [Pull request 34](https://github.com/CSampebgo333/lumavok-real-estate-platform/pull/34) retains the required checks and review gates.
 
 ## Preview and deployment requirements
 

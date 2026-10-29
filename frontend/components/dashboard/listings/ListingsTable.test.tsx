@@ -1,3 +1,4 @@
+import i18n from "@/lib/i18n";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -276,6 +277,30 @@ describe("ListingsTable", () => {
         ],
       });
       expect(screen.getByText("€200 /week")).toBeInTheDocument();
+    });
+
+    it("keeps selection state neutral while formatting French rental terms", async () => {
+      restore = useMobileViewport();
+      await i18n.changeLanguage("fr");
+      renderTable({
+        listings: [
+          makeProperty({
+            id: "fr-rental",
+            title: "Location test",
+            price: 200,
+            currencyCode: "EUR",
+            listingType: "RENT",
+            rentPeriod: "WEEK",
+            requestedLanguage: "en",
+          }),
+        ],
+        selectedIds: new Set(["fr-rental"]),
+      });
+      expect(screen.getByRole("listitem")).toHaveAttribute(
+        "data-state",
+        "selected",
+      );
+      expect(screen.getByText(/200.*€.*\/semaine/)).toBeInTheDocument();
     });
 
     it("renders cards instead of a table, each row's controls present exactly once", () => {
