@@ -26,7 +26,7 @@ Install PostgreSQL 17 client tools and check `pg_dump --version`. Use a direct o
 Choose a private directory **outside the repository**, then run:
 
 ```bash
-npm --prefix database/full-database-design run baseline:capture -- \
+npm --prefix database run baseline:capture -- \
   --output /private/lumavok-before.baseline.json
 ```
 
@@ -35,7 +35,7 @@ npm --prefix database/full-database-design run baseline:capture -- \
 Review that checkpoint alongside the private backup, the current architecture and the rehearsal results. Supply its approved path as `LUMAVOK_BASELINE_FILE` and the separately reviewed hash as `LUMAVOK_BASELINE_SHA256`. Do not automatically trust a freshly calculated hash or recapture a changed database merely to silence a drift error.
 
 ```bash
-npm --prefix database/full-database-design run migrate:preflight
+npm --prefix database run migrate:preflight
 ```
 
 With those two variables, this uses verified adoption. Without them, it retains the strict original-file path. Both commands are read-only. No `migrate resolve`, fake historical SQL, direct history-table update or reset is needed.
@@ -69,7 +69,7 @@ In addition to `DIRECT_URL` and the two baseline variables, the apply command re
 | `LUMAVOK_RESTORE_TEST_REFERENCE` | Actual successful restore/preservation rehearsal, not an unrelated fixture run |
 
 ```bash
-npm --prefix database/full-database-design run migrate:deploy
+npm --prefix database run migrate:deploy
 ```
 
 Setting variables is not user authorization. Production still requires separate explicit approval; it has not been granted for this change. The command uses Prisma to append new migration records and never changes the original history entries. If deployment fails or is interrupted, inspect status and preserve the evidence. Partial migration state or schema drift blocks a retry until reviewed. Never mark an unsuccessful migration applied to bypass the gate.

@@ -16,13 +16,13 @@ The application supports public property and agency pages, canonical locations a
 | --- | --- |
 | `frontend/` | Next.js pages, components, hooks, services, interface dictionaries, unit and browser tests |
 | `backend/` | Express API, Auth and Storage bridges, scoped Prisma queries and integration fixtures |
-| `database/full-database-design/` | Canonical Prisma schema, additive SQL migrations, preserved Burkina Faso seeds and guarded operations |
+| `database/` | Canonical Prisma schema, additive SQL migrations, preserved Burkina Faso seeds and guarded operations |
 | `scripts/` | Lockfile installation, verification orchestration, fixture startup and secret scanning |
 | `docs/` | Architecture, API contracts, database adoption, deployment and dated review evidence |
 | `infrastructure/` | Environment examples, Compose support, Nginx example and release tooling |
 | `.github/workflows/` | Quality, database, browser, container and manually gated release/deploy workflows |
 
-SQL migrations are authoritative for RLS, grants, constraints, triggers and partial indexes. Prisma describes application models. Historical database designs, migration assets and source provenance remain in their existing paths; [ORIGINS.md](docs/consolidation/ORIGINS.md) explains their purpose. The current structure already separates application, database, tooling and documentation responsibilities; this review introduces no unnecessary directory moves.
+SQL migrations are authoritative for RLS, grants, constraints, triggers and partial indexes. Prisma describes application models. Historical database designs, migration assets and source provenance remain in their existing paths; [ORIGINS.md](docs/consolidation/ORIGINS.md) explains their purpose. The current structure already separates application, database, tooling and documentation responsibilities; the database package now sits directly under `database/`, with all schema, migration, seed, test and operation files immediately accessible. The redundant wrapper README was consolidated into `database/README.md`. Scripts, Prisma generation, Docker paths, CI and documentation follow the flattened layout. Historical branch inventories and original-source links retain their recorded paths.
 
 ## Prerequisites and clean installation
 

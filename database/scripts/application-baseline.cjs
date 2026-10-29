@@ -270,7 +270,7 @@ function compare(expected, actual, sameTarget = true) {
 function writePrivateBaseline(file, value) {
   validateDocument(value);
   const directory = fs.realpathSync(path.dirname(path.resolve(file)));
-  const repository = fs.realpathSync(path.resolve(root, "../.."));
+  const repository = fs.realpathSync(path.resolve(root, ".."));
   if (directory === repository || directory.startsWith(repository + path.sep))
     throw new ReviewError(
       "Save private baseline artifacts outside the Git repository.",

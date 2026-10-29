@@ -20,7 +20,7 @@ test('PostgreSQL 17: dedicated non-owner login, startup guard, RLS and protected
     await client.query('BEGIN');await client.query("SELECT set_config('lumavok.user_id','u1',true),set_config('lumavok.role','PROPERTY_DEVELOPER',true),set_config('lumavok.developer_id','dev1',true)");
     assert.equal((await client.query("UPDATE public.property SET title='stolen' WHERE id='draft'")).rowCount,0);await assert.rejects(client.query(`UPDATE public."user" SET role='ADMIN' WHERE id='u1'`));await client.query('ROLLBACK');
     assert.deepEqual((await client.query('SELECT id FROM public.property ORDER BY id')).rows.map(r=>r.id),['p1']);
-    const cwd=path.resolve(__dirname,'../../../backend');const result=spawnSync(process.execPath,['--import','tsx','--input-type=module','-e',`const {assertRuntimeRole,prisma}=await import('./src/config/prisma.ts');try{await assertRuntimeRole();}finally{await prisma.$disconnect()}`],{cwd,env:{...process.env,DATABASE_URL:runtimeURL.toString()},encoding:'utf8'});assert.equal(result.status,0,'Dedicated runtime login must pass startup guard');
+    const cwd=path.resolve(__dirname,'../../backend');const result=spawnSync(process.execPath,['--import','tsx','--input-type=module','-e',`const {assertRuntimeRole,prisma}=await import('./src/config/prisma.ts');try{await assertRuntimeRole();}finally{await prisma.$disconnect()}`],{cwd,env:{...process.env,DATABASE_URL:runtimeURL.toString()},encoding:'utf8'});assert.equal(result.status,0,'Dedicated runtime login must pass startup guard');
    }finally{if(client)await client.end();await owner.end();await admin.query(`DROP DATABASE "${database}" WITH(FORCE)`);await admin.query(`DROP ROLE IF EXISTS "${login}"`)}
   }
  }finally{await admin.end()}

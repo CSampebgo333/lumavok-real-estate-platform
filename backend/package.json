@@ -9,8 +9,8 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "typecheck": "tsc --noEmit",
-    "db:generate": "prisma generate --schema=../database/full-database-design/schema.prisma",
-    "db:migrate": "node ../database/full-database-design/scripts/deploy-reviewed.cjs --apply",
+    "db:generate": "prisma generate --schema=../database/schema.prisma",
+    "db:migrate": "node ../database/scripts/deploy-reviewed.cjs --apply",
     "test": "node --import tsx --test tests/*.test.ts"
   },
   "dependencies": {

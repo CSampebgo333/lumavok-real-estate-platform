@@ -1,6 +1,6 @@
 # Schema and access reference
 
-There are **22 application models**, plus Prisma's migration history and Supabase-managed Auth/Storage schemas. Exact column types, defaults and FK actions are in [schema.prisma](../database/full-database-design/schema.prisma); additional PostgreSQL guarantees are in the ordered [migrations](../database/full-database-design/migrations/). SQL is authoritative when Prisma cannot represent a CHECK, partial index, trigger, privilege or cross-schema FK.
+There are **22 application models**, plus Prisma's migration history and Supabase-managed Auth/Storage schemas. Exact column types, defaults and FK actions are in [schema.prisma](../database/schema.prisma); additional PostgreSQL guarantees are in the ordered [migrations](../database/migrations/). SQL is authoritative when Prisma cannot represent a CHECK, partial index, trigger, privilege or cross-schema FK.
 
 ## Entities
 

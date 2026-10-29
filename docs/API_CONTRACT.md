@@ -78,7 +78,7 @@ Illustrative fixture responses for the same property (additional detail fields o
 }
 ```
 
-If English is missing and French is the configured fallback, the English request returns the French text with `requestedLanguage: "en"`, `contentLanguage: "fr"`, `fallbackUsed: true`. The monetary facts, IDs and relationships are unchanged. A parameterized SQL example for curated, publicly publishable translations is [localized-property.sql](../database/full-database-design/operations/localized-property.sql); invoke it under the ordinary scoped runtime role, never expose a privileged SQL RPC.
+If English is missing and French is the configured fallback, the English request returns the French text with `requestedLanguage: "en"`, `contentLanguage: "fr"`, `fallbackUsed: true`. The monetary facts, IDs and relationships are unchanged. A parameterized SQL example for curated, publicly publishable translations is [localized-property.sql](../database/operations/localized-property.sql); invoke it under the ordinary scoped runtime role, never expose a privileged SQL RPC.
 
 ## Write semantics
 

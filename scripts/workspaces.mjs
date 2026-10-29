@@ -1,5 +1,5 @@
 import { spawnSync } from "node:child_process";
-const database = "database/full-database-design";
+const database = "database";
 const plans = {
   install: [
     [database, "ci"],

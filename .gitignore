@@ -17,6 +17,6 @@ test-results/
 .freebuff/
 supabase/.temp/
 database-details.txt
-database/full-database-design/operations/reviewed-content-manifest.json
+database/operations/reviewed-content-manifest.json
 *.baseline.json
 private-backups/
