@@ -1,3 +1,5 @@
+> **Historical record — initial database review.** The results and design below apply to the reviewed candidate, not the current release. Current guidance is indexed in [Documentation](../README.md), with verification in [Testing](../TESTING.md).
+
 # Lumavok database and bilingual integration review
 
 Historical review record. The original-file-only deployment gate described below was superseded on 29 October 2026 by the optional [verified baseline adoption workflow](../BASELINE_AND_FREE_RESTORE.md); historical SQL is never fabricated and production has not been changed.

@@ -1,29 +1,32 @@
 ---
 name: Bug report
-about: Report a defect or regression
+about: Report a reproducible defect or regression
 title: "[BUG] "
 labels: [bug, needs-review]
 assignees: []
 ---
 
-## Summary
+## Problem
 
-Describe the bug clearly and concisely.
+<!-- Reporters describe the observed behavior and its effect on users or contributors. -->
 
-## Steps to Reproduce
+## Reproduction
 
 1.
 2.
 3.
 
-## Expected Behavior
+## Expected behavior
 
-## Actual Behavior
+## Observed behavior
 
 ## Environment
 
-- Browser / Device:
-- Branch / Commit:
-- Area:
+- Branch and commit:
+- Affected component or route:
+- Browser and device:
+- Selected language:
 
-## Screenshots / Logs
+## Evidence
+
+<!-- Screenshots and sanitized logs. Credentials and private records remain excluded. -->

@@ -1,34 +1,41 @@
-# Security model and review
+# Security
 
-Report suspected vulnerabilities privately to the repository owners through an established private channel. Do not post credentials, production records or exploit details in a public issue. No private-reporting address or operational response guarantee has been invented.
+Lumavok protects account, seller and property data through server validation, restricted database access and row-level authorization. These controls apply to the version-controlled implementation; operators verify their effective behavior on the intended service environment before release.
 
-## Implemented controls
+## Reporting vulnerabilities
 
-| Boundary         | Enforcement                                                                                                                                                                                                             |
-| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Identity         | Supabase verifies the bearer token; confirmed email and a mapped Auth UUID are required. Sensitive requests also check the session identifier against managed session state.                                            |
-| Authority        | Reload application roles and active, non-deleted seller membership from PostgreSQL. Registration cannot grant a role; editable Auth metadata is not trusted. Seller activation is administrator-only and atomic.        |
-| Runtime database | Non-owner `NOBYPASSRLS` login inheriting `lumavok_runtime`; startup rejects elevated roles, owner memberships and `SET ROLE` sessions. Migration URL is kept outside the service.                                       |
-| RLS and grants   | Tables use appropriate public/owner/client/admin predicates plus column grants and protected-field triggers. Data API roles do not receive application-table access; `service_role` application privileges are revoked. |
-| Privileged SQL   | Fixed search paths, parameterized queries, protected internal functions, and no public execute permission on privileged trigger helpers. Views are not used to bypass RLS.                                              |
-| Sessions         | In-memory browser access token; HttpOnly, Secure-in-production, SameSite=Strict refresh cookie. Origin validation for mutations. Shared refresh rejects stale responses; cache clears on account/authority change.      |
-| Logout/recovery  | Server revokes sessions; unsuccessful revocation is surfaced. Recovery tokens use the fragment/body flow and are scrubbed from the URL. Recovery responses do not disclose account existence.                           |
-| Uploads          | Authenticated active seller, per-seller quota, file/dimension limits, real image decoding/re-encoding, private bucket, verified UUID path, short signed URLs, asset-state FK and idempotent deletion.                   |
-| Input/output     | Validated DTOs and canonical IDs, bounded pagination, stable error codes, safe generic provider/DB errors, no token/secret logs.                                                                                        |
-| Web delivery     | Same-origin API proxy, nonce script CSP, frame/object restrictions, security headers, explicit private/no-store responses, TLS server example.                                                                          |
-| Delivery         | Lockfiles, pinned CI actions, dependency audits, publication scan, least-permission jobs and explicit environment-gated deployment.                                                                                     |
+Contributors report suspected vulnerabilities privately to the repository maintainers through an established private channel. Public issues must not contain credentials, private records or sensitive exploit details. A dedicated reporting address and response-time commitment have not been published.
 
-The RLS tests check allowed operations **and denied reads/writes across accounts**, protected role/owner/activation fields, public draft hiding, cross-city districts, ownerless/orphan data, translation isolation and attached-media deletion. RLS being enabled by itself is not considered adequate verification.
+## Security boundaries
 
-## Residual risks and operational requirements
+| Boundary | Control |
+| --- | --- |
+| Identity | Supabase verifies bearer tokens. Confirmed email, an application account mapping and an active managed session are required. |
+| Authorization | The API reloads roles and active seller relationships from PostgreSQL. Registration inputs and editable Auth metadata cannot grant authority. |
+| Database runtime | A non-owner `NOBYPASSRLS` login inherits `lumavok_runtime`. Startup rejects elevated privileges, table ownership and role-switching sessions. |
+| Row access | RLS predicates, column grants and protected-field triggers restrict public, account, seller and administrative operations. Application tables are not exposed to Data API roles by the security migrations. |
+| Privileged SQL | Internal helpers use fixed search paths and restricted execution. Runtime queries are parameterized. |
+| Sessions | Browser access tokens remain in memory. Refresh cookies are HttpOnly, Secure in production and SameSite=Strict. Mutation requests validate Origin. |
+| Refresh and recovery | Shared refresh rejects stale session responses. Account/role changes clear private caches. Recovery responses avoid account enumeration and tokens are removed from browser URLs. |
+| Images | Active sellers upload decoded, validated and re-encoded image bytes. Seller-scoped object paths, UUID asset identifiers and database attachment rules protect ownership and deletion. |
+| API responses | Validated inputs, bounded pagination and stable error codes limit malformed requests and disclosure of database/provider details. |
+| Web delivery | Same-origin API requests, nonce-based script CSP, security headers and private/no-store responses protect browser delivery. Production requires TLS. |
+| Changes and releases | Lockfiles, pinned CI actions, audits, secret scanning and protected release workflows support review and controlled deployment. |
 
-- The API and ordinary runtime connection are trusted to establish actor variables. A compromised backend or stolen runtime credential can impersonate actors within that boundary. Protect secrets, restrict network access and rotate credentials; RLS does not eliminate this trust.
-- The Storage credential can administer Storage objects and therefore remains privileged even though application-table access is revoked. Keep it server-only and separate from the migration and database logins. Verify the actual Supabase key/grant behavior in staging.
-- Signed media URLs grant temporary bearer access. Existing public Cloudinary URLs cannot be made private retroactively without a separately approved migration. Private-backup-derived URL verification was not performed because automatic approval review blocked disclosure to third parties.
-- Rate limits are process-local. Multiple API replicas need a shared rate-limit store or trusted edge enforcement before relying on global quotas. There is no implemented payment or fraud-detection service.
-- Search uses bounded queries and indexes but has not been load-tested with production-scale data. Counters and historical event text are retained; analytics ingestion is not an abuse-proof public tracking pipeline.
-- Unattached upload retention/cleanup, backup schedules, alert routing, GitHub branch/environment protection, vulnerability-response ownership and secret rotation are operational tasks, not settings created by source files.
-- Browser/HTTP tests simulate Auth and Storage transport. Real email confirmation/recovery, cookie behavior behind production TLS/proxies, session revocation, managed Auth health, Storage access and pooler behavior require staging checks.
-- No production changes were made. The initially inspected managed Auth endpoint returned 5xx, and two historical migration files are unavailable. Both are explicit existing-project release blockers.
+Authorization tests include denied reads and writes across accounts, hidden drafts, protected roles and ownership, translation isolation, location consistency and attached-media deletion. Enabling RLS without appropriate grants and policies is insufficient.
 
-The pattern-based secret scanner checks publication candidates without printing values. It cannot detect every secret format or prove that earlier repository history is safe. It complements review and GitHub secret scanning; it is not a credential vault.
+## Operational responsibilities
+
+The API and runtime connection are trusted to establish transaction-local actor context. A compromised API or stolen runtime credential can forge that context. Operators protect credentials, restrict network access and maintain a rotation procedure.
+
+The Storage credential remains privileged even when it has no application-table access. It stays server-side, separate from the runtime database and migration logins. Signed image URLs provide temporary bearer access. Existing public Cloudinary references require a separately reviewed migration before their access model changes.
+
+Rate limits are process-local. Multiple API replicas require shared enforcement or an appropriate trusted edge. Unattached-upload retention, monitoring, alert routing, backup schedules and vulnerability-response ownership also require operational configuration.
+
+## Release requirements
+
+Automated fixtures simulate Auth and Storage transport. They do not certify real confirmation/recovery email, managed revocation, private object access, TLS/proxy cookies or pooler behavior. Operators complete those checks, an actual private backup/restore rehearsal and the reviewed migration workflow before production.
+
+The latest recorded live inspection and repository controls are summarized in [Operations status](docs/OPERATIONS_STATUS.md). [Deployment](docs/DEPLOYMENT.md) contains the release gates. Historical Auth failures are dated observations, not a current health check.
+
+The secret scanner detects known patterns without printing values. It complements review and provider secret scanning; it cannot prove that every secret format or earlier commit is safe.

@@ -1,4 +1,4 @@
-# Schema and access reference
+# Database schema
 
 There are **22 application models**, plus Prisma's migration history and Supabase-managed Auth/Storage schemas. Exact column types, defaults and FK actions are in [schema.prisma](../database/schema.prisma); additional PostgreSQL guarantees are in the ordered [migrations](../database/migrations/). SQL is authoritative when Prisma cannot represent a CHECK, partial index, trigger, privilege or cross-schema FK.
 
@@ -45,14 +45,14 @@ These indexes are derived from implemented query paths. Production query plans, 
 
 ## RLS and privilege matrix
 
-All application access below is through the trusted API and its non-owner runtime login. Supabase `anon`/`authenticated` and `service_role` receive no application-table privileges after the security migrations. This does not revoke their managed Auth/Storage service responsibilities.
+The matrix describes the migrated implementation. Application access runs through the trusted API and its non-owner runtime login; operators verify the effective live grants and policies during adoption. Supabase `anon`/`authenticated` and `service_role` receive no application-table privileges after the security migrations. This does not revoke their managed Auth/Storage service responsibilities.
 
 | Data                                        | Public API scope                                    | Account/seller scope                                                                                            | Administrative scope                           |
 | ------------------------------------------- | --------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
-| Active catalogue and published translations | Read active, non-deleted listings of active sellers | Owner can read/edit its own drafts and exact-language content                                                   | Manage authorized records                      |
+| Active catalogue and published translations | Read active, non-deleted listings of active sellers | Sellers read/edit their own drafts and exact-language content                                                   | Manage authorized records                      |
 | Locations, amenities and language settings  | Read reference data                                 | Read                                                                                                            | Restricted writes                              |
 | User account                                | None                                                | Own safe account columns; cannot promote role or read password hashes                                           | Authorized identity/role operations            |
-| Seller profile                              | Active public business projection; no account email | Owner profile; approval/verification/owner fields protected                                                     | Pending review and activation                  |
+| Seller profile                              | Active public business projection; no account email | Sellers manage their own safe profile fields; approval, verification and ownership remain protected                                                     | Pending review and activation                  |
 | Favorites                                   | None                                                | Own records only                                                                                                | Narrow operational access where policy permits |
 | Appointments/history                        | None                                                | Buyer sees own viewings; seller sees/manages its property appointments; server-derived owner and initial status | Authorized operational access                  |
 | Notifications                               | None                                                | Seller's notifications; read/status changes only                                                                | Authorized operational access                  |

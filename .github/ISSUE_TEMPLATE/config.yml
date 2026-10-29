@@ -1,5 +1,5 @@
 blank_issues_enabled: false
 contact_links:
-  - name: Architecture discussion
-    url: https://github.com/byte-africa/byte-realestate/discussions
-    about: Use GitHub Discussions for design or architecture decisions.
+  - name: Project issues
+    url: https://github.com/CSampebgo333/lumavok-real-estate-platform/issues
+    about: Contributors review existing issues before opening another report or proposal.

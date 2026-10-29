@@ -1,3 +1,5 @@
+> **Historical record — 29 October 2026 application review.** This record predates the database flattening and documentation cleanup. Results retain their stated revision and scope. [Testing](TESTING.md) records later verified revisions, and [Operations status](OPERATIONS_STATUS.md) summarizes service prerequisites.
+
 # Independent deployment review — 29 October 2026
 
 ## Scope and authority

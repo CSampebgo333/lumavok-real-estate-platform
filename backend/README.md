@@ -1,7 +1,24 @@
-# Lumavok API
+# API
 
-Express, Prisma and managed Supabase Auth/Storage. Follow the [root README](../README.md), [API contracts](../docs/API_CONTRACT.md), [security review](../SECURITY.md) and [environment/deployment guide](../docs/DEPLOYMENT.md).
+The Lumavok API validates requests, verifies Supabase Auth sessions and enforces account and seller permissions before accessing PostgreSQL or Storage. Express provides routing, Prisma supplies the application query interface, and SQL migrations enforce the database access model.
 
-Use `npm run db:generate` after schema changes, then `npm run dev`, `npm run typecheck`, `npm test` and `npm run build`. Generate the client from the canonical database schema; no separate backend schema is authoritative. The API refuses elevated/owner database connections at startup. Never provide the migration URL or service-role key to browser code. The Storage credential is server-only and distinct from the ordinary SQL login.
+## Local development
 
-`tests/e2e-server.ts` starts an explicitly enabled, disposable fixture with synthetic provider responses. It is not an alternate production server and is excluded from the production image. Actual managed Auth/Storage validation is still required in staging.
+Contributors install dependencies from the repository root with `npm run setup`. Connected development uses the private configuration described in [Deployment](../docs/DEPLOYMENT.md). The root `npm run dev:fixture` command provides a disposable alternative without cloud credentials.
+
+From `backend/`, the main commands are:
+
+| Command | Purpose |
+| --- | --- |
+| `npm run dev` | Start the development API |
+| `npm run db:generate` | Generate Prisma from `database/schema.prisma` |
+| `npm run typecheck` | Check TypeScript |
+| `npm test` | Run HTTP, database-integration and image tests |
+| `npm run build` | Compile the production API |
+| `npm start` | Run the compiled API |
+
+## Runtime responsibilities
+
+The API requires a restricted, non-owner database login. Migration credentials remain outside the application runtime, and the Storage credential stays server-side. Every application query uses transaction-local actor context. [Architecture](../docs/ARCHITECTURE.md), [API contracts](../docs/API_CONTRACT.md) and [Security](../SECURITY.md) describe these boundaries.
+
+`tests/e2e-server.ts` is an explicitly enabled fixture with synthetic Auth and Storage responses. It is excluded from the production image. Real-provider acceptance remains part of the [deployment procedure](../docs/DEPLOYMENT.md).

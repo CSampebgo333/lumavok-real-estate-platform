@@ -1,8 +1,8 @@
-# Maintained API contract
+# API contracts
 
 The public web origin proxies `/api/v1` to Express. The API is not mounted at a separate browser-accessible origin in the supplied deployment. Every authenticated call uses a bearer access token; refresh uses the HttpOnly cookie. Sensitive cookies are Secure in production and SameSite=Strict. Mutation requests with an unexpected Origin are rejected.
 
-Success: `{ "success": true, "data": ... }`. Errors use HTTP status plus `{ "success": false, "code": "...", "message": "..." }`; validation may include safe field errors. The frontend maps stable codes to English/French messages. Never render raw provider/SQL errors as user-facing text.
+Success: `{ "success": true, "data": ... }`. Errors use HTTP status plus `{ "success": false, "code": "...", "message": "..." }`; validation may include safe field errors. The frontend maps stable codes to English/French messages. Clients display the localized public message rather than raw provider or SQL details.
 
 Paginated data: `{ "items": [], "total": 0, "page": 1, "pageSize": 12, "totalPages": 1 }`. Page sizes are capped at 100, pages are positive safe integers capped at one million, and repeated/object query values are rejected. Catalogue sort/category/filter names are allowlisted in the API. Exact accepted fields are in the committed router/schema files and HTTP contract tests.
 
@@ -18,12 +18,12 @@ Paginated data: `{ "items": [], "total": 0, "page": 1, "pageSize": 12, "totalPag
 | `/viewings`                    | GET own paginated requests; POST a viewing with `propertyId` and an explicit-offset future `scheduledFor`; owner and buyer derived from the verified context.                                             |
 | `/sellers`                     | POST `/request` (USER); GET `/pending` and POST `/:id/activate` (ADMIN).                                                                                                                                  |
 | `/sellers/me`                  | GET own exact-language profile; PATCH active seller's safe profile fields using `expectedUpdatedAt`. Public contact email is explicit and separate from account email.                                    |
-| `/developers/me/listings`      | Seller GET list/counts/edit; POST create; PATCH content/status/bulk-status; DELETE controlled listing or POST bulk-delete; POST `/:id/translations/:lang/publish`.                                        |
+| `/developers/me/listings`      | Active-seller GET list/counts/edit; POST create; PATCH content/status/bulk-status; DELETE controlled listing or POST bulk-delete; POST `/:id/translations/:lang/publish`.                                        |
 | `/developers/me/appointments`  | Seller list/counts/details; PATCH status, reschedule and supported bulk transitions.                                                                                                                      |
-| `/developers/me/notifications` | Seller GET list/unread-count; PATCH `/:id/read`, `/read-all`. Mark-all returns `{updatedCount}`.                                                                                                          |
+| `/developers/me/notifications` | Active-seller GET list/unread-count; PATCH `/:id/read`, `/read-all`. Mark-all returns `{updatedCount}`.                                                                                                          |
 | `/developers/me/dashboard`     | Seller bounded aggregate preview.                                                                                                                                                                         |
 | `/developers/me/analytics`     | Seller bounded SQL aggregation and trends.                                                                                                                                                                |
-| `/uploads`                     | Seller POST `/file` multipart `file`; DELETE `/:publicId` using an encoded public ID. The server validates asset ownership and state.                                                                     |
+| `/uploads`                     | Active-seller POST `/file` multipart `file`; DELETE `/:publicId` using an encoded public ID. The server validates asset ownership and state.                                                                     |
 
 `GET /api/health` is process liveness; `GET /api/ready` checks a database round trip. Readiness is not a substitute for managed Auth/Storage staging checks.
 
@@ -78,7 +78,7 @@ Illustrative fixture responses for the same property (additional detail fields o
 }
 ```
 
-If English is missing and French is the configured fallback, the English request returns the French text with `requestedLanguage: "en"`, `contentLanguage: "fr"`, `fallbackUsed: true`. The monetary facts, IDs and relationships are unchanged. A parameterized SQL example for curated, publicly publishable translations is [localized-property.sql](../database/operations/localized-property.sql); invoke it under the ordinary scoped runtime role, never expose a privileged SQL RPC.
+If English is missing and French is the configured fallback, the English request returns the French text with `requestedLanguage: "en"`, `contentLanguage: "fr"`, `fallbackUsed: true`. The monetary facts, IDs and relationships are unchanged. A parameterized SQL example for curated, publicly publishable translations is [localized-property.sql](../database/operations/localized-property.sql); operators invoke it under the ordinary scoped runtime role. A privileged public SQL RPC is outside this contract.
 
 ## Write semantics
 
@@ -92,4 +92,4 @@ New-media DTOs carry a server-issued public ID and preview URL. The server valid
 
 400 means malformed/invalid input; 401 means absent/invalid/ended identity; 403 means the verified actor lacks authority; 404 means the resource is not visible/found; 409 means conflict/duplicate transition or protected asset use; 413 is oversized content; 429 is rate limiting; 503 is temporary database/provider unavailability. Clients retry only appropriate operations and never replay a mutation as a different account. API and refresh requests have bounded client timeouts; server catalogue/provider requests use timeouts too.
 
-Recovery tokens are submitted in the reset body after fragment capture and immediate URL scrubbing. No token is sent through a query-string validation endpoint. Browser tests use a synthetic provider; actual email link and revocation behavior must be verified in staging.
+Recovery tokens are submitted in the reset body after fragment capture and immediate URL scrubbing. The application does not send recovery tokens through query-string validation endpoints. Browser tests use a synthetic provider; actual email link and revocation behavior must be verified in staging.

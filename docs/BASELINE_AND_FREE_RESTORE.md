@@ -1,14 +1,14 @@
-# Continue without the unavailable historical SQL or a paid project
+# Baseline adoption and local recovery
 
-The two original August migration files are useful for exact historical replay, but they are **not required to continue development or to perform an explicitly reviewed adoption of the existing database**. Do not invent SQL under their old filenames or change their stored checksums. Their effects already exist in the database.
+Operators can adopt the existing database through a reviewed schema/history checkpoint when the two original August migration files are unavailable. Exact historical replay still requires the original files. Neither route reconstructs missing SQL or changes recorded checksums; their effects already exist in the inspected database.
 
-The owner chose to remain on Supabase Free on 29 October 2026. No plan upgrade, new paid project, project pause or production database change is authorized by this workflow.
+Supabase remains on the Free plan. This procedure requires no upgrade or paid project and does not authorize project deletion, pause, repurposing or production changes.
 
-## What adoption means here
+## Adoption requirements
 
 This is an application-schema checkpoint, not a fabricated historical migration or a reset of Prisma history. The existing June/August rows, including rolled-back attempts, remain untouched. Prisma `migrate deploy` applies the subsequent reviewed migrations. The pinned Prisma CLI is tested against PostgreSQL 17 with those missing files absent.
 
-The original strict path remains available if the files are recovered. The alternative requires:
+The strict original-file path remains available. Reviewed adoption requires:
 
 1. The three successfully applied historical migrations to have their independently audited checksums. Only the two named August files may be absent. A different checksum, unknown applied migration, unresolved failure, duplicate applied entry or a gap in subsequent migration order is rejected.
 2. A private, reviewed snapshot from the actual target, with a separately supplied SHA-256. It captures the application schema through `pg_dump`, migration status and `lumavok_runtime` role/membership metadata in one exported read-only PostgreSQL snapshot.
@@ -23,7 +23,7 @@ This is not a complete platform inventory: global roles other than the applicati
 
 Install PostgreSQL 17 client tools and check `pg_dump --version`. Use a direct or session-pooler administrative connection, not a transaction pooler. Supply `DIRECT_URL` through a secure local environment or secret manager; do not paste it into chat, commit it or enable shell tracing. Remote connections must explicitly set `sslmode=require` or stronger; configure verified certificates where supported. `LUMAVOK_PG_DUMP` may point to a trusted compatible executable if it is not on `PATH`.
 
-Choose a private directory **outside the repository**, then run:
+Operators select an access-restricted directory **outside the repository**, then capture the checkpoint:
 
 ```bash
 npm --prefix database run baseline:capture -- \
@@ -52,7 +52,7 @@ A Pro subscription is not required for a manual database export or an isolated l
 6. Capture and review a new **target-specific** checkpoint for the restored local database. Run `migrate:preflight`, then the approved additive migrations there. Verify English/French retrieval, fallback, permissions and preservation of original titles, descriptions, prices and rental metadata. Original Burkina seed files remain unchanged and must not be run over restored data.
 7. Record the successful local rehearsal and limitations. A local restore can validate the backup and SQL path; it does not certify Supabase-hosted email delivery, managed Storage configuration, TLS/proxy behavior or production performance. Those checks remain explicit release requirements. No paid staging project is mandatory for the local step.
 
-The current session has no securely configured operator connection for a full production export. No actual production backup/restore is claimed. The read-only dashboard inspection and synthetic CI restore are different evidence.
+The recorded work did not complete an actual production export or restore. Read-only service inspection and synthetic CI restoration are separate evidence; operators retain a verified recovery record before proceeding.
 
 ## Applying after a successful rehearsal
 
@@ -72,7 +72,7 @@ In addition to `DIRECT_URL` and the two baseline variables, the apply command re
 npm --prefix database run migrate:deploy
 ```
 
-Setting variables is not user authorization. Production still requires separate explicit approval; it has not been granted for this change. The command uses Prisma to append new migration records and never changes the original history entries. If deployment fails or is interrupted, inspect status and preserve the evidence. Partial migration state or schema drift blocks a retry until reviewed. Never mark an unsuccessful migration applied to bypass the gate.
+Populated variables do not replace operational approval. Production requires separate explicit approval for the target and pending migrations. The command uses Prisma to append new migration records and never changes the original history entries. If deployment fails or is interrupted, inspect status and preserve the evidence. Partial migration state or schema drift blocks a retry until reviewed. Never mark an unsuccessful migration applied to bypass the gate.
 
 After a successful deployment, preserve the before checkpoint and capture/review a new after checkpoint for subsequent changes. The old checkpoint intentionally becomes stale. Future preflight with the reviewed after checkpoint is idempotent when no migrations remain.
 
@@ -80,6 +80,6 @@ After a successful deployment, preserve the before checkpoint and capture/review
 
 Unit tests cover missing/changed/unknown history, failed and duplicate entries, ordering, target binding, schema/history/role drift, artifact integrity, private file handling and approval guards. The native PostgreSQL test creates two disposable loopback databases, backs up/restores synthetic legacy records with `pg_dump`/`psql`, compares the baseline, detects deliberate drift, applies the actual four subsequent migrations through the pinned Prisma CLI, and checks that original records and historical migration rows are preserved. It then verifies a reviewed after checkpoint permits a no-op deployment.
 
-This fixture test is part of the existing required `native-postgres` CI job. Its result must be read from the current CI run; adding the test does not mean it passed. It requires matching `pg_dump` and `psql` executables (or trusted `LUMAVOK_PG_DUMP`/`LUMAVOK_PSQL` paths). CI uses clients from its disposable PostgreSQL 17 service.
+The fixture runs in the required `native-postgres` CI job. [Testing](TESTING.md) links verified revisions; the current commit’s job determines its result. It requires matching `pg_dump` and `psql` executables (or trusted `LUMAVOK_PG_DUMP`/`LUMAVOK_PSQL` paths). CI uses clients from its disposable PostgreSQL 17 service.
 
 References: [Prisma deployment behavior](https://www.prisma.io/docs/orm/v6/prisma-migrate/workflows/development-and-production), [PostgreSQL pg_dump](https://www.postgresql.org/docs/17/app-pgdump.html), [Supabase manual backup/restore](https://supabase.com/docs/guides/self-hosting/restore-from-platform). The repository pins Prisma 5.20.0; its actual behavior is verified in the native test instead of assuming current documentation alone proves compatibility.

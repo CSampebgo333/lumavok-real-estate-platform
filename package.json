@@ -2,7 +2,7 @@
   "name": "lumavok-real-estate-platform",
   "version": "1.0.0",
   "private": true,
-  "description": "Bilingual real estate platform for Burkina Faso",
+  "description": "French and English real estate platform for Burkina Faso",
   "engines": {
     "node": ">=24 <25",
     "npm": ">=11 <13"

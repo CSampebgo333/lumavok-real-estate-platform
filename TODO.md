@@ -1,12 +1,24 @@
-# Remaining release gates
+# Remaining work
 
-Source implementation and known limitations are maintained in [docs/TESTING.md](docs/TESTING.md), [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) and [SECURITY.md](SECURITY.md). Avoid treating superseded frontend-only planning notes as active product requirements.
+This list tracks outstanding release and operational work. Implemented capabilities are described in the [README](README.md); verification procedures and evidence are in [Testing](docs/TESTING.md).
 
-- Recover the two exact original applied August migration files for the existing production project.
-- Complete the isolated managed-Supabase migration/backup-restore and Auth/Storage/TLS/pooler rehearsal.
-- Review legacy identity links and content-language/currency/rental metadata through private manifests; preserve original facts.
-- Supply approved published terms/privacy content and the HTTPS policy links used by registration.
-- Configure protected branches, protected release/staging/production environments, secure secrets, monitoring ownership and approved deployment infrastructure.
-- Define reviewed unattached-upload retention and multi-replica rate limiting before scaling beyond the documented topology.
+## Before production
 
-No production deployment is authorized by completing this checklist in source. Obtain the explicit operational approval described in the deployment guide.
+- Operators capture a private backup and complete an isolated restore/preservation rehearsal.
+- Operators follow recovered exact migration history or reviewed baseline adoption, then obtain explicit approval for the target and pending migrations.
+- Operators verify the restricted database login, intended pooler, RLS/grants and production proxy/TLS configuration.
+- Operators configure and test real Auth confirmation, recovery, session refresh and revocation.
+- Operators provision private Storage and verify upload, display, ownership, expiry and deletion behavior.
+- Sellers and administrators review legacy identity mappings, source language, translations, currencies, rental periods and public business contact details.
+- Maintainers supply approved terms/privacy content and configure its HTTPS URLs.
+- Operators establish monitoring, alert ownership, backup schedules, secret rotation and a tested rollback procedure.
+- Maintainers provide a compatible host and isolated services for a shareable full-stack preview.
+
+## Team and scaling
+
+- Maintainers onboard an authorized independent reviewer and review peer-approval/environment settings.
+- Operators define retention for unattached uploads using the existing asset lifecycle.
+- Shared rate-limit enforcement is required before relying on global limits across multiple API replicas.
+- Production-scale query plans and load tests inform further performance work.
+
+Map view, direct WhatsApp contact, dashboard settings and administrative reporting remain disabled features. Their presence in older planning notes is not an implementation commitment. [Frontend follow-up](frontend/TODO.md) and [Deployment](docs/DEPLOYMENT.md) provide the relevant scope.

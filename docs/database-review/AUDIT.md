@@ -1,3 +1,5 @@
+> **Historical record — initial database review.** The results and design below apply to the reviewed candidate, not the current release. Current guidance is indexed in [Documentation](../README.md), with verification in [Testing](../TESTING.md).
+
 # Initial audit: observed state before redesign
 
 Read-only inspection covered Lumavok's `real-estate` Supabase project, public schema/records, migration history, Auth/Storage configuration and the three source branches independently. The target project reference is `haxzufwizwqfrqzzzmsa`. A differently scoped connector exposed an unrelated project; it was not used as the target. The initial full audit and architecture proposal were delivered separately before architecture approval.

@@ -1,9 +1,29 @@
-# Canonical database package
+# Database
 
-Maintain the [Prisma schema](schema.prisma) and ordered [SQL migrations](migrations/). SQL additionally enforces RLS, CHECK constraints, protected fields, partial indexes and cross-schema Auth integrity.
+The database package contains Lumavok’s canonical Prisma schema, ordered SQL migrations, original Burkina Faso seeds, guarded operations and isolated tests. SQL defines the RLS policies, grants, constraints, triggers and indexes that Prisma cannot fully represent.
 
-Use the [root setup guide](../README.md), current [schema](../docs/SCHEMA.md), [deployment/migration strategy](../docs/DEPLOYMENT.md), [security review](../SECURITY.md) and [tests](../docs/TESTING.md). The documents under `docs/` here are historical evidence and do not supersede those references.
+## Package contents
 
-Run `npm test` for isolated SQL/seed-preservation and adoption-guard tests. Existing-project `migrate:preflight` accepts either recovered exact historical files or the explicitly reviewed [baseline adoption workflow](../docs/BASELINE_AND_FREE_RESTORE.md). Neither path fabricates or replaces historical records. The separately guarded fresh-project path accepts an empty Supabase application schema only. Never use `db push`, an unreviewed down migration or a seed script against shared/production data.
+| Path | Purpose |
+| --- | --- |
+| `schema.prisma` | Application models and Prisma client generation |
+| `migrations/` | Version-controlled schema and access-rule changes |
+| `seeds/` | Preserved original Burkina Faso seed files |
+| `scripts/` | Guarded migration, baseline and content operations |
+| `operations/` | Reviewed SQL examples and provisioning operations |
+| `tests/` | Disposable schema, authorization and preservation tests |
+| `docs/`, `legacy/` | Historical design material and the earlier schema |
 
-All five original Burkina seed files remain byte-for-byte unchanged. The legacy runner requires an explicitly enabled local pre-expansion database. Use the integrated disposable fixture for current development rather than partially populating the expanded schema with legacy seeds.
+## Development and verification
+
+Contributors run `npm run setup` from the repository root. From `database/`, `npm test` runs isolated SQL, seed-preservation and baseline tests. `npm run test:native` requires an explicitly disposable loopback PostgreSQL 17 environment; [Testing](../docs/TESTING.md) describes its configuration.
+
+The original seed files remain byte-for-byte unchanged. Their guarded runner supports only an explicitly selected local, pre-expansion database. The integrated fixture is the supported dataset for current application development.
+
+## Migration workflow
+
+Existing databases use recovered exact historical SQL or the [reviewed baseline adoption procedure](../docs/BASELINE_AND_FREE_RESTORE.md). Fresh databases use the separate empty-schema workflow in [Deployment](../docs/DEPLOYMENT.md). Neither route rewrites applied history or authorizes production changes implicitly.
+
+Contributors preserve applied migrations and add new reviewed migrations for justified schema changes. Shared database resets, unreviewed down migrations and `prisma db push` are outside this workflow. A schema checkpoint does not replace a complete backup.
+
+[Schema](../docs/SCHEMA.md), [Security](../SECURITY.md) and [Architecture](../docs/ARCHITECTURE.md) describe the maintained design. Material under `docs/` in this package is historical reference rather than current setup guidance.

@@ -1,3 +1,5 @@
-# Maintained product/backend reconciliation
+# Product and API alignment
 
-This historical planning document is superseded by [AUDIT.md](AUDIT.md) and [INTEGRATION.md](INTEGRATION.md). The consolidated application implements account favorites, buyer viewings, approved seller onboarding, exact-language profile/listing editing, protected media and current Auth/authorization. Read the current API and deployment documentation for supported contracts and remaining release gates. The original repository preserves the earlier proposal.
+The application uses the shared behavior described in [Integrated workflows](INTEGRATION.md), [API contracts](API_CONTRACT.md) and [Architecture](ARCHITECTURE.md). Account favorites, viewing requests, seller approval, localized editors and private media follow those contracts.
+
+Earlier planning decisions remain in project history. Current requirements and unresolved release work belong in the maintained guides and [Remaining work](../TODO.md), rather than another parallel reconciliation plan.

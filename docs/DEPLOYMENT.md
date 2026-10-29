@@ -1,92 +1,92 @@
-# Environment, migration and deployment
+# Deployment
 
-**No production migration or deployment has been executed.** Source publication does not authorize production changes. The application is prepared for a separately approved staging rehearsal and production release only after these gates pass.
+Operators release Lumavok only after database recovery, authorization and real-provider acceptance are verified for the intended environment. Source publication and a passing CI run do not authorize production changes. The documented workflow keeps Supabase on Free and separates database migration from application deployment.
 
-## Environment separation
+## Configuration
 
-| Variable                        | Runtime responsibility                                                                                                                                                                              |
-| ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `DATABASE_URL`                  | Backend only: dedicated non-owner login inheriting `lumavok_runtime`, with required TLS/pooler parameters. Never the owner/migration connection.                                                    |
-| `DIRECT_URL`                    | Separate migration job only: securely injected direct administrative connection. Production API configuration rejects it.                                                                           |
-| `SUPABASE_URL`                  | Backend project URL; HTTPS in production. Use the intended staging/production project, not an unrelated connected MCP project.                                                                      |
-| `SUPABASE_PUBLISHABLE_KEY`      | Backend Auth public/publishable key. No service-role key is accepted as a browser configuration.                                                                                                    |
-| `SUPABASE_STORAGE_KEY`          | Backend-only Storage credential. Required in production, isolated from the SQL runtime login and migration credentials.                                                                             |
-| `CORS_ORIGIN`                   | Exact web origin, HTTPS in production, no trailing path. Mutation Origin must match.                                                                                                                |
-| `AUTH_REDIRECT_URL`             | Approved HTTPS reset-password URL in production; configure it in managed Auth as well.                                                                                                              |
-| `AUTH_COOKIE_NAME`              | Defaults to `refresh_token`; must match the frontend cookie navigation gate. Prefer retaining the documented default.                                                                               |
-| `REFRESH_TOKEN_EXPIRES_IN_DAYS` | Cookie lifetime, 1–30 days, default 7; managed Auth remains the session authority.                                                                                                                  |
-| `CONTENT_READ_MODE`             | `localized` normally; controlled legacy-read compatibility mode is an operator rollback aid, not an automatic fallback on errors.                                                                   |
-| `TRUST_PROXY_HOPS`              | Default 0. Configure only after verifying the real proxy chain and blocking direct API access. Leaving 0 behind a shared proxy also shares IP rate limits; verify legitimate-user behavior.         |
-| `TERMS_URL`, `PRIVACY_URL`      | Frontend server-only configuration for operator-approved published HTTPS policy links. Legal content must be provided and approved by the business before launch.                                   |
-| `PORT`, `NODE_ENV`              | API port 4000; production enables secure-cookie and strict environment checks.                                                                                                                      |
-| `BACKEND_API_URL`               | Frontend server-only API target. Local default `http://localhost:4000`; supplied container build targets `http://api:4000`. Rewrites are part of the Next build, so rebuild for a different target. |
+Real values remain in a secret manager or protected environment files outside Git. The committed examples describe the expected shape; they do not supply deployable credentials.
 
-Use the committed example files as templates. Supply real values through a secret manager or protected environment files outside Git. The frontend needs no database connection, privileged key or browser Supabase credential. Managed database URL/pooler/TLS support must be verified on staging with the chosen Prisma version and a real login.
+| Variable | Responsibility |
+| --- | --- |
+| `DATABASE_URL` | API-only connection for a non-owner login inheriting `lumavok_runtime`, with verified TLS/pooler settings |
+| `DIRECT_URL` | Administrative connection for the separate migration process; rejected by the production API |
+| `SUPABASE_URL` | Intended project URL; HTTPS in production |
+| `SUPABASE_PUBLISHABLE_KEY` | Auth publishable/public key used by the API |
+| `SUPABASE_STORAGE_KEY` | Server-only Storage credential, separate from database and migration logins; required in production |
+| `CORS_ORIGIN` | Exact web origin, HTTPS in production, without a trailing path |
+| `AUTH_REDIRECT_URL` | Approved HTTPS recovery URL, also configured in managed Auth |
+| `AUTH_COOKIE_NAME` | `refresh_token` by default; must match the frontend navigation gate |
+| `REFRESH_TOKEN_EXPIRES_IN_DAYS` | Cookie lifetime from 1 to 30 days, default 7; managed Auth owns session validity |
+| `CONTENT_READ_MODE` | `localized` normally; `legacy` is a controlled compatibility/rollback setting |
+| `TRUST_PROXY_HOPS` | Default 0; operators change it only after verifying the proxy chain and blocking bypass ingress |
+| `TERMS_URL`, `PRIVACY_URL` | Frontend server-only HTTPS links to approved published legal policies |
+| `PORT`, `NODE_ENV` | API port 4000 and runtime mode; production enforces secure-cookie/configuration checks |
+| `BACKEND_API_URL` | Frontend server-only API target; local default `http://localhost:4000`, container build default `http://api:4000` |
 
-## Migration order and preservation
+Browser configuration receives no database URL or privileged key. Next.js rewrites are part of the build, so a changed API proxy target requires rebuilding the frontend. Managed TLS/pooler compatibility requires a real login test with the pinned Prisma version. Behind a proxy, a value of zero also affects per-IP rate limits; operators verify legitimate-user behavior as well as spoofing resistance.
 
-| Migration                                           | Purpose                                                                                                                                      |
-| --------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| `20260629000000_init`                               | Retained original baseline; checksum preserved.                                                                                              |
-| `20261026000100_reconcile_observed_enums`           | Reconcile supported enum values with the observed schema.                                                                                    |
-| `20261026000200_expand_bilingual_core`              | Add locale/core metadata, translation relations, managed identity links, appointment compatibility, integrity constraints and query indexes. |
-| `20261026000300_enforce_runtime_security`           | Scoped runtime role, RLS/column grants, protected fields, session checks and narrow counter triggers.                                        |
-| `20261028100816_integrate_media_events_and_indexes` | Atomic domain notifications, query indexes, asset lifecycle/attachment FK and explicit service-role application isolation.                   |
+## Database migration selection
 
-Keep the enum reconciliation before SQL that references the new enum values. No existing domain table/column/record is dropped. The old district FK is replaced by a stricter composite FK. Initial original text, prices, IDs, media, hashes/tokens and original seeds remain. Compatibility changes are explicit in [INTEGRATION.md](INTEGRATION.md).
+| Migration | Purpose |
+| --- | --- |
+| `20260629000000_init` | Original retained baseline |
+| `20261026000100_reconcile_observed_enums` | Compatible enum reconciliation |
+| `20261026000200_expand_bilingual_core` | Localization, managed identity, relationships, constraints and indexes |
+| `20261026000300_enforce_runtime_security` | Runtime role, RLS/grants, protected fields, sessions and counters |
+| `20261028100816_integrate_media_events_and_indexes` | Notifications, indexes, asset lifecycle and service-role isolation |
 
-### Existing Lumavok database: original history or verified adoption
+Enum reconciliation precedes SQL that uses the new values. Existing identifiers, source text, amounts, media and legacy Auth fields remain preserved. The stricter district/city relationship replaces an older foreign key without discarding records.
 
-The observed applied history includes two migrations whose original files were unavailable in every inspected branch:
+### Existing database
 
-| Required original file                                | Audited SHA-256                                                    |
-| ----------------------------------------------------- | ------------------------------------------------------------------ |
-| `20260831000001_expand_enums/migration.sql`           | `d65a7b8abef1ec0a04c18da2dccaabd8e1c0d9b9f8d29a3e21c28d20f64c89e5` |
+The inspected Prisma history includes two applied August migrations whose original files are unavailable:
+
+| Original file | Recorded SHA-256 |
+| --- | --- |
+| `20260831000001_expand_enums/migration.sql` | `d65a7b8abef1ec0a04c18da2dccaabd8e1c0d9b9f8d29a3e21c28d20f64c89e5` |
 | `20260831000002_add_tables_and_columns/migration.sql` | `768cd85a9e674e8f2dd50568b26e8433e64e2eacb8320e46335422d913eee2a5` |
 
-Recovering these exact files remains one route. Alternatively, use the [verified baseline adoption workflow](BASELINE_AND_FREE_RESTORE.md): preserve the exact recorded checksums, review a private snapshot of the actual application schema and compare it before deployment. Only these two already-applied historical files may be absent. Do not reconstruct substitutes, edit history or use `migrate resolve` to bypass a mismatch. `npm --prefix database run migrate:preflight` remains read-only. Without a reviewed baseline it retains the strict original-file gate. Applying changes requires explicit database, target, backup and restore-test references; adoption also requires baseline approval.
+Operators either recover checksum-matching originals or follow [reviewed baseline adoption](BASELINE_AND_FREE_RESTORE.md). The adoption path verifies the actual target and recorded history without reconstructing historical SQL. Unknown history, unresolved failures, drift and unsupported gaps stop deployment. `npm --prefix database run migrate:preflight` remains read-only.
 
-Take a private verified backup and restore it into an isolated local Supabase recovery environment or an already-authorized staging project. A Pro upgrade is not required for the [free local route](BASELINE_AND_FREE_RESTORE.md). Use the existing-project preflight and replay the reviewed additive chain there. Test representative constraint validation and lock duration; new unique indexes may reveal duplicates. Local timing does not prove hosted production performance. Resolve inconsistencies through an approved data correction, not a destructive cleanup hidden in migrations.
+An actual private backup and successful isolated restore precede migration approval. Operators rehearse the additive chain, preservation checks and relevant constraints/index lock durations on the recovery target. Local timings do not establish hosted performance. Data corrections require review; migrations do not hide destructive cleanup.
 
-### New isolated project
+### Fresh isolated database
 
-Provision managed Auth first. Use `migrate:fresh:preflight` only with a securely supplied staging `DIRECT_URL`. It requires an empty public application schema and managed `auth.users`/`auth.sessions`. The distinct `migrate:fresh` command requires `LUMAVOK_DATABASE_APPROVAL` and `LUMAVOK_TARGET_PROJECT` references. It refuses any existing application schema/history and never attempts to erase it.
+Managed Auth must exist first. `migrate:fresh:preflight` requires an empty public application schema with `auth.users` and `auth.sessions`. The separate `migrate:fresh` command also requires explicit database/target approval references. It refuses existing application tables/history rather than deleting them.
 
-The fresh path does not solve existing-production history. Do not point it at an existing database. CI fixtures create their own Auth/Storage stand-ins; that is not a managed-project migration rehearsal.
+The fresh path is not an adoption shortcut for an existing database. CI Auth/Storage stand-ins do not certify managed provisioning.
 
-### Runtime provisioning and data cutover
+## Runtime and provider preparation
 
-Create an actual LOGIN role with an operator-generated secret, `INHERIT NOBYPASSRLS NOCREATEDB NOCREATEROLE`, inheriting only `lumavok_runtime`. Do not use `postgres` plus `SET ROLE`: startup explicitly rejects that arrangement. Set secure TLS/network rules and verify the startup assertion against the intended pooler/direct connection. Keep role credentials out of SQL files and logs.
+1. Operators provision a dedicated login with `NOSUPERUSER INHERIT NOBYPASSRLS NOCREATEDB NOCREATEROLE`, membership only in `lumavok_runtime` and no application-table ownership. The secret is supplied securely. Startup must pass with the actual login and intended pooler; `postgres` followed by `SET ROLE` is rejected.
+2. Operators configure Auth email confirmation, SMTP, approved redirects, session lifetimes, recovery and revocation. Recovery email uses `{{ .RedirectTo }}#token={{ .TokenHash }}` with an allowlisted `/reset-password` redirect. Confirmation links retain the provider confirmation URL with an approved login redirect. Operators verify actual template/provider behavior before cutover. Historical Auth failures require fresh checks.
+3. Existing accounts are linked only through a reviewed, verified identity mapping using [link-auth-identity.sql](../database/operations/link-auth-identity.sql). An unverified email or editable metadata is insufficient proof. Initial administrator assignment is a separate privileged decision.
+4. Operators provision the private `property-media` bucket with the reviewed [operation](../database/operations/provision-private-storage.sql). Existing public buckets are not silently changed. Valid/invalid bytes, owner isolation, draft privacy, expiry and deletion are tested against the real service.
+5. Sellers and administrators review source languages, translations, monetary terms and public contact details. `content:check` verifies a private manifest before the separately approved `content:apply` operation. Original-value preconditions prevent stale backfills. Original seeds are not run over shared data.
+6. Operators verify ingress restrictions, the exact proxy chain, CORS, cookie scheme/domain, upload limits and legal-policy URLs. Only seller-approved business email is public; login addresses are not copied into contact fields automatically.
 
-Configure Auth email confirmation, SMTP, approved redirects, recovery template token-hash fragment flow, session lifetimes and revocation. Resolve the initially observed Auth 5xx before cutover. Existing account email alone is not proof of ownership; use [link-auth-identity.sql](../database/operations/link-auth-identity.sql) only after a separately reviewed identity mapping and session revocation plan.
+## CI and release controls
 
-Provision the private `property-media` bucket using the reviewed [operation](../database/operations/provision-private-storage.sql). It fails if an existing bucket is public; do not silently change used buckets. Verify there are no permissive object policies and the server Storage credential behaves as intended. New objects use the asset registry; retain legacy file references until separately approved verification/migration. Unattached upload cleanup remains a reviewed retention operation.
+The six CI jobs cover quality/build/audit checks, native PostgreSQL, desktop/mobile browser journeys and both containers. Their databases are disposable and require no production secrets. The recorded repository controls are summarized in [Operations status](OPERATIONS_STATUS.md); operators recheck effective settings before release.
 
-Retain English and French content exactly where its language is established. Use the private reviewed manifest with `content:check` first; `content:apply` is an explicitly approved operation with optimistic original-value preconditions. Do not commit production manifests, infer language from spelling, convert prices or relabel unknown prices as XOF. Introduce French translations as additional rows, with publication reviewed independently.
+`release.yml` is manually dispatched with an exact 40-character commit and a successful CI run. The protected `release` environment and `RELEASE_ENABLED=true` gate the build/publication of commit-tagged GHCR candidates. Operators retain the resulting immutable image digests.
 
-## CI and manually gated delivery
+`deploy.yml` is also manual. The selected protected `staging` or `production` environment requires approval and `DEPLOYMENT_ENABLED=true`. Required secrets are `DEPLOY_HOST`, `DEPLOY_USER`, `SSH_PRIVATE_KEY` and `SSH_KNOWN_HOSTS`. Operators verify host keys independently and use a restricted deploy identity plus host-side registry access. Source files do not provision these settings.
 
-`ci.yml` runs lockfile setup, secret scan, type/lint/format checks, SQL/HTTP/frontend tests, production builds, full dependency audits, actual PostgreSQL 17 runtime/RLS tests, desktop/mobile browser journeys and both container builds. All databases are disposable; no production secret is needed. All six jobs are now required by the active `main` ruleset. Pull requests and up-to-date checks are mandatory, with deletion/force pushes blocked and no bypass actors. See [OPERATIONS_STATUS.md](OPERATIONS_STATUS.md) for verified settings and the independent-review limitation.
+The last recorded release/deployment flags were disabled. Production remains separately approved even when flags and references are populated.
 
-`release.yml` is manual. The protected `release` environment requires owner approval and the `main` branch, with administrator bypass disabled. `RELEASE_ENABLED=false` is saved explicitly; enable it only for an authorized release. Supply an exact 40-character commit with a successful CI run. It builds and publishes commit-tagged GHCR candidates. Record the resulting immutable image digests; tags alone are not deployment inputs.
+## Container host
 
-`deploy.yml` is also manual. Separate protected `staging` and `production` environments now require owner approval and the `main` branch, with administrator bypass disabled. Both explicitly have `DEPLOYMENT_ENABLED=false`; set it to `true` only when the target deployment is authorized. No deployment secrets have been added. Required secrets are `DEPLOY_HOST`, `DEPLOY_USER`, `SSH_PRIVATE_KEY`, `SSH_KNOWN_HOSTS`. Verify the host key out of band; the workflow never performs permissive host-key discovery. Use a dedicated restricted deploy user/key and GHCR pull credentials on the host.
+The target host receives the reviewed `compose.yml`, deployment script, private API/web environment files and approved GHCR image digests. The supplied deployment expects `/srv/lumavok/`. A TLS reverse proxy uses the Nginx location example inside an existing valid TLS server block.
 
-Provision `/srv/lumavok/compose.yml`, `deploy.sh` and private `api.env` plus `web.env` from the reviewed release. Supply a TLS reverse proxy using the provided Nginx location example in an existing valid TLS server block. Only the web port binds to loopback; the API has no public host port. Validate the actual forwarded-header chain, upload limits and cookie domain/scheme. Compose does not provision TLS, DNS, databases, managed backups or secrets.
+The web port binds to loopback, and the API has no public host port. Compose does not create DNS, TLS certificates, managed databases, backups or secrets. The deployment script accepts only GHCR `@sha256:` references, serializes changes and records the release pointer after health checks pass. It never runs migrations.
 
-Container deployment accepts only GHCR `@sha256:` image references, serializes with a lock and waits for health checks. It records the new release pointer only after success. It does **not** run database migrations. A failed health check can leave some candidate containers running, so operator rollback is an explicit step, not an automatic guarantee.
+A failed health check may leave candidate containers running. Operators inspect state and perform an explicit rollback; automatic recovery is not guaranteed.
 
-## Staging acceptance and rollback
+## Acceptance and rollback
 
-Before production approval, demonstrate:
+Production approval requires recorded evidence for actual backup restoration; schema/history/data preservation; restricted runtime access and denied operations; real Auth email/session flows; French/English retrieval and editing; private media ownership/expiry/deletion; reviewed legal content; monitoring; container health; proxy/TLS behavior; and rollback.
 
-1. Private backup restore, schema/history checksum agreement and record/seed preservation; review migration lock durations and query plans.
-2. Dedicated runtime LOGIN/pooler startup, no elevated memberships, denied Data API access and legitimate/denied RLS operations.
-3. Real confirmation email, login, refresh rotation, recovery, logout/revocation and expired/deleted session rejection behind TLS/proxies.
-4. EN/FR retrieval, configurable missing-translation fallback, exact-language editing, conflict handling, XOF/rental terms and verified legacy content/identity mapping.
-5. Real private Storage upload/sign/display, cross-owner rejection, attached-delete rejection, failure/retry behavior and legacy reference validity without publishing private URLs.
-6. Published and approved terms/privacy documents, browser journeys, monitoring/alert ownership, rate limits under the chosen replica topology, container health and rollback rehearsal.
+Application rollback uses previously approved image digests. `.release.previous.env` records the earlier successful release and is reviewed before use. Additive schema objects can remain during an application rollback. Operators stop writes if integrity is uncertain rather than disabling policies or dropping populated structures.
 
-For application rollback, retain prior image digests and invoke the reviewed server script with those exact digests. `.release.previous.env` records the previous successful release; inspect it before use. Stop writes if data integrity is uncertain. Additive columns/tables may remain while reverting the application; do not drop them or remove policies as an emergency guess.
-
-For database rollback, use a tested forward correction or restore the verified backup into a separate recovery project, compare integrity and perform an approved cutover. Restore is not lossless if newer writes exist; plan and reconcile the write window. Destructive down migrations are intentionally not supplied. No actual production restore/deployment has been performed in this work.
+Database recovery uses a tested forward correction or restoration into a separate recovery target followed by an approved cutover. Newer writes require reconciliation. A stale backup is not lossless recovery. Destructive down migrations are not supplied, and no production restoration or deployment is established by the recorded fixture tests.
