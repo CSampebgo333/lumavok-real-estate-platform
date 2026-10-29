@@ -83,6 +83,20 @@ describe("ListingsTable", () => {
     expect(screen.getByText("Sold")).toBeInTheDocument();
   });
 
+  it("includes the billing period in the desktop price", () => {
+    renderTable({
+      listings: [
+        makeProperty({
+          price: 175000,
+          currencyCode: "XOF",
+          listingType: "RENT",
+          rentPeriod: "MONTH",
+        }),
+      ],
+    });
+    expect(screen.getByText(/175,000.*\/month/)).toBeInTheDocument();
+  });
+
   it("calls onToggleRow when a row checkbox is toggled", async () => {
     const user = userEvent.setup();
     const onToggleRow = vi.fn();
@@ -248,6 +262,21 @@ describe("ListingsTable", () => {
   describe("below md (card presentation)", () => {
     let restore: () => void;
     afterEach(() => restore?.());
+
+    it("includes the billing period in the mobile price", () => {
+      restore = useMobileViewport();
+      renderTable({
+        listings: [
+          makeProperty({
+            price: 200,
+            currencyCode: "EUR",
+            listingType: "RENT",
+            rentPeriod: "WEEK",
+          }),
+        ],
+      });
+      expect(screen.getByText("€200 /week")).toBeInTheDocument();
+    });
 
     it("renders cards instead of a table, each row's controls present exactly once", () => {
       restore = useMobileViewport();

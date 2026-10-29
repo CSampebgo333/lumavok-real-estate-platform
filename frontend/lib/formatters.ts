@@ -1,3 +1,4 @@
+import type { Property } from "@/types";
 import { getStoredLanguage } from "@/lib/locale";
 import { DEFAULT_CURRENCY } from "@/constants/config";
 
@@ -120,5 +121,26 @@ export function formatRentPeriod(
     language === "fr"
       ? { DAY: "/jour", WEEK: "/semaine", MONTH: "/mois", YEAR: "/an" }
       : { DAY: "/day", WEEK: "/week", MONTH: "/month", YEAR: "/year" };
-  return period ? (labels[period] ?? "") : "";
+  return (
+    (period && labels[period]) ||
+    (language === "fr" ? "(période à confirmer)" : "(period unconfirmed)")
+  );
+}
+
+/** Preserve each listing's monetary metadata, including unknown legacy terms. */
+export function formatListingPrice(
+  property: Pick<
+    Property,
+    "price" | "currencyCode" | "listingType" | "rentPeriod"
+  >,
+  language: string = getStoredLanguage(),
+) {
+  const amount = formatPrice(
+    property.price,
+    property.currencyCode ?? null,
+    language,
+  );
+  return property.listingType === "RENT"
+    ? `${amount} ${formatRentPeriod(property.rentPeriod, language)}`
+    : amount;
 }

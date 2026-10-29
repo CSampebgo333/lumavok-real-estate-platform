@@ -28,8 +28,9 @@ import {
 import { isFeatureEnabled } from "@/constants/features";
 import { ROUTES } from "@/constants/routes";
 import { useRecentListings } from "@/hooks/useDashboard";
-import { formatPrice, formatRelativeTime } from "@/lib/formatters";
+import { formatListingPrice, formatRelativeTime } from "@/lib/formatters";
 import { isPubliclyVisible } from "@/services";
+import { useContentLocale } from "@/hooks/useContentLocale";
 import type { Property } from "@/types";
 
 const COLUMN_COUNT = 4;
@@ -73,6 +74,7 @@ function ListingActions({ property }: { property: Property }) {
 
 /** Latest properties in the developer's portfolio: status, last-updated, and per-row actions. */
 export function RecentListings() {
+  const { language } = useContentLocale();
   const ui = useUi();
   const { data, isLoading, isError } = useRecentListings();
 
@@ -152,7 +154,8 @@ export function RecentListings() {
                         {property.title}
                       </span>
                       <span className="text-muted-foreground text-xs">
-                        {property.city} · {formatPrice(property.price)}
+                        {property.city} ·{" "}
+                        {formatListingPrice(property, language)}
                       </span>
                     </div>
                   </div>

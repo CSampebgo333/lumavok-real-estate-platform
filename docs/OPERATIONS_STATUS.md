@@ -63,7 +63,7 @@ The new-project form refused another free project because the current account al
 
 The owner declined a Pro upgrade for now. Continue on Free using a private manual export and an isolated local Supabase restore rehearsal. No upgrade, payment, resource deletion or pause is part of this plan. The hosted project quota does not prevent local testing.
 
-The Supabase connector still cannot access the Lumavok project; its current authorization exposes another organization. Dashboard read-only access was verified through the user's selected GitHub sign-in. That does not provide a securely configured CLI/database connection for backup, restore or runtime testing.
+The earlier connector inspection could not access the Lumavok project. The subsequent independent review on 29 October 2026 successfully inspected the project through the authorized connector; current results are recorded in [INDEPENDENT_REVIEW.md](INDEPENDENT_REVIEW.md). Dashboard read-only access was verified through the user's selected GitHub sign-in. That does not provide a securely configured CLI/database connection for backup, restore or runtime testing.
 
 Before a real restore rehearsal can run, configure a secure operator connection and an isolated local target. Obtain a current private backup through the supported operator workflow; do not publish database dumps, account records, private manifests or credentials in this public repository. Schema comparison alone does not validate row preservation, Storage object recovery or all Auth configuration.
 
