@@ -20,7 +20,7 @@ The authorized connector exposes `real-estate`, ref `haxzufwizwqfrqzzzmsa`, Post
 - Prisma history contains successful June initialization and two August migrations, plus rolled-back August attempts. Later repository integration migrations are not applied. The Supabase migration-list endpoint returned an empty list; that endpoint does not substitute for separately queried Prisma history.
 - `_prisma_migrations`, `appointment` and `appointment_history` lack RLS. Direct privilege queries returned false for `anon` SELECT/INSERT and `authenticated` SELECT on all three. The inventory’s generic public-exposure warning is not proof of effective grants; access still requires review before cutover.
 - The security advisor reported fourteen tables with RLS enabled and no policies. Enabling RLS alone does not make the integrated application work. Existing version-controlled security migrations and disposable RLS tests remain the implementation path; no live policy was changed.
-- No `property-media` bucket exists in live bucket metadata. Real private media upload/signing remains a provisioning and acceptance prerequisite.
+- No `property-media` bucket exists in live bucket metadata, and the storage-object policy query returned no policies. Real private media upload/signing remains a provisioning and acceptance prerequisite.
 
 [Supabase RLS guidance](https://supabase.com/docs/guides/database/postgres/row-level-security) and [advisor explanation](https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy) describe the grant/policy boundaries.
 
@@ -32,13 +32,16 @@ The baseline/free-restore workflow was inspected before changes. No historical S
 
 - Clean installation from three lockfiles and Prisma client generation: passed.
 - Audits: zero vulnerabilities across all three packages, including development dependencies.
-- Secret scan, backend/frontend type checks, ESLint and frontend formatting: passed for implementation; final documentation/source checks follow before publication.
+- Secret scan, backend/frontend type checks, ESLint and frontend formatting: passed, including the final pre-publication run.
 - Database: 11/11 passed, including fresh/observed-schema additive replay, denied cross-account operations, media lifecycle, adoption guards and byte-for-byte seed preservation.
 - Backend: 4/4 passed, including HTTP/Prisma/PostgreSQL integration, image validation and new error-contract tests. The integration scenario contains many assertions but counts as one test.
 - Focused pricing suite: 40/40 passed.
 - Full frontend rerun: 706/706 passed across 117 files. An earlier run had 705/706 pass because the existing listing-editor autosave test exceeded its five-second timeout during a concurrent build; that failed attempt remains disclosed.
 - Backend/Next.js production build: passed, including compilation, type checks, route generation and tracing.
-- Native PostgreSQL 17 and container builds cannot run locally because Docker and PostgreSQL executables are absent. Required CI jobs remain the verification path. No actual production-backup restoration is claimed.
+- Local desktop browser command: all 63 cases stopped at browser launch because the required Chromium executable is absent; no local browser assertion passed. The application build/server prerequisites completed. The subsequent CI jobs supply browser binaries and passed all 63 desktop and all 63 mobile cases, including bilingual persistence, protected workflows, uploads, rental publication, responsive behavior and axe accessibility checks.
+- Native PostgreSQL 17: 2/2 passed in CI, including synthetic backup/restore with verified adoption and non-owner runtime/RLS guards. This is disposable-fixture restoration, not an actual production-backup restoration.
+- Both container builds and production-runtime smoke checks passed in CI. Docker and PostgreSQL executables remain unavailable locally.
+- All six required jobs passed in [CI run 40947877479](https://github.com/CSampebgo333/lumavok-real-estate-platform/actions/runs/40947877479), testing implementation commit `6f7a913d0d34dab9dbfaa971394ad8d4e86f8856`. This report-only follow-up changes no application behavior. [Pull request 34](https://github.com/CSampebgo333/lumavok-real-estate-platform/pull/34) retains the required checks and review gates.
 
 ## Preview and deployment requirements
 
