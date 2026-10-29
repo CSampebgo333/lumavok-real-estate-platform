@@ -1,3 +1,5 @@
+> **Historical record — initial database review.** The results and design below apply to the reviewed candidate, not the current release. Current guidance is indexed in [Documentation](../README.md), with verification in [Testing](../TESTING.md).
+
 # Schema and bilingual contract
 
 The approved implementation retains all sixteen existing application models and adds five. `schema.prisma` describes the application model; the three October SQL files additionally define database checks, compound foreign keys, partial indexes, trigger guards and permissions. No legacy table/column/record is removed.

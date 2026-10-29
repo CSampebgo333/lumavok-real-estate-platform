@@ -1,6 +1,6 @@
 ---
 name: Task
-about: Track a scoped implementation or maintenance task
+about: Track a focused implementation, documentation or maintenance change
 title: "[TASK] "
 labels: [chore]
 assignees: []
@@ -10,11 +10,13 @@ assignees: []
 
 ## Scope
 
--
+<!-- Contributors identify the affected components and the intended result. -->
 
-## Acceptance Criteria
+## Acceptance criteria
 
 - [ ]
 - [ ]
 
-## Dependencies
+## Dependencies and verification
+
+<!-- Required prerequisites and the checks that establish completion. -->

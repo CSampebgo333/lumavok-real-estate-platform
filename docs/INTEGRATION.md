@@ -1,25 +1,35 @@
-# Integration report
+# Integrated workflows
 
-The maintained frontend now uses the consolidated Express API. Runtime services do not select mock business data. Synthetic modules remain only for isolated tests and demonstrations. The original three branches are not assumed to share contracts; adapters and tests reconcile their differences.
+The web interface uses the Express API for application behavior. Runtime services do not select mock business data. Separate synthetic fixtures support tests and local demonstrations.
 
-| Flow               | Integrated behavior                                                                                                                                                                                                                                          |
-| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Catalogue/detail   | SQL filters and pagination, canonical location/feature IDs, stable slugs, explicit language, actual seller ownership and short-lived media URLs.                                                                                                             |
-| French/English     | Preference cookie and provider agree with server reads, query keys, API content, validation, errors, page metadata and dashboard labels. Missing translations use the documented fallback metadata.                                                          |
-| Login/registration | Managed Auth, confirmation state, role normalization, safe redirects, memory-only access token, refresh cookie. No local-JWT alternate authority.                                                                                                            |
-| Authorization      | USER, active seller and ADMIN workspaces, plus API role/ownership checks. A navigation cookie is never treated as authentication. Seller routes require an active seller identity; ADMIN has its own workspace and does not implicitly impersonate a seller. |
-| Seller onboarding  | User application, pending state, administrator activation and refreshed database authority.                                                                                                                                                                  |
-| Profile            | Exact-language biography/specialization, canonical city, separate explicitly public contact email, conflict detection and unsaved-edit handling.                                                                                                             |
-| Listings           | Canonical location/amenities, explicit currency/period, debounced draft persistence, exact-language editing, optimistic row versions and validated publication.                                                                                              |
-| Images             | Validated upload, ownership/reference checks, signed display, safe detachment and protected deletion.                                                                                                                                                        |
-| Favorites          | Server-owned by the authenticated account; reload/cross-device persistence, optimistic rollback and errors. Anonymous visitors are asked to sign in.                                                                                                         |
-| Viewings           | Buyer request/history, seller appointment workflow, transactional history/notifications and bounded analytics.                                                                                                                                               |
-| Failures           | Missing resources map to 404; network/provider failures produce visible retryable errors. Favorite batch reads ignore only true 404s.                                                                                                                        |
+## Supported journeys
 
-Compatibility changes are intentional: frontend `DEVELOPER` maps to database `PROPERTY_DEVELOPER`; category casing is adapted; listing DTOs carry `currencyCode`, `rentPeriod`, `priceDecimal`, localization metadata and canonical IDs. Listing updates use `rowVersion`, profile edits use `expectedUpdatedAt`. Notification mark-all-read returns `{updatedCount}` instead of an unbounded ID array. There is no silent direct-Supabase table integration path.
+| Journey | Behavior |
+| --- | --- |
+| Property discovery | Bounded SQL search, filters and pagination; canonical locations/features; stable slugs; localized details and seller information |
+| French and English | Persistent interface selection, explicit content requests, fallback metadata, translated validation/errors and exact-language editing |
+| Accounts | Managed registration, confirmation, sign-in, recovery, refresh and revocation |
+| Permissions | User, active-seller and administrator workspaces backed by API/database checks; administrators do not automatically impersonate sellers |
+| Seller applications | Users apply, administrators activate approved profiles, and refreshed database authority controls access |
+| Seller profiles | Localized biography/specialization, canonical city, explicit public contact email and concurrent-edit detection |
+| Listings | Draft autosave, canonical references, explicit monetary terms, row versions, translations and validated publication |
+| Images | Decoded/re-encoded uploads, verified ownership, signed display and protected attachment/deletion |
+| Favorites | Account-based persistence with optimistic updates, rollback and visible failures |
+| Viewings | Buyer requests/history, seller scheduling workflows, transactional history/notifications and bounded analytics |
+| Failures | Missing resources return 404; service outages remain visible retryable failures rather than empty results |
 
-Public contact email is separate from the private account email and must be explicitly entered by the owner. Legacy profiles and records lacking verified Auth mapping require the reviewed operator link procedure. New registration does not assume that matching an old email proves ownership.
+## Compatibility conventions
 
-Original seeds and production facts are preserved. Metadata correction or French content backfill is a distinct reviewed data operation, using a private manifest and optimistic preconditions. No original record was rewritten to make a test pass. Fixture price, location and translations are synthetic and never replace the Burkina seed files.
+The interface role `DEVELOPER` maps to database `PROPERTY_DEVELOPER`; explanatory prose uses seller. Categories normalize supported casing. Listing responses include canonical IDs, `currencyCode`, `rentPeriod`, `priceDecimal` and localization metadata. Listing edits use `rowVersion`, while profile edits use `expectedUpdatedAt`. Mark-all-read notifications return `{updatedCount}` rather than an unbounded list of IDs.
 
-[TESTING.md](TESTING.md) records executed checks and limitations. Native Postgres, managed provider, deployment and restore gates are distinguished from local fixture verification in [DEPLOYMENT.md](DEPLOYMENT.md).
+Browser requests use `/api/v1` on the web origin. The application does not silently switch to direct Supabase table queries or a second password/JWT authority.
+
+## Existing records
+
+Public business email is separate from account email and is entered explicitly by the seller. Existing accounts require reviewed Auth identity mapping; matching an unverified email is insufficient proof of ownership.
+
+Original seeds, prices, descriptions and media references remain preserved. Language classification, translations and monetary metadata are reviewed data operations with private manifests and original-value preconditions. Synthetic fixture values do not replace Burkina Faso seed data.
+
+## Acceptance
+
+[Testing](TESTING.md) records automated evidence and fixture boundaries. [Deployment](DEPLOYMENT.md) covers actual provider behavior, database adoption, recovery and production acceptance. A passing integrated fixture does not establish that the corresponding live services are provisioned.

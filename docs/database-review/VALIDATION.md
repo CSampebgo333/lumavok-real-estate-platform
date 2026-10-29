@@ -1,3 +1,5 @@
+> **Historical record — initial database review.** The results and design below apply to the reviewed candidate, not the current release. Current guidance is indexed in [Documentation](../README.md), with verification in [Testing](../TESTING.md).
+
 # Validation and integration results
 
 Historical review record. For current tests and the optional adoption route that does not require the unavailable historical SQL files, see [TESTING.md](../TESTING.md) and [BASELINE_AND_FREE_RESTORE.md](../BASELINE_AND_FREE_RESTORE.md). The results below retain their original scope and date.

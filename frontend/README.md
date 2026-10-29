@@ -1,9 +1,27 @@
-# Lumavok frontend
+# Web interface
 
-Next.js App Router and TypeScript interface. Start with the [root setup instructions](../README.md), [API contract](../docs/API_CONTRACT.md), [architecture](../docs/ARCHITECTURE.md) and [tests](../docs/TESTING.md).
+The Lumavok web interface uses Next.js App Router, React and TypeScript. Users browse properties in French or English, manage their accounts and access workspaces appropriate to their roles. Browser API requests use the same-origin `/api/v1` path.
 
-Run `npm run dev` locally; `BACKEND_API_URL` supplies the private API origin and defaults to `http://localhost:4000`. Browsers always call `/api/v1`. `npm run build` uses the supported webpack production builder. `npm run typecheck`, `npm run lint`, `npm run format:check`, `npm test` and `npm run e2e` are the local checks. Root scripts install dependencies and generate the backend client in the correct order.
+## Local development
 
-French is the default. Interface resources are under `public/locales/en` and `fr`; database content is localized through explicit `lang` requests and translation rows. Never store credentials in public variables or browser persistence. Access tokens live in memory and private query caches clear when accounts or authority change. See root documentation for deployment, CSP, private media and Auth behavior.
+Contributors start with the [root setup instructions](../README.md). `BACKEND_API_URL` supplies the server-side API target and defaults to `http://localhost:4000`. The disposable fixture uses `http://127.0.0.1:4100`.
 
-`AGENTS.md` applies to frontend changes: consult this installed Next version's bundled documentation before changing framework integrations.
+From `frontend/`, the main commands are:
+
+| Command                | Purpose                                             |
+| ---------------------- | --------------------------------------------------- |
+| `npm run dev`          | Start the development interface                     |
+| `npm run typecheck`    | Check TypeScript                                    |
+| `npm run lint`         | Run ESLint                                          |
+| `npm run format:check` | Check formatting                                    |
+| `npm test`             | Run unit and component tests                        |
+| `npm run build`        | Build with the supported webpack production builder |
+| `npm run e2e`          | Run browser journeys against the disposable fixture |
+
+## Language and account state
+
+French is the default. Interface resources live under `public/locales/en/` and `public/locales/fr/`; database content follows explicit `lang` requests. A persistent language preference connects server rendering, client queries and translated labels.
+
+Access tokens stay in memory, and private query caches clear when the account or its authority changes. Navigation guards improve the user journey; the API and database enforce permission checks. Privileged credentials never belong in public variables or browser persistence.
+
+[Architecture](../docs/ARCHITECTURE.md), [API contracts](../docs/API_CONTRACT.md) and [Testing](../docs/TESTING.md) provide the shared reference. [Remaining work](TODO.md) identifies frontend follow-up. Frontend changes follow the installed Next.js guidance in `AGENTS.md`.

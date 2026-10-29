@@ -1,32 +1,44 @@
-# Lumavok Real Estate Platform
+# Lumavok
 
 [![CI](https://github.com/CSampebgo333/lumavok-real-estate-platform/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/CSampebgo333/lumavok-real-estate-platform/actions/workflows/ci.yml)
 
-Lumavok supports property discovery and seller management in Burkina Faso in French and English. Users browse listings, save properties and request viewings. Agents manage their profiles, translations, listings, photos and appointments. Administrators review seller applications.
+Lumavok is a real estate platform for Burkina Faso, available in French and English. Users browse properties, save listings and request viewings. Sellers manage their business profiles, listings, photos and appointments. Administrators review seller applications.
 
-This repository is the application’s single source of truth. **Production deployment remains blocked pending a verified backup/restore, migration adoption and real-provider acceptance checks.** Existing test reports describe their recorded revisions; [the independent review](docs/INDEPENDENT_REVIEW.md) records the current work and its verification limits.
+The repository contains the frontend, API and database implementation. The application has passed automated integration, browser and container checks. Production release still requires an actual backup and restore rehearsal, reviewed database adoption, and acceptance checks against the intended Auth, Storage and hosting services. [Testing](docs/TESTING.md) records the verified revisions and the limits of that evidence.
 
-## Architecture and capabilities
+## Application overview
 
-The Next.js App Router frontend sends browser requests to the same-origin `/api/v1` proxy. The Express API validates inputs, verifies Supabase Auth sessions, establishes request-scoped database identity and queries PostgreSQL through Prisma. Supabase Storage holds private property images; the API validates image bytes and ownership and returns short-lived signed URLs.
+- Property and seller catalogues with search, filters, pagination and detail pages.
+- Account registration, email confirmation, sign-in, recovery and session revocation through Supabase Auth.
+- Account-based favorites and viewing history.
+- Seller applications, administrator approval, profile translations and listing management.
+- Listing drafts, validated publication, explicit currencies and rental billing periods.
+- Private image uploads, ownership checks and protected attachment/deletion workflows.
+- French and English interface text, localized property content and persistent language selection.
 
-The application supports public property and agency pages, canonical locations and amenities, account favorites and viewing history, seller applications and approval, listing drafts and publication, profile translations, notifications and analytics. Loading, empty, validation and failure states form part of these journeys.
+## Architecture
 
-| Path | Responsibility |
+Next.js serves the web interface and forwards browser requests from `/api/v1` to the Express API. The API validates requests, verifies Supabase Auth sessions and loads application permissions from PostgreSQL. Prisma queries run with transaction-local identity on a restricted database connection. Supabase Storage holds private images, which the API serves through short-lived signed URLs.
+
+| Path | Contents |
 | --- | --- |
-| `frontend/` | Next.js pages, components, hooks, services, interface dictionaries, unit and browser tests |
-| `backend/` | Express API, Auth and Storage bridges, scoped Prisma queries and integration fixtures |
-| `database/` | Canonical Prisma schema, additive SQL migrations, preserved Burkina Faso seeds and guarded operations |
-| `scripts/` | Lockfile installation, verification orchestration, fixture startup and secret scanning |
-| `docs/` | Architecture, API contracts, database adoption, deployment and dated review evidence |
-| `infrastructure/` | Environment examples, Compose support, Nginx example and release tooling |
-| `.github/workflows/` | Quality, database, browser, container and manually gated release/deploy workflows |
+| `frontend/` | Next.js pages, React components, translations, API clients and browser tests |
+| `backend/` | Express routes, validation, authentication, authorization and service integration |
+| `database/` | Prisma schema, SQL migrations, original seeds, operations and database tests |
+| `scripts/` | Installation, verification, fixture startup and secret scanning |
+| `docs/` | Team guides, architecture, API contracts, operations and dated records |
+| `infrastructure/` | Container deployment, environment examples and reverse-proxy configuration |
+| `.github/` | CI workflows, release gates and contribution templates |
 
-SQL migrations are authoritative for RLS, grants, constraints, triggers and partial indexes. Prisma describes application models. Historical database designs, migration assets and source provenance remain in their existing paths; [ORIGINS.md](docs/consolidation/ORIGINS.md) explains their purpose. The current structure already separates application, database, tooling and documentation responsibilities; the database package now sits directly under `database/`, with all schema, migration, seed, test and operation files immediately accessible. The redundant wrapper README was consolidated into `database/README.md`. Scripts, Prisma generation, Docker paths, CI and documentation follow the flattened layout. Historical branch inventories and original-source links retain their recorded paths.
+The database implementation sits directly inside `database/`; the earlier wrapper directory has been removed. SQL migrations define the access rules, constraints, triggers and indexes that Prisma cannot fully express. [Architecture](docs/ARCHITECTURE.md) explains these boundaries.
 
-## Prerequisites and clean installation
+## Requirements
 
-Contributors use Node **24**, npm **11** and Git. Real service integration requires Supabase PostgreSQL 17, Auth and a private Storage bucket. Native database tests require an explicitly disposable loopback PostgreSQL 17 instance with matching client tools. Container checks require Docker Engine and Compose v2.
+Contributors use Node **24**, npm **11** and Git. Native database tests require an isolated PostgreSQL 17 instance and matching client tools. Browser tests require compatible Chromium binaries. Container checks require Docker Engine and Compose v2.
+
+A connected environment also requires Supabase PostgreSQL, Auth and a private Storage bucket. Supabase remains on the Free plan; local development and database rehearsals do not require a paid project.
+
+## Install
 
 ```bash
 git clone https://github.com/CSampebgo333/lumavok-real-estate-platform.git
@@ -34,86 +46,77 @@ cd lumavok-real-estate-platform
 npm run setup
 ```
 
-Setup installs the three committed lockfiles and generates the backend Prisma client without connecting to a database. Each package retains its existing lockfile; contributors avoid mixing package managers.
+Setup installs dependencies from the three package lockfiles and generates the backend Prisma client. It does not connect to a database or apply migrations.
 
-## Local execution with synthetic data
+## Run locally with demonstration data
 
-Contributors can run the real API and frontend against an isolated in-memory PostgreSQL fixture without cloud credentials:
+The disposable fixture runs the real API, Prisma queries and database rules against synthetic records. Auth responses, email delivery and Storage transport are simulated.
 
 ```bash
 # Terminal 1
 npm run dev:fixture
 
-# Terminal 2; frontend listens on http://localhost:3000
+# Terminal 2
 BACKEND_API_URL=http://127.0.0.1:4100 npm run dev:web
 ```
 
-On PowerShell, the second terminal uses `$env:BACKEND_API_URL="http://127.0.0.1:4100"` followed by `npm run dev:web`.
+The frontend opens at `http://localhost:3000`. On PowerShell, contributors set `$env:BACKEND_API_URL="http://127.0.0.1:4100"` before running `npm run dev:web`.
 
-Fixture accounts include `seller@example.test`, `buyer@example.test`, `admin@example.test` and `applicant@example.test`, with password `FixturePassword123!`. These public demonstration credentials authorize only synthetic, disposable fixture records. The fixture exercises Express, Prisma, SQL migrations and RLS, while simulating Auth responses, email delivery and Storage transport. Data disappears when the fixture process ends. It is a local test environment, not a production backup restoration or a durable shared preview.
+Fixture accounts include `seller@example.test`, `buyer@example.test`, `admin@example.test` and `applicant@example.test`. Their shared password is `FixturePassword123!`. These are public test credentials for disposable synthetic data. The fixture loses its records when its process ends and is excluded from the production API image.
 
-## Environment and dedicated development services
+## Connect development services
 
-Contributors copy `backend/.env.example` to `backend/.env` and `frontend/.env.example` to `frontend/.env.local`, then inject service configuration through a secret manager or private local environment.
+Contributors copy `backend/.env.example` to `backend/.env` and `frontend/.env.example` to `frontend/.env.local`. Real values stay in private local configuration or a secret manager.
 
-| Environment | Required configuration |
+| Component | Main configuration |
 | --- | --- |
-| Frontend server | `BACKEND_API_URL`; approved `TERMS_URL` and `PRIVACY_URL` for registration |
-| API runtime | `DATABASE_URL`, `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `CORS_ORIGIN`, `AUTH_REDIRECT_URL`; server-only `SUPABASE_STORAGE_KEY` for uploads |
-| API operational settings | `PORT`, `NODE_ENV`, `AUTH_COOKIE_NAME`, refresh-token lifetime, verified `TRUST_PROXY_HOPS`, `CONTENT_READ_MODE` |
-| Separate migration process | Administrative `DIRECT_URL` and the reviewed baseline, backup, restoration and target approval references |
+| Frontend server | `BACKEND_API_URL`, approved `TERMS_URL` and `PRIVACY_URL` |
+| API | `DATABASE_URL`, `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `CORS_ORIGIN`, `AUTH_REDIRECT_URL` and server-only `SUPABASE_STORAGE_KEY` |
+| Separate migration process | Administrative `DIRECT_URL`, reviewed baseline and approval/backup/restore references |
 
-The runtime database login inherits only `lumavok_runtime`; startup rejects ownership, superuser, `BYPASSRLS`, elevated membership and role-switching sessions. Migration credentials remain outside the runtime. Production configuration requires HTTPS and a Storage credential. No privileged value belongs in `NEXT_PUBLIC_*`, browser bundles, logs, documentation or Git.
+The runtime database login inherits only `lumavok_runtime` and owns no application tables. The API rejects elevated connections and production migration credentials. Browser bundles receive no database URL or privileged Supabase key.
 
-After isolated service provisioning and the reviewed database setup, contributors start `npm run dev:api` and `npm run dev:web` in separate terminals. Browsers use the frontend origin; the API origin remains a server-side proxy target.
+[Deployment](docs/DEPLOYMENT.md) describes the complete configuration and database preparation. After the dedicated development services are configured, `npm run dev:api` and `npm run dev:web` start the two application processes.
 
-## Database setup and preservation
+## Database workflow
 
-Operators select the fresh-database or existing-database workflow in [DEPLOYMENT.md](docs/DEPLOYMENT.md). The original August migration SQL is unavailable; [BASELINE_AND_FREE_RESTORE.md](docs/BASELINE_AND_FREE_RESTORE.md) documents verified adoption without fabricated history. Its schema checkpoint does **not** replace a full backup of records, Auth, roles, provider settings and Storage objects.
+The original Burkina Faso seed files remain unchanged. They belong to the earlier schema and are not a supported way to populate an expanded or shared database. Current development uses the separate disposable fixtures.
 
-Original Burkina Faso seed files remain byte-for-byte preserved. They are historical, pre-expansion assets and are unsuitable for an expanded/shared database. New test records belong in separate disposable fixtures. Applied migrations and migration-history records remain unchanged; justified schema changes use reviewed additive migrations tested in isolated environments. Shared database resets and `prisma db push` are prohibited.
+Existing databases follow the [baseline adoption and restore procedure](docs/BASELINE_AND_FREE_RESTORE.md). The two unavailable August migration files are never reconstructed. Operators can recover their exact originals or use the reviewed adoption workflow while preserving recorded history. New databases use the separate guarded fresh-schema path. Applied migrations are never rewritten, and shared databases are never reset through development commands.
 
-Supabase remains on Free. A private manual export and local restore rehearsal can support recovery testing without a paid hosted project. Production migrations require separate explicit approval after a successful actual backup/restore rehearsal.
+A schema checkpoint is not a complete backup. Recovery also covers application records, Auth data, roles, configuration and Storage objects.
 
-## English and French behavior
+## French and English
 
-French is the default. Users select English or French; the language cookie persists for one year and local storage retains the browser preference. Server rendering reads the cookie, while client requests send an explicit `lang`. Query keys distinguish languages.
+French is the default. Users can switch to English; a cookie and browser storage retain their preference. Server rendering, API requests and query caches use the selected language consistently.
 
-Static interface copy belongs in the frontend dictionaries. Database content uses separate translation rows. Published content resolves in requested-language, configured-fallback, then source-language order; response metadata identifies fallback. Editors load the exact selected translation and never overwrite a fallback row as if it were authored in another language.
+Interface text lives in frontend dictionaries. Property text, feature names and seller biographies use database translation rows. Public content resolves from the requested language to the configured fallback, then to the verified source language. Responses identify fallback, while editors load only the selected translation.
 
-Identifiers, coordinates, amounts and dates remain language-independent. Presentation formats dates and currency according to the selected language. Sale amounts have no recurring period; rental amounts show their recorded day, week, month or year. Unknown historical currency or rental terms remain visibly unconfirmed rather than receiving invented business facts.
+Identifiers, coordinates, dates and monetary amounts remain language-independent. The interface formats their presentation. Rental prices show the recorded billing period; sale prices have no recurring period. Missing historical currency or rental terms remain unconfirmed until reviewed.
 
-## Verification
+## Verify changes
 
 ```bash
-npm run check          # secret scan, TypeScript, ESLint and frontend formatting
-npm test               # SQL/RLS, HTTP/Prisma and frontend regression tests
-npm run build          # backend compilation and Next.js production build
-npm run audit          # all three lockfiles, including development dependencies
-npm run test:e2e       # desktop browser workflows against the disposable fixture
+npm run check
+npm test
+npm run build
+npm run audit
+npm run test:e2e
 E2E_MOBILE=1 npm run test:e2e
 ```
 
-The browser runner requires a compatible Chromium installation. Contributors install it with `npm --prefix frontend exec -- playwright install --with-deps chromium` where the environment supports browser installation. Native PostgreSQL test flags, fixture boundaries, accessibility checks and CI jobs are documented in [TESTING.md](docs/TESTING.md). Unrun checks and failed prerequisites remain explicit in review reports.
+`check` runs the secret scan, TypeScript, ESLint and frontend formatting checks. Browser setup, native PostgreSQL requirements and CI evidence are documented in [Testing](docs/TESTING.md).
 
-## Security, deployment and known limitations
+## Release status
 
-The API verifies identity and ownership; navigation guards do not authorize database operations. SQL enforces actor-scoped RLS and protected fields. Storage credentials stay server-side, uploads are re-encoded, and attachment/deletion rules protect references. [SECURITY.md](SECURITY.md) describes remaining operational risks.
+The recorded live database has not adopted the integration migrations, and the private media bucket still requires provisioning. Actual backup recovery, managed Auth/Storage behavior, reviewed legacy content, approved legal policies, TLS/proxy configuration and rollback remain release gates.
 
-[DEPLOYMENT.md](docs/DEPLOYMENT.md) covers immutable container images, runtime secrets, TLS, proxy configuration, health checks, approved migrations and rollback. Application startup and deployment do not migrate databases automatically. Protected-branch review and required CI checks remain in force; production deployment and disruptive live policy changes require separate approval.
+A shared full-stack preview requires a compatible Node/container host and isolated demonstration services. The recorded preview attempt did not produce a working public URL. A static export cannot provide the protected API journeys.
 
-A full-stack shared preview requires a Node-compatible frontend/API host plus isolated database, Auth and Storage services. Sites Workers cannot directly host this Express/Prisma/PostgreSQL stack: their runtime lacks raw PostgreSQL TCP and is not a general Node server. A static export cannot provide the protected journeys. No public preview or production readiness is claimed without actual hosting and browser verification.
+Contributors work through branches and pull requests. Production migrations, disruptive access-policy changes and production deployment require separate approval. [Security](SECURITY.md), [Deployment](docs/DEPLOYMENT.md) and [Remaining work](TODO.md) define these responsibilities.
 
-The live Supabase schema has not adopted the repository’s integration migrations. Actual backup restoration, real Auth/email and private Storage acceptance, reviewed content curation, legal-policy URLs, hosted proxy/TLS behavior and production rollback remain release prerequisites. Synthetic fixture tests do not certify those services.
+## Team documentation
 
-## Further documentation
+The [documentation index](docs/README.md) identifies current guides, reference material and historical records. Contributors start with [Contributing](CONTRIBUTING.md) and the README for the component they maintain.
 
-- [Independent implementation review](docs/INDEPENDENT_REVIEW.md)
-- [Architecture and bilingual strategy](docs/ARCHITECTURE.md)
-- [Schema and access matrix](docs/SCHEMA.md)
-- [API contracts](docs/API_CONTRACT.md)
-- [Baseline adoption and free restore](docs/BASELINE_AND_FREE_RESTORE.md)
-- [Testing](docs/TESTING.md), [deployment](docs/DEPLOYMENT.md) and [contribution workflow](CONTRIBUTING.md)
-- [Earlier integration evidence](docs/INTEGRATION.md) and [source provenance](docs/consolidation/ORIGINS.md)
-
-The project retains the existing [MIT license](LICENSE), copyright Emmanuel Adoum.
+The project retains its existing [MIT license](LICENSE) and original source attribution.

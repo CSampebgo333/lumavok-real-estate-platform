@@ -1,27 +1,29 @@
-## Summary
+## Problem and resulting behavior
 
-What does this PR change?
+<!-- Contributors describe the concrete problem and the behavior after this change. -->
 
-## Changes
+## Scope
 
--
+<!-- Relevant application, database, configuration and documentation changes. -->
 
-## Screenshots / Videos
+## Verification
 
--
+<!-- Exact commands/results and the tested revision. Unrun checks and failures remain explicit. -->
 
-## Testing
+- Checks performed:
+- Results:
+- Unavailable prerequisites or unresolved failures:
 
-- [ ] Unit tests written and passing
-- [ ] Tested locally end to end
-- [ ] No regressions in related features
+## Data and compatibility
 
-## Checklist
+<!-- Migration, authorization, localization and record-preservation impact. Use “None” where applicable. -->
 
-- [ ] Code follows naming conventions
-- [ ] No `console.log` left in production code
-- [ ] No hardcoded secrets or API keys
-- [ ] `.env.example` updated if a new env var was added
-- [ ] `CHANGELOG.md` entry added if this is user-facing
+## Review checklist
 
-Closes BYTE-
+- [ ] Relevant guides and environment examples match the resulting behavior.
+- [ ] No credentials, private records, backups or production manifests are included.
+- [ ] French/English behavior is covered where affected.
+- [ ] Database and permission changes include preservation and denied-access checks where applicable.
+- [ ] Deployment requirements, operational approval and rollback impact are recorded where applicable.
+
+Related issue:

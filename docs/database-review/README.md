@@ -1,4 +1,4 @@
-> Historical evidence. The consolidated schema, access model and operations are documented in the root README and current `docs/` files. This document is retained for provenance, not as current setup instructions.
+> **Historical record — initial database review.** The results and design below apply to the reviewed candidate, not the current release. Current guidance is indexed in [Documentation](../README.md), with verification in [Testing](../TESTING.md).
 
 # Lumavok approved architecture implementation
 

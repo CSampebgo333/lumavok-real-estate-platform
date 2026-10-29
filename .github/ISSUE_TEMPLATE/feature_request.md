@@ -1,20 +1,22 @@
 ---
 name: Feature request
-about: Propose a new feature or enhancement
+about: Propose a capability with a clear user need and acceptance criteria
 title: "[FEAT] "
-labels: [feature, v2-backlog]
+labels: [feature]
 assignees: []
 ---
 
-## Problem Statement
+## User need
 
-What problem does this solve?
+<!-- Requesters identify the affected users and the problem they need to solve. -->
 
-## Proposed Solution
+## Proposed behavior
 
-## Acceptance Criteria
+## Acceptance criteria
 
 - [ ]
 - [ ]
 
-## Notes
+## Dependencies and constraints
+
+<!-- Relevant data, authorization, language, operational or cost considerations. -->

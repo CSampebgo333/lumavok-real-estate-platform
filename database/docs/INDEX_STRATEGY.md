@@ -1,4 +1,4 @@
-> Historical evidence. The consolidated schema, access model and operations are documented in the root README and current `docs/` files. This document is retained for provenance, not as current setup instructions.
+> **Historical reference — June 2026 design.** The text, examples and benchmark claims below are retained for provenance. They do not establish current schema or measured production capacity. Current behavior is defined in [Database schema](../../docs/SCHEMA.md), [Architecture](../../docs/ARCHITECTURE.md) and [Testing](../../docs/TESTING.md).
 
 # Index Strategy
 

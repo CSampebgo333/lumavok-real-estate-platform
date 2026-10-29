@@ -1,7 +1,7 @@
 {
   "name": "@lumavok/backend",
   "version": "1.0.0",
-  "description": "Backend API service for the Lumavok Real Estate Platform",
+  "description": "Lumavok API for property, account and seller workflows",
   "main": "dist/server.js",
   "type": "module",
   "scripts": {

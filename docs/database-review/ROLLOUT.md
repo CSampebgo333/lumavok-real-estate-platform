@@ -1,3 +1,5 @@
+> **Historical record — initial database review.** The results and design below apply to the reviewed candidate, not the current release. Current guidance is indexed in [Documentation](../README.md), with verification in [Testing](../TESTING.md).
+
 # Approved architecture: controlled rollout
 
 No commands in this document have been run against the shared project. The target is Lumavok / real-estate, project `haxzufwizwqfrqzzzmsa`; do not use the unrelated Maison project exposed by a different connector scope.

@@ -1,3 +1,5 @@
+> **Historical record — consolidation review.** Branches, observations and decisions below belong to the reviewed source. Current instructions are indexed in [Documentation](README.md); [Operations status](OPERATIONS_STATUS.md) summarizes the last recorded service checks.
+
 # Audit and consolidation decisions
 
 Audit evidence combines the initial read-only Supabase inspection (26 October 2026), independently inspected Git branches, source reproduction, disposable SQL/HTTP tests and browser verification. A dated snapshot is not a claim about the current live service. No production records or private backup are included here.
