@@ -84,7 +84,7 @@ test(
       await source.query(`INSERT INTO public."user"(id,email,password_hash,role) VALUES('fixture-owner','fixture@example.test','unusable-fixture','PROPERTY_DEVELOPER');
       INSERT INTO public.city(id,name)VALUES('fixture-city','Ouagadougou');
       INSERT INTO public.district(id,city_id,name)VALUES('fixture-district','fixture-city','Zone du Bois');
-      INSERT INTO public.property_developer(id,user_id,whatsapp_number,phone_number,profile_image_url,profile_image_public_id,city,updated_at,slug)VALUES('fixture-developer','fixture-owner','','','','','Ouagadougou',now(),'fixture-developer');
+      INSERT INTO public.property_developer(id,user_id,whatsapp_number,phone_number,profile_image_url,profile_image_public_id,city,updated_at)VALUES('fixture-developer','fixture-owner','','','','','Ouagadougou',now());
       INSERT INTO public.property(id,property_developer_id,title,slug,description,category,listing_type,price,address,city_id,district_id,updated_at)VALUES('fixture-property','fixture-developer','Maison à Ouagadougou','fixture-property','Description française conservée','HOUSE','RENT',125000,'Fixture address','fixture-city','fixture-district',now());`);
       const beforeHistory = (
         await source.query(
@@ -169,6 +169,15 @@ test(
       assert.equal(drift.status, 1);
       assert.match(drift.stderr, /drift/);
       await restored.query("DROP INDEX fixture_drift"); // This object was created by this disposable test.
+      await restored.query(
+        "CREATE POLICY fixture_policy_drift ON public.property FOR SELECT USING(false)",
+      );
+      const policyDrift = run();
+      assert.equal(policyDrift.status, 1);
+      assert.match(policyDrift.stderr, /drift/);
+      await restored.query(
+        "DROP POLICY fixture_policy_drift ON public.property",
+      );
       const deployment = run(true);
       assert.equal(deployment.status, 0, deployment.stderr);
       assert.deepEqual((await restored.query(legacyQuery)).rows, beforeData);

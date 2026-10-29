@@ -144,6 +144,7 @@ async function capture(client, connectionString, dump = dumpSchema) {
   const target = endpoint(connectionString);
   await client.query("BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY");
   try {
+    await client.query("SET LOCAL search_path=pg_catalog");
     const version = Number(
       (await client.query("SHOW server_version_num")).rows[0]
         .server_version_num,
