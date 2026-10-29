@@ -18,3 +18,5 @@ test-results/
 supabase/.temp/
 database-details.txt
 database/full-database-design/operations/reviewed-content-manifest.json
+*.baseline.json
+private-backups/

@@ -58,6 +58,12 @@ The keyboard correction on `dabf47f9e744b7d52acbdcfa2d7188243de4069f` passed all
 
 On 29 October, the active branch ruleset was read back through GitHub's API. Required-reviewer, main-only branch and no-bypass controls were saved and verified for all three environments, and each enable flag was explicitly set to `false`. No deployment was triggered to test the gates. Read-only Supabase SQL reconfirmed historical migration checksums and the absence of another migration SQL store. The existing-project preflight failed as intended on the first missing historical file. All six database tests passed, including byte-for-byte Burkina seed preservation and the missing-history and production-seeding guards. The secret scan passed across 558 first-party text files, and `git diff --check` passed. [OPERATIONS_STATUS.md](OPERATIONS_STATUS.md) records the recovery searches and the free-plan staging/backup blockers; none is reported as a successful managed restore.
 
+## Baseline adoption and free restore workflow
+
+The owner chose to continue without fabricated historical SQL or a Pro upgrade. The new adoption guards passed all 11 local database tests, covering audited checksums, unresolved/duplicate history, migration order, schema/history/role drift, target binding, reviewed artifact hashes, private file handling, approval guards and unchanged Burkina seeds. The production connection was not used.
+
+The required native PostgreSQL job now also runs a real `pg_dump`/`psql` restore of synthetic legacy records, checks the restored schema/history, and applies the subsequent migrations using the pinned Prisma CLI while the two historical files remain absent. It verifies record/history preservation, rejection of drift and an idempotent no-op after a reviewed post-change checkpoint. CI supplies matching PostgreSQL client tools from its disposable service; results are recorded in the PR's required CI run. This is not a backup/restore of Lumavok production or a managed Auth/Storage acceptance test. See [BASELINE_AND_FREE_RESTORE.md](BASELINE_AND_FREE_RESTORE.md).
+
 ## Limits
 
 Local browser download from the usual Playwright CDN was unavailable. Local runs use an isolated Chromium executable supplied through `PLAYWRIGHT_BROWSER_CONFIG`; web security and CSP remain enabled. CI installs the Playwright-supported Chromium and runs desktop/mobile independently. The optional executable override is for local tooling, not part of the production runtime.

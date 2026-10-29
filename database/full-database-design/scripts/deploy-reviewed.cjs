@@ -1,79 +1,79 @@
-// Read-only by default. Never bypass the missing-history gate.
-const fs = require("node:fs");
+// Read-only by default. Known missing history requires explicit, reviewed adoption.
 const path = require("node:path");
-const crypto = require("node:crypto");
 const { spawnSync } = require("node:child_process");
-const root = path.resolve(__dirname, "..");
-const expected = {
-  "20260629000000_init":
-    "6463d2eaa9074e955a7af437959f164a8f77c968d54c0459339fd3e97acb580a",
-  "20260831000001_expand_enums":
-    "d65a7b8abef1ec0a04c18da2dccaabd8e1c0d9b9f8d29a3e21c28d20f64c89e5",
-  "20260831000002_add_tables_and_columns":
-    "768cd85a9e674e8f2dd50568b26e8433e64e2eacb8320e46335422d913eee2a5",
-};
+const { Client } = require("pg");
+const {
+  root,
+  ReviewError,
+  localMigrations,
+  requireOriginalFiles,
+  validateHistory,
+} = require("./migration-audit.cjs");
+const {
+  endpoint,
+  capture,
+  compare,
+  readApprovedBaseline,
+} = require("./application-baseline.cjs");
+
 async function main() {
-  for (const [name, checksum] of Object.entries(expected)) {
-    const file = path.join(root, "migrations", name, "migration.sql");
-    if (!fs.existsSync(file))
-      throw new Error(
-        "Missing audited migration: " +
-          name +
-          ". Recover the original file; do not invent a matching history entry.",
-      );
-    if (
-      crypto
-        .createHash("sha256")
-        .update(fs.readFileSync(file))
-        .digest("hex") !== checksum
-    )
-      throw new Error("Migration checksum mismatch: " + name);
-  }
-  if (!process.env.DIRECT_URL)
-    throw new Error(
-      "DIRECT_URL must be supplied through the secure deployment environment.",
+  if (process.argv.slice(2).some((arg) => arg !== "--apply"))
+    throw new ReviewError(
+      "Unknown deployment argument. Use the documented secure environment variables.",
     );
-  const { Client } = require("pg"),
-    client = new Client({ connectionString: process.env.DIRECT_URL });
-  await client.connect();
+  const files = localMigrations();
+  const adopting = Boolean(process.env.LUMAVOK_BASELINE_FILE);
+  const approved = adopting ? readApprovedBaseline() : null;
+  if (!adopting) requireOriginalFiles(files);
+  endpoint(process.env.DIRECT_URL);
+  const apply = process.argv.includes("--apply");
+  if (
+    apply &&
+    (!process.env.LUMAVOK_DATABASE_APPROVAL ||
+      !process.env.LUMAVOK_RESTORE_TEST_REFERENCE ||
+      !process.env.LUMAVOK_BACKUP_REFERENCE ||
+      !process.env.LUMAVOK_TARGET_PROJECT ||
+      (adopting && !process.env.LUMAVOK_BASELINE_APPROVAL))
+  )
+    throw new ReviewError(
+      "Deployment requires explicit database approval, backup, restore-test and target references; adoption also requires baseline approval.",
+    );
+  if (process.env.PRISMA_SCHEMA_DISABLE_ADVISORY_LOCK)
+    throw new ReviewError("Do not disable Prisma migration locking.");
+  const client = new Client({
+    connectionString: process.env.DIRECT_URL,
+    connectionTimeoutMillis: 15000,
+  });
+  let pending;
   try {
-    const result = await client.query(
-      "SELECT migration_name,checksum FROM public._prisma_migrations WHERE finished_at IS NOT NULL AND rolled_back_at IS NULL",
-    );
-    for (const row of result.rows) {
-      const file = path.join(
-        root,
-        "migrations",
-        row.migration_name,
-        "migration.sql",
+    await client.connect();
+    if (approved) {
+      const actual = await capture(client, process.env.DIRECT_URL);
+      compare(approved, actual);
+      pending = validateHistory(actual.history, files, true);
+      console.log(
+        "Reviewed application baseline and exact historical checksums verified; original history remains unchanged.",
       );
-      if (
-        !fs.existsSync(file) ||
-        crypto
-          .createHash("sha256")
-          .update(fs.readFileSync(file))
-          .digest("hex") !== row.checksum
-      )
-        throw new Error(
-          "Database migration history cannot be replayed: " +
-            row.migration_name,
-        );
+    } else {
+      const { rows } = await client.query(`SELECT migration_name,checksum,
+        finished_at IS NOT NULL AS applied,rolled_back_at IS NOT NULL AS rolled_back
+        FROM public._prisma_migrations ORDER BY migration_name,checksum,id`);
+      pending = validateHistory(rows, files);
+      console.log("Historical migration checksums verified.");
     }
-    console.log("Historical migration checksums verified.");
   } finally {
     await client.end();
   }
-  if (!process.argv.includes("--apply")) {
-    console.log("Read-only preflight completed. No migrations applied.");
+  if (!apply) {
+    console.log(
+      `Read-only preflight completed; ${pending.length} pending migration(s). Nothing applied.`,
+    );
     return;
   }
-  if (
-    !process.env.LUMAVOK_DATABASE_APPROVAL ||
-    !process.env.LUMAVOK_RESTORE_TEST_REFERENCE
-  )
-    throw new Error(
-      "Deployment requires the database approval and restore-test references in the secure deployment environment.",
-    );
+  if (!pending.length) {
+    console.log("No pending migrations. Nothing changed.");
+    return;
+  }
   const result = spawnSync(
     process.execPath,
     [
@@ -83,12 +83,29 @@ async function main() {
       "--schema",
       path.join(root, "schema.prisma"),
     ],
-    { cwd: root, stdio: "inherit", env: process.env },
+    {
+      cwd: root,
+      encoding: "utf8",
+      maxBuffer: 4 * 1024 * 1024,
+      env: { ...process.env, DATABASE_URL: process.env.DIRECT_URL },
+    },
   );
-  if (result.status !== 0)
-    throw new Error("Migration deployment did not complete.");
+  // CLI errors can contain SQL or connection details. Never send them to shared logs.
+  if (result.error || result.status !== 0) {
+    const code = String(result.stderr || "").match(/\bP\d{4}\b/)?.[0];
+    throw new ReviewError(
+      `Migration deployment did not complete${code ? ` (${code})` : ""}. Inspect migration status through the secure operator environment; do not retry or reset blindly.`,
+    );
+  }
+  console.log(
+    "Pending migrations applied by Prisma. Retain the pre-change baseline and capture a new reviewed checkpoint after validation.",
+  );
 }
 main().catch((error) => {
-  console.error(error.message);
+  console.error(
+    error instanceof ReviewError
+      ? error.message
+      : "Migration preflight failed. Check the private baseline and secure database connection; sensitive error details were not printed.",
+  );
   process.exitCode = 1;
 });
