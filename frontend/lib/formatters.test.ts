@@ -4,6 +4,8 @@ import { beforeEach, describe, expect, it } from "vitest";
 
 import {
   formatCompactNumber,
+  formatListingPrice,
+  formatRentPeriod,
   formatDate,
   formatDateTime,
   formatFullDate,
@@ -71,5 +73,55 @@ describe("formatRelativeTime", () => {
     expect(formatRelativeTime("2026-07-22T12:00:00.000Z", now)).toBe(
       "yesterday",
     );
+  });
+});
+
+describe("listing monetary terms", () => {
+  it.each([
+    ["DAY", "/day", "/jour"],
+    ["WEEK", "/week", "/semaine"],
+    ["MONTH", "/month", "/mois"],
+    ["YEAR", "/year", "/an"],
+  ])(
+    "localizes %s without changing the amount or currency",
+    (rentPeriod, en, fr) => {
+      const property = {
+        price: 175000,
+        currencyCode: "XOF",
+        listingType: "RENT" as const,
+        rentPeriod: rentPeriod as "DAY",
+      };
+      expect(formatListingPrice(property, "en")).toContain(en);
+      expect(formatListingPrice(property, "fr")).toContain(fr);
+      expect(formatListingPrice(property, "en")).toContain("175,000");
+    },
+  );
+  it("does not add a recurring period to a sale", () => {
+    expect(
+      formatListingPrice(
+        {
+          price: 42,
+          currencyCode: "EUR",
+          listingType: "SALE",
+          rentPeriod: "MONTH",
+        },
+        "en",
+      ),
+    ).toBe("€42");
+  });
+  it("does not invent missing legacy currency or rental terms", () => {
+    expect(
+      formatListingPrice(
+        {
+          price: 42,
+          currencyCode: null,
+          listingType: "RENT",
+          rentPeriod: null,
+        },
+        "en",
+      ),
+    ).toBe("42 (currency unconfirmed) (period unconfirmed)");
+    expect(formatRentPeriod(null, "fr")).toBe("(période à confirmer)");
+    expect(formatRentPeriod("UNKNOWN", "en")).toBe("(period unconfirmed)");
   });
 });

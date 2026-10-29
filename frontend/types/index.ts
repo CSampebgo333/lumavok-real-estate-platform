@@ -64,30 +64,13 @@ export interface Property {
   category: PropertyCategory;
   city: string;
   region: string;
-  /**
-   * A finer-grained subdivision within `city` (see `constants/locations.ts`'s
-   * `DISTRICTS`), mirroring the backend ER's `district`/`district_id`.
-   * Deliberately additive alongside `region`, not a replacement for it —
-   * `region` and `district` are not the same concept (region is
-   * Ghana-region-scale, district is a city-scoped subdivision) and the final
-   * terminology is still an open product/backend decision — see
-   * docs/PRODUCT_BACKEND_RECONCILIATION.md §6/§18. Optional because existing
-   * mock properties predate this field.
-   */
+  /** Canonical city-scoped district; legacy mock records may omit it. */
   district?: string;
   status: PropertyStatus;
   media: PropertyMedia[];
-  /**
-   * ISO 8601 last-updated timestamp. Optional because the public catalogue's
-   * list endpoint doesn't surface it; the developer's own dashboard listings do,
-   * which is what the Recent Listings widget orders by and displays.
-   */
+  /** ISO 8601 update time returned by the API; older fixtures may omit it. */
   updatedAt?: string;
-  /**
-   * Optional for the same reason as `updatedAt`: the public list endpoint
-   * doesn't surface them, but the Property Editor (Phase 6.3) reads and writes
-   * both on the developer's own listing record.
-   */
+  /** Detail fields are optional for compatibility with older mock records. */
   address?: string;
   amenities?: string[];
   /**

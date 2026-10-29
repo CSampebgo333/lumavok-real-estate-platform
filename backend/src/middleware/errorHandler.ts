@@ -77,10 +77,9 @@ export function errorHandler(
     };
 
     if (prismaErr.code === "P2002") {
-      const field = prismaErr.meta?.target?.[0] ?? "value";
       res.status(409).json({
         success: false,
-        message: `A record with this ${field} already exists.`,
+        message: "A conflicting record already exists.",
         code: "CONFLICT",
       });
       return;

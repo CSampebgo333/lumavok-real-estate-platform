@@ -30,13 +30,14 @@ import { isFeatureEnabled } from "@/constants/features";
 import { ROUTES } from "@/constants/routes";
 import { MOBILE_MEDIA_QUERY, useMediaQuery } from "@/hooks/useMediaQuery";
 import { getErrorMessage } from "@/lib/errors";
-import { formatPrice, formatRelativeTime } from "@/lib/formatters";
+import { formatListingPrice, formatRelativeTime } from "@/lib/formatters";
 import {
   canDeleteListing,
   getAvailableTransitions,
   isPubliclyVisible,
   type StatusTransition,
 } from "@/services";
+import { useContentLocale } from "@/hooks/useContentLocale";
 import type { Property } from "@/types";
 
 const COLUMN_COUNT = 7;
@@ -72,6 +73,7 @@ function SelectAllCheckbox({
   onChange: () => void;
 }) {
   const ui = useUi();
+
   return (
     <input
       type="checkbox"
@@ -98,6 +100,7 @@ function RowActions({
   disabled: boolean;
 }) {
   const ui = useUi();
+
   const canEdit = isFeatureEnabled("DASHBOARD_PROPERTY_EDITOR");
   const transitions = getAvailableTransitions(property.status);
   const deletable = canDeleteListing(property.status);
@@ -218,12 +221,13 @@ function ListingCards({
   pendingIds: Set<string>;
 }) {
   const ui = useUi();
+  const { language } = useContentLocale();
   return (
     <ul className="flex flex-col gap-2">
       {listings.map((property) => (
         <li
           key={property.id}
-          data-state={selectedIds.has(property.id) ? ui("selected") : undefined}
+          data-state={selectedIds.has(property.id) ? "selected" : undefined}
           className="border-border data-[state=selected]:bg-muted/50 flex gap-3 rounded-lg border p-3"
         >
           <Checkbox
@@ -261,11 +265,7 @@ function ListingCards({
             </span>
             <span className="flex flex-wrap items-center gap-x-2 text-sm">
               <span className="font-medium">
-                {formatPrice(
-                  property.price,
-                  property.currencyCode,
-                  property.requestedLanguage,
-                )}
+                {formatListingPrice(property, language)}
               </span>
               <span className="text-muted-foreground">
                 {property.listingType === "SALE"
@@ -320,6 +320,7 @@ export function ListingsTable({
   onClearFilters,
 }: ListingsTableProps) {
   const ui = useUi();
+  const { language } = useContentLocale();
   const isMobile = useMediaQuery(MOBILE_MEDIA_QUERY);
 
   if (isError) {
@@ -467,13 +468,7 @@ export function ListingsTable({
                 ? ui("For Sale")
                 : ui("For Rent")}
             </TableCell>
-            <TableCell>
-              {formatPrice(
-                property.price,
-                property.currencyCode,
-                property.requestedLanguage,
-              )}
-            </TableCell>
+            <TableCell>{formatListingPrice(property, language)}</TableCell>
             <TableCell>
               <PropertyStatusBadge status={property.status} />
             </TableCell>

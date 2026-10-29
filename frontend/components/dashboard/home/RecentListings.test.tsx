@@ -46,6 +46,27 @@ describe("RecentListings", () => {
     expect(screen.getByText("Draft")).toBeInTheDocument();
   });
 
+  it("preserves a listing's currency and recurring period", async () => {
+    getRecentListings.mockResolvedValue([
+      makeProperty({
+        title: "Weekly rental",
+        price: 200,
+        currencyCode: "EUR",
+        listingType: "RENT",
+        rentPeriod: "WEEK",
+      }),
+      makeProperty({
+        id: "legacy",
+        title: "Legacy listing",
+        price: 42,
+        currencyCode: null,
+      }),
+    ]);
+    renderWithQueryClient(<RecentListings />);
+    expect(await screen.findByText(/€200 \/week/)).toBeInTheDocument();
+    expect(screen.getByText(/42 \(currency unconfirmed\)/)).toBeInTheDocument();
+  });
+
   it("shows an empty state when there are no listings", async () => {
     getRecentListings.mockResolvedValue([]);
 

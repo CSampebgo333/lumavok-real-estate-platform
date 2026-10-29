@@ -1,3 +1,4 @@
+import i18n from "@/lib/i18n";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -81,6 +82,20 @@ describe("ListingsTable", () => {
     expect(screen.getByText("Draft")).toBeInTheDocument();
     expect(screen.getByText("Active")).toBeInTheDocument();
     expect(screen.getByText("Sold")).toBeInTheDocument();
+  });
+
+  it("includes the billing period in the desktop price", () => {
+    renderTable({
+      listings: [
+        makeProperty({
+          price: 175000,
+          currencyCode: "XOF",
+          listingType: "RENT",
+          rentPeriod: "MONTH",
+        }),
+      ],
+    });
+    expect(screen.getByText(/175,000.*\/month/)).toBeInTheDocument();
   });
 
   it("calls onToggleRow when a row checkbox is toggled", async () => {
@@ -248,6 +263,45 @@ describe("ListingsTable", () => {
   describe("below md (card presentation)", () => {
     let restore: () => void;
     afterEach(() => restore?.());
+
+    it("includes the billing period in the mobile price", () => {
+      restore = useMobileViewport();
+      renderTable({
+        listings: [
+          makeProperty({
+            price: 200,
+            currencyCode: "EUR",
+            listingType: "RENT",
+            rentPeriod: "WEEK",
+          }),
+        ],
+      });
+      expect(screen.getByText("€200 /week")).toBeInTheDocument();
+    });
+
+    it("keeps selection state neutral while formatting French rental terms", async () => {
+      restore = useMobileViewport();
+      await i18n.changeLanguage("fr");
+      renderTable({
+        listings: [
+          makeProperty({
+            id: "fr-rental",
+            title: "Location test",
+            price: 200,
+            currencyCode: "EUR",
+            listingType: "RENT",
+            rentPeriod: "WEEK",
+            requestedLanguage: "en",
+          }),
+        ],
+        selectedIds: new Set(["fr-rental"]),
+      });
+      expect(screen.getByRole("listitem")).toHaveAttribute(
+        "data-state",
+        "selected",
+      );
+      expect(screen.getByText(/200.*€.*\/semaine/)).toBeInTheDocument();
+    });
 
     it("renders cards instead of a table, each row's controls present exactly once", () => {
       restore = useMobileViewport();
