@@ -1,10 +1,4 @@
-# Replace these placeholders with the actual GitHub usernames before enabling branch protection.
-
-- @adoumouangnamouemmanuel
-
-/frontend/ @claudetomoh
-/backend/ @soaliyek
-/database/ @CSampebgo333
-/infrastructure/ @adoumouangnamouemmanuel
-/.github/ @adoumouangnamouemmanuel
-/docs/ @adoumouangnamouemmanuel
+# The repository currently has one owner and no collaborators with write access.
+# Add component owners only after their access is approved and accepted.
+# Independent approval remains a separate onboarding gate; see docs/OPERATIONS_STATUS.md.
+* @CSampebgo333
